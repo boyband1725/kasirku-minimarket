@@ -47,7 +47,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,3){
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
 fun pairedPrinters():List<BluetoothDevice>{val adapter=BluetoothAdapter.getDefaultAdapter()?:return emptyList();return try{adapter.bondedDevices?.toList()?:emptyList()}catch(e:SecurityException){emptyList()}}
-fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,Int>>,total:Long):String{
+fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,Int>>,total:Long,paymentMethod:String,paidAmount:Long,changeAmount:Long):String{
  var socket:BluetoothSocket?=null
  return try{
   socket=device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
@@ -69,6 +69,8 @@ fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,
   }
   send("--------------------------------\n")
   send("TOTAL: "+rupiah(total)+"\n")
+  send("Pembayaran: "+paymentMethod+"\n")
+  if(paymentMethod=="TUNAI"){send("Tunai: "+rupiah(paidAmount)+"\n");send("Kembali: "+rupiah(changeAmount)+"\n")}
   send("Terima kasih\n")
   send("\n\n\n")
   out.flush()
@@ -93,6 +95,8 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
  var showPrinters by remember{mutableStateOf(false)}
  var receiptLines by remember{mutableStateOf<List<Pair<Product,Int>>>(emptyList())}
  var receiptTotal by remember{mutableLongStateOf(0L)}
+ var receiptPayment by remember{mutableStateOf("TUNAI")};var receiptPaid by remember{mutableLongStateOf(0L)};var receiptChange by remember{mutableLongStateOf(0L)}
+ var showPayment by remember{mutableStateOf(false)};var paymentMethod by remember{mutableStateOf("TUNAI")};var cashInput by remember{mutableStateOf("")}
  val permissionLauncher=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){granted->if(granted){printerList=pairedPrinters();showPrinters=true}else note="Izin Bluetooth diperlukan untuk memilih printer"}
  val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga_modal,harga_jual,stok");products.forEach{p->w.appendLine(listOf(csvEscape(p.name),csvEscape(p.barcode),p.costPrice.toString(),p.price.toString(),p.stock.toString()).joinToString(","))}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}
  val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->BufferedReader(InputStreamReader(s)).lineSequence().drop(1).forEach{line->val a=parseCsvLine(line);if(a.size>=5)db.save(a[0].trim(),a[1].trim(),a[2].trim().toLongOrNull()?:0,a[3].trim().toLongOrNull()?:0,a[4].trim().toIntOrNull()?:0) else if(a.size>=4)db.save(a[0].trim(),a[1].trim(),0,a[2].trim().toLongOrNull()?:0,a[3].trim().toIntOrNull()?:0)}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}
@@ -106,13 +110,59 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
     Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
     LazyColumn(Modifier.weight(1f)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("${p.barcode} • Stok ${p.stock} • Modal ${money(p.costPrice)} • Jual ${money(p.price)}")},trailingContent={TextButton(onClick={if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"}){Text("+ Tambah")}})}}
     Text("Total: ${money(total)}",style=MaterialTheme.typography.headlineSmall)
-    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={val snapshot=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}};if(db.completeSale(cart,products)){receiptLines=snapshot;receiptTotal=total;cart=emptyMap();products=db.all();note="Transaksi tersimpan. Cetak struk di bawah."}else note="Transaksi gagal. Periksa stok."},modifier=Modifier.weight(1f)){Text("Bayar / Simpan")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
-    if(receiptLines.isNotEmpty()){Text("Printer: ${chosenPrinter?.name?: "Belum dipilih"}");Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)}else{printerList=pairedPrinters();showPrinters=true}}){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"KASIRKU MINIMARKET",receiptLines,receiptTotal)}){Text("Cetak struk")}}}
+    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},modifier=Modifier.weight(1f)){Text("Bayar")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
+    if(receiptLines.isNotEmpty()){Text("Printer: ${chosenPrinter?.name?: "Belum dipilih"}");Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)}else{printerList=pairedPrinters();showPrinters=true}}){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"KASIRKU MINIMARKET",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)}){Text("Cetak struk")}}}
    }
    1->{Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Manajemen barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Button(onClick={add=true}){Text("+ Barang")}};LazyColumn{items(products){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("Barcode ${p.barcode} • Modal ${money(p.costPrice)} • Jual ${money(p.price)} • Stok ${p.stock} • Laba/unit ${money(p.price-p.costPrice)}")})}}}
    else->{Text("Impor / Ekspor CSV",style=MaterialTheme.typography.titleLarge);Text("Format baru: nama,barcode,harga_modal,harga_jual,stok. Format lama 4 kolom juga didukung.");Button(onClick={export.launch("barang-kasirku.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor barang ke CSV")};OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor barang dari CSV")};Text("Data tersimpan di HP dan bekerja tanpa internet.")}
   }
  }
+}
+if(showPayment){
+ AlertDialog(
+  onDismissRequest={showPayment=false},
+  title={Text("Pembayaran")},
+  text={
+   Column(verticalArrangement=Arrangement.spacedBy(10.dp)){
+    Text("Total belanja: \${money(total)}",style=MaterialTheme.typography.titleMedium)
+    Text("Pilih metode pembayaran")
+    Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
+     RadioButton(selected=paymentMethod=="TUNAI",onClick={paymentMethod="TUNAI"})
+     Text("Tunai")
+     Spacer(Modifier.width(18.dp))
+     RadioButton(selected=paymentMethod=="QRIS",onClick={paymentMethod="QRIS"})
+     Text("QRIS")
+    }
+    if(paymentMethod=="TUNAI"){
+     OutlinedTextField(value=cashInput,onValueChange={cashInput=it.filter{ch->ch.isDigit()}},label={Text("Uang diterima (Rp)")},singleLine=true,modifier=Modifier.fillMaxWidth())
+     val paid=cashInput.toLongOrNull()?:0L
+     Text("Kembalian: \${money((paid-total).coerceAtLeast(0))}")
+     if(paid<total)Text("Uang diterima masih kurang",color=MaterialTheme.colorScheme.error)
+    }else{
+     Text("Minta pelanggan membayar melalui aplikasi bank/e-wallet ke QRIS toko. Setelah pembayaran masuk, konfirmasi di bawah.")
+     Text("Catatan: konfirmasi QRIS ini manual; aplikasi belum terhubung ke penyedia QRIS untuk verifikasi otomatis.")
+    }
+   }
+  },
+  confirmButton={
+   TextButton(onClick={
+    val paid=if(paymentMethod=="TUNAI")cashInput.toLongOrNull()?:0L else total
+    if(paid<total){note="Uang tunai kurang dari total belanja"}
+    else if(paymentMethod=="QRIS"){
+     receiptLines=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}}
+     if(db.completeSale(cart,products,"QRIS",total)){
+      receiptTotal=total;receiptPayment="QRIS";receiptPaid=total;receiptChange=0L;cart=emptyMap();products=db.all();showPayment=false;note="Pembayaran QRIS dikonfirmasi. Transaksi tersimpan."
+     }else note="Transaksi gagal. Periksa stok."
+    }else{
+     receiptLines=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}}
+     if(db.completeSale(cart,products,"TUNAI",paid)){
+      receiptTotal=total;receiptPayment="TUNAI";receiptPaid=paid;receiptChange=paid-total;cart=emptyMap();products=db.all();showPayment=false;note="Pembayaran tunai tersimpan. Kembalian \${money(paid-total)}."
+     }else note="Transaksi gagal. Periksa stok."
+    }
+   }){Text(if(paymentMethod=="QRIS")"Konfirmasi QRIS diterima" else "Simpan pembayaran")}
+  },
+  dismissButton={TextButton(onClick={showPayment=false}){Text("Batal")}}
+ )
 }
 if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cost by remember{mutableStateOf("")};var price by remember{mutableStateOf("")};var stock by remember{mutableStateOf("")}
  AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal (Rp)")});OutlinedTextField(price,{price=it},label={Text("Harga jual (Rp)")});OutlinedTextField(stock,{stock=it},label={Text("Stok awal")})}},confirmButton={TextButton(onClick={val c=cost.toLongOrNull();val p=price.toLongOrNull();if(name.isNotBlank()&&c!=null&&p!=null&&c>=0&&p>=c){db.save(name,barcode,c,p,stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama, modal, dan harga jual (minimal sama dengan modal)"}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})}
