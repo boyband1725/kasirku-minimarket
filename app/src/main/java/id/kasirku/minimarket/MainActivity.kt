@@ -27,6 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -106,12 +109,21 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
  val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga_modal,harga_jual,stok");products.forEach{p->w.appendLine(listOf(csvEscape(p.name),csvEscape(p.barcode),p.costPrice.toString(),p.price.toString(),p.stock.toString()).joinToString(","))}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}
  val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->BufferedReader(InputStreamReader(s)).lineSequence().drop(1).forEach{line->val a=parseCsvLine(line);if(a.size>=5)db.save(a[0].trim(),a[1].trim(),a[2].trim().toLongOrNull()?:0,a[3].trim().toLongOrNull()?:0,a[4].trim().toIntOrNull()?:0) else if(a.size>=4)db.save(a[0].trim(),a[1].trim(),0,a[2].trim().toLongOrNull()?:0,a[3].trim().toIntOrNull()?:0)}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}
  val total=cart.entries.sumOf{(id,n)->(products.find{it.id==id}?.price?:0)*n}
+ fun addScannedBarcode(raw:String){
+  val scanned=raw.trim().filter{it.isLetterOrDigit()||it=='-'||it=='_'}
+  if(scanned.isBlank()){note="Barcode kosong";code="";return}
+  val p=products.find{it.barcode.trim().equals(scanned,true)}
+  if(p==null){note="Barcode $scanned belum terdaftar. Tambahkan melalui menu Barang.";code=""}
+  else if(p.stock<=0){note="Stok ${p.name} habis";code=""}
+  else if((cart[p.id]?:0)>=p.stock){note="Stok ${p.name} tidak cukup";code=""}
+  else{cart=cart+(p.id to ((cart[p.id]?:0)+1));note="${p.name} berhasil ditambahkan";code=""}
+ }
  Scaffold(topBar={TopAppBar(title={Text("SeaMart")})},bottomBar={NavigationBar{NavigationBarItem(selected=tab==0,onClick={tab=0},icon={},label={Text("Kasir")});NavigationBarItem(selected=tab==1,onClick={tab=1},icon={},label={Text("Barang")});NavigationBarItem(selected=tab==2,onClick={tab=2},icon={},label={Text("CSV")})}}){padding->
  Column(Modifier.padding(padding).padding(14.dp).fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
   if(note.isNotBlank())Text(note,color=MaterialTheme.colorScheme.primary)
   when(tab){
-   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth());OutlinedTextField(code,{code=it},label={Text("Barcode / kode barang")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-    Button(onClick={val p=products.find{it.barcode==code};if(p!=null){if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"}else note="Barcode tidak ditemukan";code=""},modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
+   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth());OutlinedTextField(value=code,onValueChange={v->if(v.contains("\\n")||v.contains("\\r"))addScannedBarcode(v)else code=v},label={Text("Scan barcode di sini")},placeholder={Text("Hubungkan scanner Bluetooth / USB OTG")},modifier=Modifier.fillMaxWidth(),singleLine=true,keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={addScannedBarcode(code)}))
+    Button(onClick={addScannedBarcode(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
     Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
     LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=8.dp)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->
  Card(modifier=Modifier.fillMaxWidth().heightIn(min=142.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)){
