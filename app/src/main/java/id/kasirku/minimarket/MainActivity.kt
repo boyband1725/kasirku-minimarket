@@ -103,8 +103,8 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
 @Composable fun KasirKuApp(){
  val ctx=LocalContext.current;val db=remember{StoreDb(ctx)}
  val scannerFocus=remember{FocusRequester()}
- LaunchedEffect(tab){if(tab==0){try{scannerFocus.requestFocus()}catch(_:Exception){}}}
  var products by remember{mutableStateOf(db.all())};var tab by remember{mutableIntStateOf(0)}
+ LaunchedEffect(tab){if(tab==0){try{scannerFocus.requestFocus()}catch(_:Exception){}}}
  var search by remember{mutableStateOf("")};var code by remember{mutableStateOf("")}
  var cart by remember{mutableStateOf(mapOf<Long,Int>())};var note by remember{mutableStateOf("")};var add by remember{mutableStateOf(false)}
  var chosenPrinter by remember{mutableStateOf<BluetoothDevice?>(null)}
