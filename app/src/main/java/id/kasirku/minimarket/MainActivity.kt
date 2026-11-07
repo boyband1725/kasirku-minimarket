@@ -23,55 +23,49 @@ import java.io.InputStreamReader
 import java.text.NumberFormat
 import java.util.Locale
 
-data class Product(val id:Long,val name:String,val barcode:String,val price:Long,val stock:Int)
-class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,1){
+data class Product(val id:Long,val name:String,val barcode:String,val costPrice:Long,val price:Long,val stock:Int)
+class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,2){
  override fun onCreate(db:SQLiteDatabase){
-  db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,barcode TEXT UNIQUE,price INTEGER NOT NULL,stock INTEGER NOT NULL)")
+  db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,barcode TEXT UNIQUE,cost_price INTEGER NOT NULL DEFAULT 0,price INTEGER NOT NULL,stock INTEGER NOT NULL)")
   db.execSQL("CREATE TABLE sales(id INTEGER PRIMARY KEY AUTOINCREMENT,total INTEGER,created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
-  db.execSQL("INSERT INTO products(name,barcode,price,stock) VALUES('Air Mineral 600ml','899000000001',4000,30),('Mie Instan','899000000002',3500,50),('Roti Tawar','899000000003',15000,12)")
+  db.execSQL("CREATE TABLE sale_items(id INTEGER PRIMARY KEY AUTOINCREMENT,sale_id INTEGER NOT NULL,product_id INTEGER NOT NULL,product_name TEXT NOT NULL,quantity INTEGER NOT NULL,cost_price INTEGER NOT NULL,sale_price INTEGER NOT NULL,line_total INTEGER NOT NULL)")
+  db.execSQL("INSERT INTO products(name,barcode,cost_price,price,stock) VALUES('Air Mineral 600ml','899000000001',2500,4000,30),('Mie Instan','899000000002',2200,3500,50),('Roti Tawar','899000000003',11000,15000,12)")
  }
- override fun onUpgrade(db:SQLiteDatabase,o:Int,n:Int){}
- fun all():List<Product>{val a=mutableListOf<Product>();readableDatabase.rawQuery("SELECT id,name,barcode,price,stock FROM products ORDER BY name",null).use{c->while(c.moveToNext())a.add(Product(c.getLong(0),c.getString(1),c.getString(2)?: "",c.getLong(3),c.getInt(4)))};return a}
- fun save(n:String,b:String,p:Long,s:Int){val v=ContentValues().apply{put("name",n);put("barcode",b);put("price",p);put("stock",s)};writableDatabase.insertWithOnConflict("products",null,v,SQLiteDatabase.CONFLICT_REPLACE)}
- fun sale(t:Long){writableDatabase.execSQL("INSERT INTO sales(total) VALUES(?)",arrayOf(t))}
+ override fun onUpgrade(db:SQLiteDatabase,oldVersion:Int,newVersion:Int){if(oldVersion<2){db.execSQL("ALTER TABLE products ADD COLUMN cost_price INTEGER NOT NULL DEFAULT 0");db.execSQL("CREATE TABLE IF NOT EXISTS sale_items(id INTEGER PRIMARY KEY AUTOINCREMENT,sale_id INTEGER NOT NULL,product_id INTEGER NOT NULL,product_name TEXT NOT NULL,quantity INTEGER NOT NULL,cost_price INTEGER NOT NULL,sale_price INTEGER NOT NULL,line_total INTEGER NOT NULL)")}}
+ fun all():List<Product>{val a=mutableListOf<Product>();readableDatabase.rawQuery("SELECT id,name,barcode,cost_price,price,stock FROM products ORDER BY name",null).use{c->while(c.moveToNext())a.add(Product(c.getLong(0),c.getString(1),c.getString(2)?: "",c.getLong(3),c.getLong(4),c.getInt(5)))};return a}
+ fun save(n:String,b:String,cost:Long,p:Long,s:Int){val v=ContentValues().apply{put("name",n);put("barcode",b);put("cost_price",cost);put("price",p);put("stock",s)};writableDatabase.insertWithOnConflict("products",null,v,SQLiteDatabase.CONFLICT_REPLACE)}
+ fun completeSale(cart:Map<Long,Int>,products:List<Product>):Boolean{val db=writableDatabase;return try{db.beginTransaction();val lines=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}};if(lines.isEmpty()||lines.any{(p,q)->q<=0||q>p.stock})throw IllegalStateException("Stok tidak cukup");val total=lines.sumOf{(p,q)->p.price*q};val sale=ContentValues().apply{put("total",total)};val saleId=db.insertOrThrow("sales",null,sale);lines.forEach{(p,q)->val st=db.compileStatement("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?");st.bindLong(1,q.toLong());st.bindLong(2,p.id);st.bindLong(3,q.toLong());if(st.executeUpdateDelete()!=1)throw IllegalStateException("Stok berubah");val item=ContentValues().apply{put("sale_id",saleId);put("product_id",p.id);put("product_name",p.name);put("quantity",q);put("cost_price",p.costPrice);put("sale_price",p.price);put("line_total",p.price*q)};db.insertOrThrow("sale_items",null,item)};db.setTransactionSuccessful();true}catch(e:Exception){false}finally{db.endTransaction()}}
 }
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
+fun csvEscape(v:String)="\\""+v.replace("\\"","\\"\\"")+"\\""
+fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch=='\\"'){if(quoted&&i+1<line.length&&line[i+1]=='\\"'){cell.append('\\"');i++}else quoted=!quoted}else if(ch==','&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun KasirKuApp(){
- val ctx= LocalContext.current;val db= remember{StoreDb(ctx)}
+ val ctx=LocalContext.current;val db=remember{StoreDb(ctx)}
  var products by remember{mutableStateOf(db.all())};var tab by remember{mutableIntStateOf(0)}
  var search by remember{mutableStateOf("")};var code by remember{mutableStateOf("")}
- var cart by remember{mutableStateOf(mapOf<Long,Int>())};var note by remember{mutableStateOf("")}
- var add by remember{mutableStateOf(false)}
- val export= rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga,stok");products.forEach{p->w.appendLine("\"${p.name.replace("\"","")}\",${p.barcode},${p.price},${p.stock}")}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}
- val import= rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->BufferedReader(InputStreamReader(s)).lineSequence().drop(1).forEach{line->val a=line.split(",");if(a.size>=4)db.save(a[0].trim().trim('"'),a[1].trim(),a[2].trim().toLongOrNull()?:0,a[3].trim().toIntOrNull()?:0)}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}
+ var cart by remember{mutableStateOf(mapOf<Long,Int>())};var note by remember{mutableStateOf("")};var add by remember{mutableStateOf(false)}
+ val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga_modal,harga_jual,stok");products.forEach{p->w.appendLine(listOf(csvEscape(p.name),csvEscape(p.barcode),p.costPrice.toString(),p.price.toString(),p.stock.toString()).joinToString(","))}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}}
+ val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->BufferedReader(InputStreamReader(s)).lineSequence().drop(1).forEach{line->val a=parseCsvLine(line);if(a.size>=5)db.save(a[0].trim(),a[1].trim(),a[2].trim().toLongOrNull()?:0,a[3].trim().toLongOrNull()?:0,a[4].trim().toIntOrNull()?:0) else if(a.size>=4)db.save(a[0].trim(),a[1].trim(),0,a[2].trim().toLongOrNull()?:0,a[3].trim().toIntOrNull()?:0)}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}}
  val total=cart.entries.sumOf{(id,n)->(products.find{it.id==id}?.price?:0)*n}
- Scaffold(topBar={TopAppBar(title={Text("KasirKu Minimarket")})},bottomBar={NavigationBar{NavigationBarItem(tab==0,{tab=0},icon={},label={Text("Kasir")});NavigationBarItem(tab==1,{tab=1},icon={},label={Text("Barang")});NavigationBarItem(tab==2,{tab=2},icon={},label={Text("CSV")})}}){padding->
+ Scaffold(topBar={TopAppBar(title={Text("KasirKu Minimarket 2.0")})},bottomBar={NavigationBar{NavigationBarItem(selected=tab==0,onClick={tab=0},icon={},label={Text("Kasir")});NavigationBarItem(selected=tab==1,onClick={tab=1},icon={},label={Text("Barang")});NavigationBarItem(selected=tab==2,onClick={tab=2},icon={},label={Text("CSV")})}}){padding->
  Column(Modifier.padding(padding).padding(14.dp).fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
   if(note.isNotBlank())Text(note,color=MaterialTheme.colorScheme.primary)
   when(tab){
-   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth())
-    OutlinedTextField(code,{code=it},label={Text("Barcode / kode barang")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-    Button(onClick={val p=products.find{it.barcode==code};if(p!=null)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Barcode tidak ditemukan";code=""},modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
+   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth());OutlinedTextField(code,{code=it},label={Text("Barcode / kode barang")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+    Button(onClick={val p=products.find{it.barcode==code};if(p!=null){if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"}else note="Barcode tidak ditemukan";code=""},modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
     Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
-    LazyColumn(Modifier.weight(1f)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("${p.barcode} • Stok ${p.stock} • ${money(p.price)}")},trailingContent={TextButton(onClick={cart=cart+(p.id to ((cart[p.id]?:0)+1))}){Text("+ Tambah")}})}}
+    LazyColumn(Modifier.weight(1f)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("${p.barcode} • Stok ${p.stock} • Modal ${money(p.costPrice)} • Jual ${money(p.price)}")},trailingContent={TextButton(onClick={if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"){Text("+ Tambah")}})}}
     Text("Total: ${money(total)}",style=MaterialTheme.typography.headlineSmall)
-    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={db.sale(total);cart=emptyMap();note="Transaksi tersimpan"},modifier=Modifier.weight(1f)){Text("Bayar / Simpan")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
+    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={if(db.completeSale(cart,products)){cart=emptyMap();products=db.all();note="Transaksi tersimpan dan stok diperbarui"}else note="Transaksi gagal. Periksa stok."},modifier=Modifier.weight(1f)){Text("Bayar / Simpan")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
    }
-   1->{Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Manajemen barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Button(onClick={add=true}){Text("+ Barang")}}
-    LazyColumn{items(products){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("Kode ${p.barcode} • ${money(p.price)} • Stok ${p.stock}")})}}
-   }
-   else->{Text("Impor / Ekspor CSV",style=MaterialTheme.typography.titleLarge);Text("Format: nama,barcode,harga,stok. Harga tanpa titik ribuan.")
-    Button(onClick={export.launch("barang-kasirku.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor barang ke CSV")}
-    OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor barang dari CSV")}
-    Text("Data disimpan di HP dan bisa digunakan tanpa internet.")
-   }
+   1->{Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Manajemen barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Button(onClick={add=true}){Text("+ Barang")}};LazyColumn{items(products){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("Barcode ${p.barcode} • Modal ${money(p.costPrice)} • Jual ${money(p.price)} • Stok ${p.stock} • Laba/unit ${money(p.price-p.costPrice)}")})}}}
+   else->{Text("Impor / Ekspor CSV",style=MaterialTheme.typography.titleLarge);Text("Format baru: nama,barcode,harga_modal,harga_jual,stok. Format lama 4 kolom juga didukung.");Button(onClick={export.launch("barang-kasirku.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor barang ke CSV")};OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor barang dari CSV")};Text("Data tersimpan di HP dan bekerja tanpa internet.")}
   }
  }
 }
- if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var price by remember{mutableStateOf("")};var stock by remember{mutableStateOf("")}
- AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(price,{price=it},label={Text("Harga")});OutlinedTextField(stock,{stock=it},label={Text("Stok")})}},confirmButton={TextButton(onClick={if(name.isNotBlank()&&price.toLongOrNull()!=null){db.save(name,barcode,price.toLong(),stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama dan harga"}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})
- }
+if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cost by remember{mutableStateOf("")};var price by remember{mutableStateOf("")};var stock by remember{mutableStateOf("")}
+ AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal (Rp)")});OutlinedTextField(price,{price=it},label={Text("Harga jual (Rp)")});OutlinedTextField(stock,{stock=it},label={Text("Stok awal")})}},confirmButton={TextButton(onClick={val c=cost.toLongOrNull();val p=price.toLongOrNull();if(name.isNotBlank()&&c!=null&&p!=null&&c>=0&&p>=c){db.save(name,barcode,c,p,stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama, modal, dan harga jual (minimal sama dengan modal)")}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})}
 }
