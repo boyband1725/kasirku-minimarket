@@ -152,7 +152,38 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
     if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},modifier=Modifier.weight(1f)){Text("Bayar")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
     if(receiptLines.isNotEmpty()){Text("Printer: ${chosenPrinter?.name?: "Belum dipilih"}");Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)}else{printerList=pairedPrinters();showPrinters=true}}){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"SEAMART",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)}){Text("Cetak struk")}}}
    }
-   1->{Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Manajemen barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Button(onClick={add=true}){Text("+ Barang")}};LazyColumn{items(products){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("Barcode ${p.barcode} • Modal ${money(p.costPrice)} • Jual ${money(p.price)} • Stok ${p.stock} • Laba/unit ${money(p.price-p.costPrice)}")})}}}
+   1->{
+    Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
+     Text("Master Barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge)
+     Button(onClick={add=true}){Text("+ Barang")}
+    }
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     OutlinedButton(onClick={export.launch("master-barang-seamart.csv")},modifier=Modifier.weight(1f)){Text("Ekspor CSV")}
+     Button(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.weight(1f)){Text("Impor CSV")}
+    }
+    Text("Kolom CSV: nama, barcode, harga_modal, harga_jual, stok",style=MaterialTheme.typography.bodySmall)
+    Row(Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(vertical=6.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
+     Text("NAMA BARANG",modifier=Modifier.width(150.dp),fontWeight=FontWeight.Bold)
+     Text("BARCODE",modifier=Modifier.width(125.dp),fontWeight=FontWeight.Bold)
+     Text("HARGA MODAL",modifier=Modifier.width(115.dp),fontWeight=FontWeight.Bold)
+     Text("HARGA JUAL",modifier=Modifier.width(115.dp),fontWeight=FontWeight.Bold)
+     Text("STOK",modifier=Modifier.width(55.dp),fontWeight=FontWeight.Bold)
+    }
+    Divider()
+    LazyColumn(Modifier.weight(1f)){
+     items(products){p->
+      Row(Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(vertical=10.dp),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
+       Text(p.name,modifier=Modifier.width(150.dp),maxLines=2,overflow=TextOverflow.Ellipsis)
+       Text(p.barcode,modifier=Modifier.width(125.dp))
+       Text(money(p.costPrice),modifier=Modifier.width(115.dp))
+       Text(money(p.price),modifier=Modifier.width(115.dp),fontWeight=FontWeight.SemiBold)
+       Text(p.stock.toString(),modifier=Modifier.width(55.dp))
+      }
+      Divider()
+     }
+    }
+    Text("Jumlah barang: ${products.size}",style=MaterialTheme.typography.bodySmall)
+   }
    else->{Text("Impor / Ekspor CSV",style=MaterialTheme.typography.titleLarge);Text("Format baru: nama,barcode,harga_modal,harga_jual,stok. Format lama 4 kolom juga didukung.");Button(onClick={export.launch("barang-kasirku.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor barang ke CSV")};OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor barang dari CSV")};Text("Data tersimpan di HP dan bekerja tanpa internet.")}
   }
  }
