@@ -39,7 +39,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,2){
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
 fun csvEscape(v:String) = "\"" + v.replace("\"", "\"\"") + "\""
-fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch=='\\"'){if(quoted&&i+1<line.length&&line[i+1]=='\\"'){cell.append('\\"');i++}else quoted=!quoted}else if(ch==','&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
+fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();val quote=34.toChar();val comma=44.toChar();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch==quote){if(quoted&&i+1<line.length&&line[i+1]==quote){cell.append(quote);i++}else quoted=!quoted}else if(ch==comma&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun KasirKuApp(){
