@@ -57,7 +57,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,3){
  }
  override fun onUpgrade(db:SQLiteDatabase,oldVersion:Int,newVersion:Int){if(oldVersion<2){db.execSQL("ALTER TABLE products ADD COLUMN cost_price INTEGER NOT NULL DEFAULT 0");db.execSQL("CREATE TABLE IF NOT EXISTS sale_items(id INTEGER PRIMARY KEY AUTOINCREMENT,sale_id INTEGER NOT NULL,product_id INTEGER NOT NULL,product_name TEXT NOT NULL,quantity INTEGER NOT NULL,cost_price INTEGER NOT NULL,sale_price INTEGER NOT NULL,line_total INTEGER NOT NULL)")};if(oldVersion<3){db.execSQL("ALTER TABLE sales ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'TUNAI'");db.execSQL("ALTER TABLE sales ADD COLUMN paid_amount INTEGER NOT NULL DEFAULT 0");db.execSQL("ALTER TABLE sales ADD COLUMN change_amount INTEGER NOT NULL DEFAULT 0")}}
  fun all():List<Product>{val a=mutableListOf<Product>();readableDatabase.rawQuery("SELECT id,name,barcode,cost_price,price,stock FROM products ORDER BY name",null).use{c->while(c.moveToNext())a.add(Product(c.getLong(0),c.getString(1),c.getString(2)?: "",c.getLong(3),c.getLong(4),c.getInt(5)))};return a}
- fun save(n:String,b:String,cost:Long,p:Long,s:Int){val v=ContentValues().apply{put("name",n);put("barcode",b);put("cost_price",cost);put("price",p);put("stock",s)};writableDatabase.insertWithOnConflict("products",null,v,SQLiteDatabase.CONFLICT_REPLACE)}
+ fun save(n:String,b:String,cost:Long,p:Long,s:Int){val v=ContentValues().apply{put("name",n);if(b.isBlank())putNull("barcode")else put("barcode",b);put("cost_price",cost);put("price",p);put("stock",s)};writableDatabase.insertWithOnConflict("products",null,v,SQLiteDatabase.CONFLICT_REPLACE)}
  fun completeSale(cart:Map<Long,Int>,products:List<Product>,paymentMethod:String,paidAmount:Long):Boolean{val db=writableDatabase;return try{db.beginTransaction();val lines=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}};if(lines.isEmpty()||lines.any{(p,q)->q<=0||q>p.stock})throw IllegalStateException("Stok tidak cukup");val total=lines.sumOf{(p,q)->p.price*q};if(paidAmount<total)throw IllegalStateException("Pembayaran kurang");val sale=ContentValues().apply{put("total",total);put("payment_method",paymentMethod);put("paid_amount",paidAmount);put("change_amount",paidAmount-total)};val saleId=db.insertOrThrow("sales",null,sale);lines.forEach{(p,q)->val st=db.compileStatement("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?");st.bindLong(1,q.toLong());st.bindLong(2,p.id);st.bindLong(3,q.toLong());if(st.executeUpdateDelete()!=1)throw IllegalStateException("Stok berubah");val item=ContentValues().apply{put("sale_id",saleId);put("product_id",p.id);put("product_name",p.name);put("quantity",q);put("cost_price",p.costPrice);put("sale_price",p.price);put("line_total",p.price*q)};db.insertOrThrow("sale_items",null,item)};db.setTransactionSuccessful();true}catch(e:Exception){false}finally{db.endTransaction()}}
 }
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
@@ -98,7 +98,7 @@ fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,
  }
 }
 fun csvEscape(v:String) = "\"" + v.replace("\"", "\"\"") + "\""
-fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();val quote=34.toChar();val comma=44.toChar();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch==quote){if(quoted&&i+1<line.length&&line[i+1]==quote){cell.append(quote);i++}else quoted=!quoted}else if(ch==comma&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
+fun parseCsvLine(line:String,delimiter:Char=','):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();val quote=34.toChar();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch==quote){if(quoted&&i+1<line.length&&line[i+1]==quote){cell.append(quote);i++}else quoted=!quoted}else if(ch==delimiter&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun KasirKuApp(){
@@ -117,7 +117,34 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
  var showPayment by remember{mutableStateOf(false)};var paymentMethod by remember{mutableStateOf("TUNAI")};var cashInput by remember{mutableStateOf("")}
  val permissionLauncher=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){granted->if(granted){printerList=pairedPrinters();showPrinters=true}else note="Izin Bluetooth diperlukan untuk memilih printer"}
  val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga_modal,harga_jual,stok");products.forEach{p->w.appendLine(listOf(csvEscape(p.name),csvEscape(p.barcode),p.costPrice.toString(),p.price.toString(),p.stock.toString()).joinToString(","))}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}
- val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->BufferedReader(InputStreamReader(s)).lineSequence().drop(1).forEach{line->val a=parseCsvLine(line);if(a.size>=5)db.save(a[0].trim(),a[1].trim(),a[2].trim().toLongOrNull()?:0,a[3].trim().toLongOrNull()?:0,a[4].trim().toIntOrNull()?:0) else if(a.size>=4)db.save(a[0].trim(),a[1].trim(),0,a[2].trim().toLongOrNull()?:0,a[3].trim().toIntOrNull()?:0)}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}
+ val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{
+  ctx.contentResolver.openInputStream(u)?.use{stream->
+   val lines=BufferedReader(InputStreamReader(stream)).lineSequence().filter{it.isNotBlank()}.toList()
+   if(lines.isNotEmpty()){
+    val delimiter=if(lines.first().count{it==';'}>lines.first().count{it==','})';' else ','
+    val header=parseCsvLine(lines.first().removePrefix("\uFEFF"),delimiter).map{it.trim().lowercase(Locale.ROOT)}
+    val hasHeader=header.any{it in listOf("produk","nama","nama barang","harga jual","barcode")}
+    val rows=if(hasHeader)lines.drop(1) else lines
+    var imported=0
+    rows.forEach{line->
+     val a=parseCsvLine(line,delimiter)
+     fun value(vararg keys:String,fallback:Int=-1):String{
+      val ix=keys.firstNotNullOfOrNull{k->header.indexOf(k).takeIf{it>=0}}
+      return a.getOrNull(ix?:fallback)?.trim().orEmpty()
+     }
+     val name=value("produk","nama","nama barang",fallback=0)
+     if(name.isNotBlank()){
+      val barcode=value("barcode",fallback=1)
+      val cost=value("harga pokok","harga_modal","harga modal",fallback=2).replace(".","").replace(",","").toLongOrNull()?:0L
+      val price=value("harga jual","harga_jual",fallback=3).replace(".","").replace(",","").toLongOrNull()?:0L
+      val stock=value("stok","stock",fallback=4).toIntOrNull()?:0
+      db.save(name,barcode,cost,price,stock);imported++
+     }
+    }
+    products=db.all();note="Impor berhasil: $imported barang"
+   }
+  }
+ }catch(e:Exception){note="Impor gagal: ${e.message}"}}
  val total=cart.entries.sumOf{(id,n)->(products.find{it.id==id}?.price?:0)*n}
  fun addScannedBarcode(raw:String){
   val scanned=raw.trim()
