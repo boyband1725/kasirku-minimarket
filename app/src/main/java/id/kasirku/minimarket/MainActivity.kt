@@ -85,4 +85,54 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
 }
 if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cost by remember{mutableStateOf("")};var price by remember{mutableStateOf("")};var stock by remember{mutableStateOf("")}
  AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal (Rp)")});OutlinedTextField(price,{price=it},label={Text("Harga jual (Rp)")});OutlinedTextField(stock,{stock=it},label={Text("Stok awal")})}},confirmButton={TextButton(onClick={val c=cost.toLongOrNull();val p=price.toLongOrNull();if(name.isNotBlank()&&c!=null&&p!=null&&c>=0&&p>=c){db.save(name,barcode,c,p,stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama, modal, dan harga jual (minimal sama dengan modal)"}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})}
+
+ if(showPrinters){
+  AlertDialog(
+   onDismissRequest={showPrinters=false},
+   title={Text("Pilih printer Bluetooth")},
+   text={
+    Column(verticalArrangement=Arrangement.spacedBy(8.dp)){
+     if(printerList.isEmpty()){
+      Text("Belum ada printer Bluetooth yang dipasangkan ke HP. Pasangkan printer melalui Pengaturan > Koneksi > Bluetooth, lalu tekan Muat ulang.")
+     }else{
+      Text("Pilih printer yang sudah dipasangkan:")
+      LazyColumn(Modifier.heightIn(max=280.dp)){
+       items(printerList){device->
+        TextButton(
+         onClick={
+          if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){
+           showPrinters=false
+           permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+          }else{
+           chosenPrinter=device
+           showPrinters=false
+           note="Printer dipilih: \${device.name?:device.address}"
+          }
+         },
+         modifier=Modifier.fillMaxWidth()
+        ){
+         Column(Modifier.fillMaxWidth()){
+          Text(device.name?: "Printer tanpa nama")
+          Text(device.address,style=MaterialTheme.typography.bodySmall)
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   confirmButton={
+    TextButton(onClick={
+     if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){
+      permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+     }else{
+      printerList=pairedPrinters()
+      note=if(printerList.isEmpty()) "Belum ada perangkat Bluetooth yang dipasangkan" else "Daftar printer diperbarui"
+     }
+    }){Text("Muat ulang")}
+   },
+   dismissButton={TextButton(onClick={showPrinters=false}){Text("Tutup")}}
+  )
+ }
+
 }
