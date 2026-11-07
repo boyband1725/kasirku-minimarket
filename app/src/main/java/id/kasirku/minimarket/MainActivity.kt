@@ -156,7 +156,7 @@ if(showPayment){
     }else{
      receiptLines=cart.mapNotNull{(id,q)->products.find{it.id==id}?.let{it to q}}
      if(db.completeSale(cart,products,"TUNAI",paid)){
-      receiptTotal=total;receiptPayment="TUNAI";receiptPaid=paid;receiptChange=paid-total;cart=emptyMap();products=db.all();showPayment=false;note="Pembayaran tunai tersimpan. Kembalian \${money(paid-total)}."
+      receiptTotal=total;receiptPayment="TUNAI";receiptPaid=paid;receiptChange=paid-total;cart=emptyMap();products=db.all();showPayment=false;note="Pembayaran tunai tersimpan. Kembalian ${money(paid-total)}."
      }else note="Transaksi gagal. Periksa stok."
     }
    }){Text(if(paymentMethod=="QRIS")"Konfirmasi QRIS diterima" else "Simpan pembayaran")}
