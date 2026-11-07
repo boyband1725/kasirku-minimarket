@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.NumberFormat
@@ -129,6 +131,7 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
  val ctx=LocalContext.current;val isTablet=LocalConfiguration.current.screenWidthDp>=700;val db=remember{StoreDb(ctx)}
  var products by remember{mutableStateOf(db.all())};var tab by remember{mutableIntStateOf(0)}
  var search by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cart by remember{mutableStateOf(mapOf<Long,Int>())}
+ val barcodeFocusRequester=remember{FocusRequester()}
  var message by remember{mutableStateOf("")};var editing by remember{mutableStateOf<Product?>(null)};var showEditor by remember{mutableStateOf(false)};var showPay by remember{mutableStateOf(false)}
  var paymentMethod by remember{mutableStateOf("Tunai")};var paid by remember{mutableStateOf("")}
  var loggedUser by remember{mutableStateOf<String?>(null)}
@@ -152,6 +155,7 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
  val bluetoothPermission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){granted->if(granted)showPrinterPicker=true else message="Izin Bluetooth diperlukan untuk memilih printer"}
  val openPrinterPicker={if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.S&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)bluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)else showPrinterPicker=true}
 
+ LaunchedEffect(tab,activeShiftId){if(tab==0&&activeShiftId!=null)barcodeFocusRequester.requestFocus()}
  val refresh={products=db.all()}
  val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){uri:Uri?->if(uri!=null)try{ctx.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use{w->w.appendLine("barcode,nama,kategori,harga_modal,harga_jual,stok,stok_minimum");products.forEach{p->w.appendLine(listOf(p.barcode,p.name,p.category,p.cost.toString(),p.price.toString(),p.stock.toString(),p.minStock.toString()).joinToString(","){csvCell(it)})}};message="Ekspor CSV berhasil"}catch(e:Exception){message="Ekspor gagal: ${e.message}"}}
  val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri:Uri?->if(uri!=null)try{var added=0;var updated=0;ctx.contentResolver.openInputStream(uri)?.bufferedReader()?.use{reader->val rows=parseCsv(reader.readText().removePrefix("\uFEFF"));if(rows.size<2)throw IllegalArgumentException("CSV kosong");val h=rows.first().map{it.trim().lowercase().replace(" ","_")};val ni=h.indexOfFirst{it in listOf("nama","name","nama_barang","nama_produk")};val bi=h.indexOfFirst{it in listOf("barcode","sku","kode","kode_barang")};val ci=h.indexOfFirst{it in listOf("kategori","category")};val coi=h.indexOfFirst{it in listOf("harga_modal","modal","harga_beli","cost")};val pi=h.indexOfFirst{it in listOf("harga_jual","harga","price")};val si=h.indexOfFirst{it in listOf("stok","stock","jumlah")};val mi=h.indexOfFirst{it in listOf("stok_minimum","min_stok","minimum_stok","min")};if(ni<0||pi<0||si<0)throw IllegalArgumentException("Kolom wajib: nama, harga_jual, stok");rows.drop(1).forEach{r->val get:(Int)->String={i->if(i>=0&&i<r.size)r[i].trim() else ""};val name=get(ni);if(name.isNotBlank()){val old=if(get(bi).isBlank())null else products.firstOrNull{it.barcode==get(bi)};db.upsert(name,get(bi),get(ci),parseAmount(get(coi)),parseAmount(get(pi)),parseAmount(get(si)).toInt(),parseAmount(get(mi).ifBlank{"5"}).toInt());if(old==null)added++ else updated++}}};refresh();message="Impor selesai: $added barang baru, $updated diperbarui"}catch(e:Exception){message="Impor gagal: ${e.message}"}}
@@ -193,7 +197,7 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
      Row(verticalAlignment=Alignment.CenterVertically){Text("Kasir aktif • $loggedUser",fontWeight=FontWeight.Bold,color=SeaGreen,modifier=Modifier.weight(1f));Text("SHIFT #$activeShiftId",fontSize=11.sp,color=SeaGreen)}
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=SeaMint)){Column(Modifier.padding(12.dp)){Text("Produk tersedia",fontSize=12.sp);Text(products.size.toString(),fontSize=22.sp,fontWeight=FontWeight.Bold,color=SeaGreen)}};Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=SeaMint)){Column(Modifier.padding(12.dp)){Text("Item di keranjang",fontSize=12.sp);Text(cart.values.sum().toString(),fontSize=22.sp,fontWeight=FontWeight.Bold,color=SeaGreen)}}}
     OutlinedTextField(search,{search=it},modifier=Modifier.fillMaxWidth().height(50.dp),singleLine=true,textStyle=MaterialTheme.typography.bodyMedium,label={Text("Cari nama / barcode barang",fontSize=12.sp)})
-    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedTextField(barcode,{barcode=it},modifier=Modifier.weight(1f).height(50.dp),singleLine=true,textStyle=MaterialTheme.typography.bodyMedium,label={Text("Scan barcode",fontSize=12.sp)},keyboardOptions=KeyboardOptions(imeAction=androidx.compose.ui.text.input.ImeAction.Done),keyboardActions=androidx.compose.foundation.text.KeyboardActions(onDone={addScannedBarcode()}));Button(onClick={addScannedBarcode}){Text("Tambah")}}
+    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedTextField(barcode,{barcode=it},modifier=Modifier.weight(1f).height(50.dp).focusRequester(barcodeFocusRequester),singleLine=true,textStyle=MaterialTheme.typography.bodyMedium,label={Text("Scan barcode",fontSize=12.sp)},keyboardOptions=KeyboardOptions(imeAction=androidx.compose.ui.text.input.ImeAction.Done),keyboardActions=androidx.compose.foundation.text.KeyboardActions(onDone={addScannedBarcode()}));Button(onClick={addScannedBarcode}){Text("Tambah")}}
     if(isTablet){
     Row(Modifier.weight(1f).fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.Top){
      Column(Modifier.weight(2.2f).fillMaxHeight(),verticalArrangement=Arrangement.spacedBy(6.dp)){
