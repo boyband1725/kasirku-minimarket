@@ -50,12 +50,14 @@ private val SeaBg = Color(0xFFF5F8F6)
 private val Ink = Color(0xFF1B2923)
 
 data class Product(val id:Long,val name:String,val barcode:String,val category:String,val cost:Long,val price:Long,val stock:Int,val minStock:Int)
-class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,5){
+data class CashFlow(val id:Long,val type:String,val category:String,val description:String,val amount:Long,val method:String,val date:String)
+class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,6){
  override fun onCreate(db:SQLiteDatabase){
   db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,barcode TEXT UNIQUE,price INTEGER NOT NULL,stock INTEGER NOT NULL,category TEXT NOT NULL DEFAULT '',cost INTEGER NOT NULL DEFAULT 0,min_stock INTEGER NOT NULL DEFAULT 5)")
   db.execSQL("CREATE TABLE sales(id INTEGER PRIMARY KEY AUTOINCREMENT,total INTEGER,created_at TEXT DEFAULT CURRENT_TIMESTAMP,method TEXT DEFAULT 'Tunai',shift_id INTEGER)")
   db.execSQL("CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT UNIQUE NOT NULL,pin_hash TEXT NOT NULL,salt TEXT NOT NULL,role TEXT NOT NULL)")
   db.execSQL("CREATE TABLE shifts(id INTEGER PRIMARY KEY AUTOINCREMENT,opened_by TEXT,opening_cash INTEGER,opened_at TEXT DEFAULT CURRENT_TIMESTAMP,closed_by TEXT,closing_cash INTEGER,expected_cash INTEGER,closed_at TEXT,status TEXT DEFAULT 'OPEN')")
+  db.execSQL("CREATE TABLE cash_flows(id INTEGER PRIMARY KEY AUTOINCREMENT,type TEXT NOT NULL,category TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',amount INTEGER NOT NULL,method TEXT NOT NULL DEFAULT 'Tunai',created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
  }
  override fun onUpgrade(db:SQLiteDatabase,old:Int,now:Int){
   if(old<3){
@@ -65,6 +67,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,5){
    try{db.execSQL("ALTER TABLE sales ADD COLUMN method TEXT NOT NULL DEFAULT 'Tunai'")}catch(_:Exception){}
   }
   if(old<4){try{db.execSQL("ALTER TABLE sales ADD COLUMN shift_id INTEGER")}catch(_:Exception){};db.execSQL("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT UNIQUE NOT NULL,pin_hash TEXT NOT NULL,salt TEXT NOT NULL,role TEXT NOT NULL)");db.execSQL("CREATE TABLE IF NOT EXISTS shifts(id INTEGER PRIMARY KEY AUTOINCREMENT,opened_by TEXT,opening_cash INTEGER,opened_at TEXT DEFAULT CURRENT_TIMESTAMP,closed_by TEXT,closing_cash INTEGER,expected_cash INTEGER,closed_at TEXT,status TEXT DEFAULT 'OPEN')")}
+  if(old<6){db.execSQL("CREATE TABLE IF NOT EXISTS cash_flows(id INTEGER PRIMARY KEY AUTOINCREMENT,type TEXT NOT NULL,category TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',amount INTEGER NOT NULL,method TEXT NOT NULL DEFAULT 'Tunai',created_at TEXT DEFAULT CURRENT_TIMESTAMP)")}
  }
  private fun addColumn(db:SQLiteDatabase,name:String,type:String){try{db.execSQL("ALTER TABLE products ADD COLUMN $name $type")}catch(_:Exception){}}
  fun hasUsers():Boolean=readableDatabase.rawQuery("SELECT COUNT(*) FROM users",null).use{it.moveToFirst()&&it.getInt(0)>0}
@@ -80,6 +83,10 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,5){
  fun delete(id:Long){writableDatabase.delete("products","id=?",arrayOf(id.toString()))}
  fun completeSale(total:Long,method:String,items:Map<Long,Int>,shiftId:Long){val db=writableDatabase;db.beginTransaction();try{db.execSQL("INSERT INTO sales(total,method,shift_id) VALUES(?,?,?)",arrayOf(total,method,shiftId));items.forEach{(id,qty)->db.execSQL("UPDATE products SET stock=MAX(0,stock-?) WHERE id=?",arrayOf(qty,id))};db.setTransactionSuccessful()}finally{db.endTransaction()}}
  fun sales():List<Pair<Long,String>>{val out=mutableListOf<Pair<Long,String>>();readableDatabase.rawQuery("SELECT total,COALESCE(created_at,'' ) FROM sales ORDER BY id DESC LIMIT 100",null).use{c->while(c.moveToNext())out.add(c.getLong(0) to c.getString(1))};return out}
+ fun addCashFlow(type:String,category:String,description:String,amount:Long,method:String){require(amount>0);val v=ContentValues().apply{put("type",type);put("category",category);put("description",description);put("amount",amount);put("method",method)};writableDatabase.insertOrThrow("cash_flows",null,v)}
+ fun cashFlows():List<CashFlow>{val out=mutableListOf<CashFlow>();readableDatabase.rawQuery("SELECT id,type,category,description,amount,method,COALESCE(created_at,'') FROM cash_flows ORDER BY id DESC LIMIT 200",null).use{c->while(c.moveToNext())out.add(CashFlow(c.getLong(0),c.getString(1),c.getString(2),c.getString(3),c.getLong(4),c.getString(5),c.getString(6)))};return out}
+ fun salesTotal():Long=readableDatabase.rawQuery("SELECT COALESCE(SUM(total),0) FROM sales",null).use{if(it.moveToFirst())it.getLong(0)else 0L}
+ fun cashFlowTotal(type:String):Long=readableDatabase.rawQuery("SELECT COALESCE(SUM(amount),0) FROM cash_flows WHERE type=?",arrayOf(type)).use{if(it.moveToFirst())it.getLong(0)else 0L}
 }
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 private fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("id","ID")).format(v)
@@ -171,7 +178,7 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
  }
 
  MaterialTheme(colorScheme=lightColorScheme(primary=SeaGreen,onPrimary=Color.White,secondary=SeaGreen,background=SeaBg,surface=Color.White,onSurface=Ink)){
- Scaffold(containerColor=SeaBg,topBar={TopAppBar(title={Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)){Surface(shape=RoundedCornerShape(12.dp),color=SeaGreen){Box(Modifier.size(42.dp),contentAlignment=Alignment.Center){Text("\$",fontSize=27.sp,fontWeight=FontWeight.Bold,color=Color.White)}};Column{Text("SeaMart",fontWeight=FontWeight.Bold);Text("MINIMARKET POS",fontSize=11.sp,color=SeaGreen)}}})},bottomBar={NavigationBar(containerColor=Color.White){(if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan")else listOf("Kasir","Pengaturan")).forEach{label->val i=if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan").indexOf(label)else if(label=="Kasir")0 else 4;NavigationBarItem(selected=tab==i,onClick={tab=i},icon={Text(listOf("▦","▤","▥","⇅","⚙")[i],fontSize=18.sp)},label={Text(label)})}}}){pad->
+ Scaffold(containerColor=SeaBg,topBar={TopAppBar(title={Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)){Surface(shape=RoundedCornerShape(12.dp),color=SeaGreen){Box(Modifier.size(42.dp),contentAlignment=Alignment.Center){Text("\$",fontSize=27.sp,fontWeight=FontWeight.Bold,color=Color.White)}};Column{Text("SeaMart",fontWeight=FontWeight.Bold);Text("MINIMARKET POS",fontSize=11.sp,color=SeaGreen)}}})},bottomBar={NavigationBar(containerColor=Color.White){(if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan","Keuangan")else listOf("Kasir","Pengaturan")).forEach{label->val i=if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan","Keuangan").indexOf(label)else if(label=="Kasir")0 else 4;NavigationBarItem(selected=tab==i,onClick={tab=i},icon={Text(listOf("▦","▤","▥","⇅","⚙")[i],fontSize=18.sp)},label={Text(label)})}}}){pad->
  Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
   if(message.isNotBlank())Text(message,color=SeaGreen,style=MaterialTheme.typography.bodySmall)
   when(tab){
@@ -204,6 +211,7 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
    2->{Text("Laporan penjualan",fontWeight=FontWeight.Bold,fontSize=21.sp);val sales=db.sales();Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(14.dp)){Text("Transaksi terakhir",fontWeight=FontWeight.Bold);if(sales.isEmpty())Text("Belum ada transaksi",color=Color.Gray)else sales.forEach{(amount,date)->Row(Modifier.fillMaxWidth().padding(vertical=6.dp)){Text(date,modifier=Modifier.weight(1f),fontSize=12.sp);Text(money(amount),fontWeight=FontWeight.SemiBold,color=SeaGreen)}}}}}
    3->{Text("Impor / Ekspor Barang",fontWeight=FontWeight.Bold,fontSize=21.sp);Text("Jumlah barang saat ini: ${products.size}");Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){Text("Kolom CSV: barcode, nama, kategori, harga_modal, harga_jual, stok, stok_minimum",fontSize=12.sp);Button(onClick={export.launch("seamart-barang.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor CSV")};OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor CSV")};Text("Impor akan memperbarui barang dengan barcode yang sama, bukan menghapus seluruh daftar.",fontSize=12.sp,color=Color.Gray)}}}
    4->{Text("Pengaturan",fontWeight=FontWeight.Bold,fontSize=21.sp);Text("Login: $loggedUser • ${userRole?: ""}",color=SeaGreen);if(activeShiftId!=null){OutlinedTextField(closingCash,{closingCash=it.filter(Char::isDigit)},label={Text("Uang fisik saat tutup kasir")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.fillMaxWidth());Button(onClick={val expected=db.closeShift(loggedUser?: "Kasir",closingCash.toLongOrNull()?:0L,activeShiftId!!);activeShiftId=null;closingCash="";cart=emptyMap();message="Kasir ditutup. Perkiraan uang tunai: ${money(expected)}"},modifier=Modifier.fillMaxWidth()){Text("Tutup Kasir")}};TextButton(onClick={loggedUser=null;userRole=null;tab=0}){Text("Keluar / Ganti Pengguna")};if(userRole=="ADMIN")TextButton(onClick={showCreateCashier=true}){Text("Tambah Akun Kasir")};Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("Izinkan penjualan saat stok 0",fontWeight=FontWeight.SemiBold);Text("Barang tetap dapat dijual meskipun stok tercatat 0. Stok tidak akan menjadi minus.",fontSize=12.sp,color=Color.Gray)};Switch(checked=allowZeroStock,onCheckedChange={enabled->allowZeroStock=enabled;prefs.edit().putBoolean("allow_zero_stock",enabled).apply();message=if(enabled)"Penjualan stok 0 diizinkan" else "Penjualan stok 0 dinonaktifkan"})};Divider();Text("Printer struk Bluetooth",fontWeight=FontWeight.SemiBold);Text(selectedPrinterName?: "Belum ada printer dipilih",fontSize=12.sp,color=Color.Gray);Button(onClick=openPrinterPicker,modifier=Modifier.fillMaxWidth()){Text("Pilih / Hubungkan Printer")};OutlinedButton(onClick={if(selectedPrinter.isNullOrBlank())message="Pilih printer Bluetooth terlebih dahulu" else if(lastReceipt.isBlank())message="Belum ada struk untuk dicetak ulang" else printBluetoothReceipt(ctx,selectedPrinter!!,lastReceipt){message=it}},enabled=selectedPrinter!=null&&lastReceipt.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("Cetak Ulang Struk Terakhir")};Text("Gunakan printer thermal Bluetooth dengan mode ESC/POS (SPP), kertas 58 mm.",fontSize=12.sp,color=Color.Gray)}}}
+   5->{FinanceScreen(db=db,onMessage={message=it})}
   }
  }
 }}
@@ -216,6 +224,45 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
   val pairedPrinters=remember(showPrinterPicker){try{val adapter=(ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter;adapter?.bondedDevices?.toList()?.sortedBy{it.name?:it.address}?:emptyList()}catch(_:SecurityException){emptyList()}}
   AlertDialog(onDismissRequest={showPrinterPicker=false},title={Text("Pilih Printer Bluetooth")},text={Column(verticalArrangement=Arrangement.spacedBy(4.dp)){if(pairedPrinters.isEmpty())Text("Tidak ada perangkat yang sudah dipasangkan. Pasangkan printer melalui Pengaturan Bluetooth HP terlebih dahulu.");pairedPrinters.forEach{device->TextButton(onClick={selectedPrinter=device.address;selectedPrinterName=device.name?:device.address;prefs.edit().putString("printer_address",device.address).putString("printer_name",selectedPrinterName).apply();showPrinterPicker=false;message="Printer dipilih: $selectedPrinterName"}){Column(Modifier.fillMaxWidth()){Text(device.name?: "Printer Bluetooth");Text(device.address,fontSize=11.sp,color=Color.Gray)}}}}},confirmButton={TextButton(onClick={showPrinterPicker=false}){Text("Tutup")}})
  }
+}
+
+@Composable private fun FinanceScreen(db:StoreDb,onMessage:(String)->Unit){
+ var showEntry by remember{mutableStateOf(false)}
+ var entryType by remember{mutableStateOf("OUT")}
+ var category by remember{mutableStateOf("Belanja stok")}
+ var description by remember{mutableStateOf("")}
+ var amount by remember{mutableStateOf("")}
+ var method by remember{mutableStateOf("Tunai")}
+ var refreshKey by remember{mutableIntStateOf(0)}
+ val entries=remember(refreshKey){db.cashFlows()}
+ val sales=remember(refreshKey){db.salesTotal()}
+ val incoming=remember(refreshKey){db.cashFlowTotal("IN")}
+ val outgoing=remember(refreshKey){db.cashFlowTotal("OUT")}
+ val net=sales+incoming-outgoing
+ Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(10.dp)){
+  Text("Arus Keuangan",fontWeight=FontWeight.Bold,fontSize=21.sp)
+  Text("Ringkasan seluruh transaksi tersimpan",fontSize=12.sp,color=Color.Gray)
+  Card(colors=CardDefaults.cardColors(containerColor=SeaMint)){Column(Modifier.fillMaxWidth().padding(14.dp),verticalArrangement=Arrangement.spacedBy(4.dp)){Text("Penjualan tercatat",fontSize=12.sp);Text(money(sales),fontSize=20.sp,fontWeight=FontWeight.Bold,color=SeaGreen)}}
+  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+   Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(12.dp)){Text("Pemasukan lain",fontSize=11.sp);Text(money(incoming),fontWeight=FontWeight.Bold,color=SeaGreen)}}
+   Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(12.dp)){Text("Pengeluaran",fontSize=11.sp);Text(money(outgoing),fontWeight=FontWeight.Bold,color=Color.Red)}}
+  }
+  Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.fillMaxWidth().padding(14.dp)){Text("Arus bersih (penjualan + pemasukan - pengeluaran)",fontSize=11.sp,color=Color.Gray);Text(money(net),fontSize=22.sp,fontWeight=FontWeight.Bold,color=if(net>=0)SeaGreen else Color.Red)}}
+  Button(onClick={entryType="OUT";category="Belanja stok";showEntry=true},modifier=Modifier.fillMaxWidth()){Text("+ Catat Pengeluaran")}
+  OutlinedButton(onClick={entryType="IN";category="Modal tambahan";showEntry=true},modifier=Modifier.fillMaxWidth()){Text("+ Catat Pemasukan Lain")}
+  Text("Riwayat kas manual",fontWeight=FontWeight.Bold)
+  if(entries.isEmpty())Text("Belum ada pemasukan atau pengeluaran manual.",color=Color.Gray,fontSize=12.sp)
+  LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(6.dp)){
+   items(entries){e->Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(e.category,fontWeight=FontWeight.SemiBold);if(e.description.isNotBlank())Text(e.description,fontSize=12.sp,color=Color.Gray);Text("${e.date} • ${e.method}",fontSize=10.sp,color=Color.Gray)};Text((if(e.type=="IN")"+" else "-")+money(e.amount),fontWeight=FontWeight.Bold,color=if(e.type=="IN")SeaGreen else Color.Red)}}}
+  }
+ }
+ if(showEntry){AlertDialog(onDismissRequest={showEntry=false},title={Text(if(entryType=="OUT")"Catat Pengeluaran" else "Catat Pemasukan Lain")},text={Column(verticalArrangement=Arrangement.spacedBy(7.dp)){
+  Text(if(entryType=="OUT")"Pengeluaran mengurangi arus kas." else "Pemasukan selain transaksi penjualan.",fontSize=12.sp,color=Color.Gray)
+  OutlinedTextField(category,{category=it},label={Text("Kategori")},modifier=Modifier.fillMaxWidth())
+  OutlinedTextField(description,{description=it},label={Text("Keterangan")},modifier=Modifier.fillMaxWidth())
+  OutlinedTextField(amount,{amount=it.filter(Char::isDigit)},label={Text("Nominal (Rp)")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.fillMaxWidth())
+  Row(verticalAlignment=Alignment.CenterVertically){RadioButton(method=="Tunai",{method="Tunai"});Text("Tunai");RadioButton(method=="QRIS",{method="QRIS"});Text("QRIS")}
+ },},confirmButton={TextButton(onClick={val value=amount.toLongOrNull()?:0L;if(category.isBlank()||value<=0)onMessage("Kategori dan nominal harus diisi dengan benar")else try{db.addCashFlow(entryType,category.trim(),description.trim(),value,method);refreshKey++;showEntry=false;amount="";description="";onMessage("Catatan keuangan berhasil disimpan")}catch(e:Exception){onMessage("Gagal menyimpan: ${e.message}")}},enabled=category.isNotBlank()&&(amount.toLongOrNull()?:0L)>0){Text("Simpan")}},dismissButton={TextButton(onClick={showEntry=false}){Text("Batal")}})}
 }
 
 @Composable private fun ProductEditor(product:Product?,onDismiss:()->Unit,onSave:(Product)->Unit){var name by remember(product){mutableStateOf(product?.name?:"")};var barcode by remember(product){mutableStateOf(product?.barcode?:"")};var category by remember(product){mutableStateOf(product?.category?:"")};var cost by remember(product){mutableStateOf(product?.cost?.toString()?:"0")};var price by remember(product){mutableStateOf(product?.price?.toString()?:"")};var stock by remember(product){mutableStateOf(product?.stock?.toString()?:"0")};var min by remember(product){mutableStateOf(product?.minStock?.toString()?:"5")}
