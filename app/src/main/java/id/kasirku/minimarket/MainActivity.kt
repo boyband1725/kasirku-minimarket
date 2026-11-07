@@ -9,7 +9,6 @@ import android.os.Looper
 import androidx.core.content.ContextCompat
 import java.security.MessageDigest
 import java.util.UUID
-import java.util.UUID
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
