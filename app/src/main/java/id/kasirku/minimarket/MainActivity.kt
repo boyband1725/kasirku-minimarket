@@ -19,6 +19,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -108,7 +113,19 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
    0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth());OutlinedTextField(code,{code=it},label={Text("Barcode / kode barang")},modifier=Modifier.fillMaxWidth(),singleLine=true)
     Button(onClick={val p=products.find{it.barcode==code};if(p!=null){if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"}else note="Barcode tidak ditemukan";code=""},modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
     Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
-    LazyColumn(Modifier.weight(1f)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("${p.barcode} • Stok ${p.stock} • Modal ${money(p.costPrice)} • Jual ${money(p.price)}")},trailingContent={TextButton(onClick={if((cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"}){Text("+ Tambah")}})}}
+    LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=8.dp)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->
+ Card(modifier=Modifier.fillMaxWidth().heightIn(min=142.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)){
+  Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)){
+   Box(Modifier.size(34.dp),contentAlignment=androidx.compose.ui.Alignment.Center){
+    Surface(shape=MaterialTheme.shapes.medium,color=MaterialTheme.colorScheme.primaryContainer){Box(Modifier.fillMaxSize().padding(5.dp),contentAlignment=androidx.compose.ui.Alignment.Center){Text(p.name.take(1).uppercase(),fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.onPrimaryContainer)}}
+   }
+   Text(p.name,fontWeight=FontWeight.SemiBold,maxLines=2,overflow=TextOverflow.Ellipsis,minLines=2)
+   Text(money(p.price),style=MaterialTheme.typography.titleMedium,fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+   Text("Stok: ${p.stock}",style=MaterialTheme.typography.bodySmall,color=if(p.stock<=5)MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+   Button(onClick={if(p.stock>0&&(cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note=if(p.stock<=0)"Stok habis" else "Stok tidak cukup"},enabled=p.stock>0,modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=8.dp,vertical=4.dp)){Text(if(p.stock>0)"+ Tambah" else "Stok habis")}
+  }
+ }
+}}
     Text("Total: ${money(total)}",style=MaterialTheme.typography.headlineSmall)
     if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},modifier=Modifier.weight(1f)){Text("Bayar")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
     if(receiptLines.isNotEmpty()){Text("Printer: ${chosenPrinter?.name?: "Belum dipilih"}");Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)}else{printerList=pairedPrinters();showPrinters=true}}){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"KASIRKU MINIMARKET",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)}){Text("Cetak struk")}}}
