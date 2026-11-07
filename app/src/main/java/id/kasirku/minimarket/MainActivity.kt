@@ -168,7 +168,8 @@ private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).
   }
   return
  }
-\n MaterialTheme(colorScheme=lightColorScheme(primary=SeaGreen MaterialTheme(colorScheme=lightColorScheme(primary=SeaGreen,onPrimary=Color.White,secondary=SeaGreen,background=SeaBg,surface=Color.White,onSurface=Ink)){
+
+ MaterialTheme(colorScheme=lightColorScheme(primary=SeaGreen,onPrimary=Color.White,secondary=SeaGreen,background=SeaBg,surface=Color.White,onSurface=Ink)){
  Scaffold(containerColor=SeaBg,topBar={TopAppBar(title={Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)){Surface(shape=RoundedCornerShape(12.dp),color=SeaGreen){Box(Modifier.size(42.dp),contentAlignment=Alignment.Center){Text("\$",fontSize=27.sp,fontWeight=FontWeight.Bold,color=Color.White)}};Column{Text("SeaMart",fontWeight=FontWeight.Bold);Text("MINIMARKET POS",fontSize=11.sp,color=SeaGreen)}}})},bottomBar={NavigationBar(containerColor=Color.White){(if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan")else listOf("Kasir","Pengaturan")).forEach{label->val i=if(userRole=="ADMIN")listOf("Kasir","Barang","Laporan","CSV","Pengaturan").indexOf(label)else if(label=="Kasir")0 else 4;NavigationBarItem(selected=tab==i,onClick={tab=i},icon={Text(listOf("▦","▤","▥","⇅","⚙")[i],fontSize=18.sp)},label={Text(label)})}}}){pad->
  Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
   if(message.isNotBlank())Text(message,color=SeaGreen,style=MaterialTheme.typography.bodySmall)
