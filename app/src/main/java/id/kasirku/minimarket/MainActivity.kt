@@ -1,82 +1,106 @@
 package id.kasirku.minimarket
 
 import android.content.ContentValues
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
 import android.os.Bundle
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.NumberFormat
 import java.util.Locale
 
-data class Product(val id:Long,val name:String,val barcode:String,val price:Long,val stock:Int)
-class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,2){
+private val SeaGreen = Color(0xFF145B45)
+private val SeaMint = Color(0xFFE8F3EE)
+private val SeaBg = Color(0xFFF5F8F6)
+private val Ink = Color(0xFF1B2923)
+
+data class Product(val id:Long,val name:String,val barcode:String,val category:String,val cost:Long,val price:Long,val stock:Int,val minStock:Int)
+class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,3){
  override fun onCreate(db:SQLiteDatabase){
-  db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,barcode TEXT UNIQUE,price INTEGER NOT NULL,stock INTEGER NOT NULL)")
-  db.execSQL("CREATE TABLE sales(id INTEGER PRIMARY KEY AUTOINCREMENT,total INTEGER,created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
-  db.execSQL("INSERT INTO products(name,barcode,price,stock) VALUES('Air Mineral 600ml','899000000001',4000,30),('Mie Instan','899000000002',3500,50),('Roti Tawar','899000000003',15000,12)")
+  db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,barcode TEXT UNIQUE,price INTEGER NOT NULL,stock INTEGER NOT NULL,category TEXT NOT NULL DEFAULT '',cost INTEGER NOT NULL DEFAULT 0,min_stock INTEGER NOT NULL DEFAULT 5)")
+  db.execSQL("CREATE TABLE sales(id INTEGER PRIMARY KEY AUTOINCREMENT,total INTEGER,created_at TEXT DEFAULT CURRENT_TIMESTAMP,method TEXT DEFAULT 'Tunai')")
  }
- override fun onUpgrade(db:SQLiteDatabase,old:Int,now:Int){}
- fun all():List<Product>{val a=mutableListOf<Product>();readableDatabase.rawQuery("SELECT id,name,barcode,price,stock FROM products ORDER BY name",null).use{c->while(c.moveToNext())a.add(Product(c.getLong(0),c.getString(1),c.getString(2)?: "",c.getLong(3),c.getInt(4)))};return a}
- fun save(id:Long?,n:String,b:String,p:Long,s:Int){val v=ContentValues().apply{put("name",n);put("barcode",b.ifBlank{null});put("price",p);put("stock",s)};if(id==null)writableDatabase.insertWithOnConflict("products",null,v,SQLiteDatabase.CONFLICT_REPLACE) else writableDatabase.update("products",v,"id=?",arrayOf(id.toString()))}
+ override fun onUpgrade(db:SQLiteDatabase,old:Int,now:Int){
+  if(old<3){
+   addColumn(db,"category","TEXT NOT NULL DEFAULT ''")
+   addColumn(db,"cost","INTEGER NOT NULL DEFAULT 0")
+   addColumn(db,"min_stock","INTEGER NOT NULL DEFAULT 5")
+   try{db.execSQL("ALTER TABLE sales ADD COLUMN method TEXT NOT NULL DEFAULT 'Tunai'")}catch(_:Exception){}
+  }
+ }
+ private fun addColumn(db:SQLiteDatabase,name:String,type:String){try{db.execSQL("ALTER TABLE products ADD COLUMN $name $type")}catch(_:Exception){}}
+ fun all():List<Product>{val out=mutableListOf<Product>();readableDatabase.rawQuery("SELECT id,name,COALESCE(barcode,''),COALESCE(category,''),cost,price,stock,min_stock FROM products ORDER BY name COLLATE NOCASE",null).use{c->while(c.moveToNext())out.add(Product(c.getLong(0),c.getString(1),c.getString(2),c.getString(3),c.getLong(4),c.getLong(5),c.getInt(6),c.getInt(7)))};return out}
+ fun save(p:Product){val v=ContentValues().apply{put("name",p.name);put("barcode",p.barcode.ifBlank{null});put("category",p.category);put("cost",p.cost);put("price",p.price);put("stock",p.stock);put("min_stock",p.minStock)};if(p.id>0)writableDatabase.update("products",v,"id=?",arrayOf(p.id.toString()))else writableDatabase.insertOrThrow("products",null,v)}
+ fun upsert(name:String,barcode:String,category:String,cost:Long,price:Long,stock:Int,minStock:Int){val found=if(barcode.isBlank())null else readableDatabase.rawQuery("SELECT id FROM products WHERE barcode=?",arrayOf(barcode)).use{if(it.moveToFirst())it.getLong(0)else null};save(Product(found?:0,name,barcode,category,cost,price,stock,minStock))}
  fun delete(id:Long){writableDatabase.delete("products","id=?",arrayOf(id.toString()))}
- fun changeStock(id:Long,amount:Int){writableDatabase.execSQL("UPDATE products SET stock=MAX(0,stock+?) WHERE id=?",arrayOf(amount,id))}
- fun sale(t:Long){writableDatabase.execSQL("INSERT INTO sales(total) VALUES(?)",arrayOf(t))}
+ fun completeSale(total:Long,method:String,items:Map<Long,Int>){val db=writableDatabase;db.beginTransaction();try{db.execSQL("INSERT INTO sales(total,method) VALUES(?,?)",arrayOf(total,method));items.forEach{(id,qty)->db.execSQL("UPDATE products SET stock=MAX(0,stock-?) WHERE id=?",arrayOf(qty,id))};db.setTransactionSuccessful()}finally{db.endTransaction()}}
+ fun sales():List<Pair<Long,String>>{val out=mutableListOf<Pair<Long,String>>();readableDatabase.rawQuery("SELECT total,COALESCE(created_at,'' ) FROM sales ORDER BY id DESC LIMIT 100",null).use{c->while(c.moveToNext())out.add(c.getLong(0) to c.getString(1))};return out}
 }
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
-fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
+private fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("id","ID")).format(v)
+private fun parseCsv(text:String):List<List<String>>{val rows=mutableListOf<List<String>>();var row=mutableListOf<String>();val cell=StringBuilder();var quoted=false;val first=text.substringBefore('\n');val delimiter=if(first.count{it==';'}>first.count{it==','})';' else ',';var i=0;while(i<text.length){val ch=text[i];if(ch=='"'){if(quoted&&i+1<text.length&&text[i+1]=='"'){cell.append('"');i++}else quoted=!quoted}else if(ch==delimiter&&!quoted){row.add(cell.toString());cell.clear()}else if((ch=='\n'||ch=='\r')&&!quoted){if(ch=='\r'&&i+1<text.length&&text[i+1]=='\n')i++;row.add(cell.toString());if(row.any{it.isNotBlank()})rows.add(row);row=mutableListOf();cell.clear()}else cell.append(ch);i++};row.add(cell.toString());if(row.any{it.isNotBlank()})rows.add(row);return rows}
+private fun csvCell(v:String)="\""+v.replace("\"","\\"")+"\""
+private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).replace(" ","");if(s.contains(',')&&s.contains('.')){s=if(s.lastIndexOf(',')>s.lastIndexOf('.'))s.replace(".","").replace(',','.')else s.replace(",","")}else if(s.contains(',')){s=if(s.substringAfterLast(',').length==2)s.replace(',','.')else s.replace(",","")};return s.filter{it.isDigit()||it=='.'}.substringBefore('.').toLongOrNull()?:0L}
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class,ExperimentalFoundationApi::class)
 @Composable fun KasirKuApp(){
  val ctx=LocalContext.current;val db=remember{StoreDb(ctx)}
  var products by remember{mutableStateOf(db.all())};var tab by remember{mutableIntStateOf(0)}
- var search by remember{mutableStateOf("")};var code by remember{mutableStateOf("")}
- var cart by remember{mutableStateOf(mapOf<Long,Int>())};var note by remember{mutableStateOf("")}
- var editing by remember{mutableStateOf<Product?>(null)};var add by remember{mutableStateOf(false)}
- val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){u:Uri?->if(u!=null)try{ctx.contentResolver.openOutputStream(u)?.bufferedWriter()?.use{w->w.appendLine("nama,barcode,harga_modal,harga_jual,stok");products.forEach{p->w.appendLine("${csv(p.name)},${csv(p.barcode)},0,${p.price},${p.stock}")}};note="Ekspor CSV berhasil"}catch(e:Exception){note="Ekspor gagal: ${e.message}"}}
- val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){u:Uri?->if(u!=null)try{ctx.contentResolver.openInputStream(u)?.use{s->val lines=BufferedReader(InputStreamReader(s)).readLines();if(lines.isNotEmpty()){val headers=parseCsv(lines.first()).map{it.trim().lowercase()};val ni=headers.indexOfFirst{it in listOf("nama","name","nama_barang")};val bi=headers.indexOfFirst{it in listOf("barcode","kode","kode_barang")};val pi=headers.indexOfFirst{it in listOf("harga_jual","harga","price")};val si=headers.indexOfFirst{it in listOf("stok","stock")};lines.drop(1).forEach{line->val a=parseCsv(line);if(ni>=0&&pi>=0&&a.size>maxOf(ni,pi)){val name=a[ni].trim();val bar=if(bi>=0&&bi<a.size)a[bi].trim() else "";val price=a[pi].filter{it.isDigit()}.toLongOrNull()?:0L;val stock=if(si>=0&&si<a.size)a[si].filter{it.isDigit()||it=='-'}.toIntOrNull()?:0 else 0;if(name.isNotBlank())db.save(null,name,bar,price,stock)}}}};products=db.all();note="Impor CSV selesai"}catch(e:Exception){note="Impor gagal: ${e.message}"}}
- val total=cart.entries.sumOf{(id,n)->(products.find{it.id==id}?.price?:0)*n}
- Scaffold(topBar={TopAppBar(title={Text("SeaMart")})},bottomBar={NavigationBar{NavigationBarItem(tab==0,{tab=0},icon={},label={Text("Kasir")});NavigationBarItem(tab==1,{tab=1},icon={},label={Text("Barang")});NavigationBarItem(tab==2,{tab=2},icon={},label={Text("CSV")})}}){padding->
- Column(Modifier.padding(padding).padding(14.dp).fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
-  if(note.isNotBlank())Text(note,color=MaterialTheme.colorScheme.primary)
+ var search by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cart by remember{mutableStateOf(mapOf<Long,Int>())}
+ var message by remember{mutableStateOf("")};var editing by remember{mutableStateOf<Product?>(null)};var showEditor by remember{mutableStateOf(false)};var showPay by remember{mutableStateOf(false)}
+ var paymentMethod by remember{mutableStateOf("Tunai")};var paid by remember{mutableStateOf("")}
+ val refresh={products=db.all()}
+ val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){uri:Uri?->if(uri!=null)try{ctx.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use{w->w.appendLine("barcode,nama,kategori,harga_modal,harga_jual,stok,stok_minimum");products.forEach{p->w.appendLine(listOf(p.barcode,p.name,p.category,p.cost.toString(),p.price.toString(),p.stock.toString(),p.minStock.toString()).joinToString(","){csvCell(it)})}};message="Ekspor CSV berhasil"}catch(e:Exception){message="Ekspor gagal: ${e.message}"}}
+ val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri:Uri?->if(uri!=null)try{var added=0;var updated=0;ctx.contentResolver.openInputStream(uri)?.bufferedReader()?.use{reader->val rows=parseCsv(reader.readText().removePrefix("\uFEFF"));if(rows.size<2)throw IllegalArgumentException("CSV kosong");val h=rows.first().map{it.trim().lowercase().replace(" ","_")};fun idx(vararg names:String)=h.indexOfFirst{it in names};val ni=idx("nama","name","nama_barang","nama_produk");val bi=idx("barcode","sku","kode","kode_barang");val ci=idx("kategori","category");val coi=idx("harga_modal","modal","harga_beli","cost");val pi=idx("harga_jual","harga","price");val si=idx("stok","stock","jumlah");val mi=idx("stok_minimum","min_stok","minimum_stok","min");if(ni<0||pi<0||si<0)throw IllegalArgumentException("Kolom wajib: nama, harga_jual, stok");rows.drop(1).forEach{r->fun get(i:Int)=if(i>=0&&i<r.size)r[i].trim() else "";val name=get(ni);if(name.isNotBlank()){val old=if(get(bi).isBlank())null else products.firstOrNull{it.barcode==get(bi)};db.upsert(name,get(bi),get(ci),parseAmount(get(coi)),parseAmount(get(pi)),parseAmount(get(si)).toInt(),parseAmount(get(mi).ifBlank{"5"}).toInt());if(old==null)added++ else updated++}}};refresh();message="Impor selesai: $added barang baru, $updated diperbarui"}catch(e:Exception){message="Impor gagal: ${e.message}"}}
+ val total=cart.entries.sumOf{(id,q)->(products.find{it.id==id}?.price?:0L)*q}
+ val visible=products.filter{it.name.contains(search,true)||it.barcode.contains(search,true)||it.category.contains(search,true)}
+ MaterialTheme(colorScheme=lightColorScheme(primary=SeaGreen,onPrimary=Color.White,secondary=SeaGreen,background=SeaBg,surface=Color.White,onSurface=Ink)){
+ Scaffold(containerColor=SeaBg,topBar={TopAppBar(title={Column{Text("SeaMart",fontWeight=FontWeight.Bold);Text("MINIMARKET POS",fontSize=11.sp,color=SeaGreen)}})},bottomBar={NavigationBar(containerColor=Color.White){listOf("Kasir","Barang","Laporan","CSV").forEachIndexed{i,label->NavigationBarItem(selected=tab==i,onClick={tab=i},icon={Text(listOf("▦","▤","▥","⇅")[i],fontSize=18.sp)},label={Text(label)})}}}){pad->
+ Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+  if(message.isNotBlank())Text(message,color=SeaGreen,style=MaterialTheme.typography.bodySmall)
   when(tab){
-   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth())
-    OutlinedTextField(code,{code=it},label={Text("Barcode / kode barang")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-    Button(onClick={val p=products.find{it.barcode==code};if(p!=null&&p.stock>0)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note=if(p==null)"Barcode tidak ditemukan" else "Stok habis";code=""},modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
-    Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
-    LazyColumn(Modifier.weight(1f)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->ListItem(headlineContent={Text(p.name)},supportingContent={Text("${p.barcode} • Stok ${p.stock} • ${money(p.price)}")},trailingContent={TextButton(enabled=p.stock>0,onClick={cart=cart+(p.id to ((cart[p.id]?:0)+1))}){Text("+ Tambah")}})}}
-    Text("Total: ${money(total)}",style=MaterialTheme.typography.headlineSmall)
-    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={db.sale(total);cart=emptyMap();note="Transaksi tersimpan"},modifier=Modifier.weight(1f)){Text("Bayar / Simpan")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
+   0->{
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=SeaMint)){Column(Modifier.padding(12.dp)){Text("Produk tersedia",fontSize=12.sp);Text(products.size.toString(),fontSize=22.sp,fontWeight=FontWeight.Bold,color=SeaGreen)}};Card(Modifier.weight(1f),colors=CardDefaults.cardColors(containerColor=SeaMint)){Column(Modifier.padding(12.dp)){Text("Item di keranjang",fontSize=12.sp);Text(cart.values.sum().toString(),fontSize=22.sp,fontWeight=FontWeight.Bold,color=SeaGreen)}}}
+    OutlinedTextField(search,{search=it},modifier=Modifier.fillMaxWidth(),singleLine=true,label={Text("Cari nama / barcode barang")})
+    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedTextField(barcode,{barcode=it},modifier=Modifier.weight(1f),singleLine=true,label={Text("Scan / masukkan barcode")});Button(onClick={val p=products.firstOrNull{it.barcode==barcode.trim()};if(p!=null&&p.stock>(cart[p.id]?:0))cart=cart+(p.id to ((cart[p.id]?:0)+1))else message=if(p==null)"Barcode tidak ditemukan" else "Stok tidak cukup";barcode=""}){Text("Tambah")}}
+    Text("Pilih Produk  •  ${visible.size} barang",fontWeight=FontWeight.Bold)
+    LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),contentPadding=PaddingValues(bottom=8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){items(visible){p->Card(shape=RoundedCornerShape(14.dp),colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text(p.category.ifBlank{"PRODUK"},fontSize=10.sp,color=SeaGreen,fontWeight=FontWeight.Bold);Text(p.name,fontWeight=FontWeight.SemiBold,minLines=2);Text(money(p.price),fontWeight=FontWeight.Bold,color=SeaGreen);Text("Stok ${p.stock}",fontSize=11.sp,color=Color.Gray);Button(onClick={if(p.stock>(cart[p.id]?:0))cart=cart+(p.id to ((cart[p.id]?:0)+1))else message="Stok tidak cukup"},enabled=p.stock>(cart[p.id]?:0),modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(4.dp)){Text("+ Tambah")}}}}}
+    Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){Row(verticalAlignment=Alignment.CenterVertically){Text("Keranjang",fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));TextButton(onClick={cart=emptyMap()}){Text("Kosongkan")}};if(cart.isEmpty())Text("Belum ada barang",color=Color.Gray)else cart.forEach{(id,q)->val p=products.firstOrNull{it.id==id};if(p!=null)Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(p.name,fontWeight=FontWeight.Medium);Text(money(p.price*q),fontSize=12.sp,color=Color.Gray)};TextButton(onClick={cart=if(q<=1)cart-id else cart+(id to q-1)}){Text("−")};Text(q.toString());TextButton(onClick={if(q<p.stock)cart=cart+(id to q+1)else message="Stok maksimum"}){Text("+")}}};Divider();Row{Text("Total",fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));Text(money(total),fontWeight=FontWeight.Bold,color=SeaGreen,fontSize=20.sp)};Button(onClick={showPay=true},enabled=cart.isNotEmpty(),modifier=Modifier.fillMaxWidth()){Text("Bayar  •  ${money(total)}")}}}
    }
-   1->{Row{Text("Master Barang",modifier=Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Button(onClick={editing=null;add=true}){Text("+ Barang")}}
-    LazyColumn{items(products){p->ListItem(modifier=Modifier.clickable{editing=p;add=true},headlineContent={Text(p.name)},supportingContent={Text("Barcode ${p.barcode} • ${money(p.price)} • Stok ${p.stock}")},trailingContent={TextButton(onClick={editing=p;add=true}){Text("Edit")}})}}
-   }
-   else->{Text("Impor / Ekspor CSV",style=MaterialTheme.typography.titleLarge);Text("Kolom: nama, barcode, harga_modal, harga_jual, stok")
-    Button(onClick={export.launch("barang-kasirku.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor CSV")}
-    OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor CSV")}
-    Text("Data disimpan di HP dan bisa digunakan tanpa internet.")
-   }
+   1->{Row(verticalAlignment=Alignment.CenterVertically){Text("Master Barang",fontWeight=FontWeight.Bold,fontSize=21.sp,modifier=Modifier.weight(1f));Button(onClick={editing=null;showEditor=true}){Text("+ Barang")}};OutlinedTextField(search,{search=it},modifier=Modifier.fillMaxWidth(),singleLine=true,label={Text("Cari barang")});LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)){items(visible){p->Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(12.dp)){Row(verticalAlignment=Alignment.CenterVertically){Text(p.name,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));TextButton(onClick={editing=p;showEditor=true}){Text("Edit")}};Text("Barcode: ${p.barcode.ifBlank{"- "}}  •  Stok: ${p.stock}",fontSize=12.sp,color=Color.Gray);Text("Modal ${money(p.cost)}  |  Jual ${money(p.price)}",fontSize=13.sp,color=SeaGreen);Row{TextButton(onClick={db.save(p.copy(stock=(p.stock+1)));refresh()}){Text("+ Stok")};TextButton(onClick={db.save(p.copy(stock=(p.stock-1).coerceAtLeast(0)));refresh()}){Text("− Stok")};Spacer(Modifier.weight(1f));TextButton(onClick={db.delete(p.id);refresh();message="Barang dihapus"}){Text("Hapus",color=Color.Red)}}}}}}}
+   2->{Text("Laporan penjualan",fontWeight=FontWeight.Bold,fontSize=21.sp);val sales=db.sales();Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(14.dp)){Text("Transaksi terakhir",fontWeight=FontWeight.Bold);if(sales.isEmpty())Text("Belum ada transaksi",color=Color.Gray)else sales.forEach{(amount,date)->Row(Modifier.fillMaxWidth().padding(vertical=6.dp)){Text(date,modifier=Modifier.weight(1f),fontSize=12.sp);Text(money(amount),fontWeight=FontWeight.SemiBold,color=SeaGreen)}}}}}
+   else->{Text("Impor / Ekspor Barang",fontWeight=FontWeight.Bold,fontSize=21.sp);Text("Jumlah barang saat ini: ${products.size}");Card(colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){Text("Kolom CSV: barcode, nama, kategori, harga_modal, harga_jual, stok, stok_minimum",fontSize=12.sp);Button(onClick={export.launch("seamart-barang.csv")},modifier=Modifier.fillMaxWidth()){Text("Ekspor CSV")};OutlinedButton(onClick={import.launch(arrayOf("text/*","application/csv","application/vnd.ms-excel"))},modifier=Modifier.fillMaxWidth()){Text("Impor CSV")};Text("Impor akan memperbarui barang dengan barcode yang sama, bukan menghapus seluruh daftar.",fontSize=12.sp,color=Color.Gray)}}}
   }
  }
+}}
+ if(showEditor){ProductEditor(product=editing,onDismiss={showEditor=false},onSave={p->try{db.save(p);refresh();showEditor=false;message="Barang berhasil disimpan"}catch(e:Exception){message="Gagal menyimpan: barcode mungkin sudah digunakan"}})}
+ if(showPay){AlertDialog(onDismissRequest={showPay=false},title={Text("Pembayaran")},text={Column(verticalArrangement=Arrangement.spacedBy(8.dp)){Text("Total: ${money(total)}",fontWeight=FontWeight.Bold);Row(verticalAlignment=Alignment.CenterVertically){RadioButton(paymentMethod=="Tunai",{paymentMethod="Tunai"});Text("Tunai");Spacer(Modifier.width(16.dp));RadioButton(paymentMethod=="QRIS",{paymentMethod="QRIS"});Text("QRIS")};if(paymentMethod=="Tunai")OutlinedTextField(paid,{paid=it},label={Text("Uang diterima")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));if(paymentMethod=="Tunai"){val change=(paid.toLongOrNull()?:0L)-total;Text("Kembalian: ${money(change.coerceAtLeast(0))}")}}},confirmButton={TextButton(onClick={val cash=if(paymentMethod=="Tunai")paid.toLongOrNull()?:0L else total;if(cash<total){message="Uang pembayaran kurang"}else{db.completeSale(total,paymentMethod,cart);refresh();cart=emptyMap();showPay=false;paid="";message="Transaksi berhasil disimpan"}}){Text("Selesaikan")}},dismissButton={TextButton(onClick={showPay=false}){Text("Batal")}})}
 }
- if(add){var name by remember(editing){mutableStateOf(editing?.name?:"")};var barcode by remember(editing){mutableStateOf(editing?.barcode?:"")};var price by remember(editing){mutableStateOf(editing?.price?.toString()?:"")};var stock by remember(editing){mutableStateOf(editing?.stock?.toString()?:"0")}
- AlertDialog(onDismissRequest={add=false},title={Text(if(editing==null)"Tambah barang" else "Edit barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(price,{price=it},label={Text("Harga jual (angka)")});OutlinedTextField(stock,{stock=it},label={Text("Stok")})}},confirmButton={TextButton(onClick={val p=price.filter{it.isDigit()}.toLongOrNull();val s=stock.toIntOrNull();if(name.isNotBlank()&&p!=null&&s!=null&&s>=0){db.save(editing?.id,name,barcode,p,s);products=db.all();add=false;note="Barang berhasil disimpan"}else note="Periksa nama, harga, dan stok"}){Text("Simpan")}},dismissButton={Row{if(editing!=null)TextButton(onClick={db.delete(editing!!.id);products=db.all();add=false;note="Barang dihapus"}){Text("Hapus")};TextButton(onClick={add=false}){Text("Batal")}}})
- }
+@Composable private fun ProductEditor(product:Product?,onDismiss:()->Unit,onSave:(Product)->Unit){var name by remember(product){mutableStateOf(product?.name?:"")};var barcode by remember(product){mutableStateOf(product?.barcode?:"")};var category by remember(product){mutableStateOf(product?.category?:"")};var cost by remember(product){mutableStateOf(product?.cost?.toString()?:"0")};var price by remember(product){mutableStateOf(product?.price?.toString()?:"")};var stock by remember(product){mutableStateOf(product?.stock?.toString()?:"0")};var min by remember(product){mutableStateOf(product?.minStock?.toString()?:"5")}
+ AlertDialog(onDismissRequest=onDismiss,title={Text(if(product==null)"Tambah Barang" else "Edit Barang")},text={Column(verticalArrangement=Arrangement.spacedBy(5.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(category,{category=it},label={Text("Kategori")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));OutlinedTextField(price,{price=it},label={Text("Harga jual")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));OutlinedTextField(stock,{stock=it},label={Text("Stok")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));OutlinedTextField(min,{min=it},label={Text("Stok minimum")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))}},confirmButton={TextButton(onClick={val p=price.toLongOrNull();val s=stock.toIntOrNull();if(name.isNotBlank()&&p!=null&&s!=null&&s>=0)onSave(Product(product?.id?:0,name.trim(),barcode.trim(),category.trim(),cost.toLongOrNull()?:0,p,s,min.toIntOrNull()?:5))}){Text("Simpan")}},dismissButton={TextButton(onClick=onDismiss){Text("Batal")}})
 }
-fun csv(v:String)="\"" + v.replace("\"", "\"\"") + "\""
-fun parseCsv(line:String):List<String>{val out=mutableListOf<String>();val cur=StringBuilder();var quoted=false;var i=0;while(i<line.length){val c=line[i];if(c=='\"'){if(quoted&&i+1<line.length&&line[i+1]=='\"'){cur.append('\"');i++}else quoted=!quoted}else if(c==','&&!quoted){out.add(cur.toString());cur.clear()}else cur.append(c);i++};out.add(cur.toString());return out}
