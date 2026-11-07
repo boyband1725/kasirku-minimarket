@@ -47,7 +47,38 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,2){
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
 fun pairedPrinters():List<BluetoothDevice>{val adapter=BluetoothAdapter.getDefaultAdapter()?:return emptyList();return try{adapter.bondedDevices?.toList()?:emptyList()}catch(e:SecurityException){emptyList()}}
-fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,Int>>,total:Long):String{var socket:BluetoothSocket?=null;return try{socket=device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));socket.connect();val out=socket.outputStream;val enc=java.nio.charset.Charset.forName("CP437");fun send(t:String){out.write(t.toByteArray(enc))};send("\\u001B@");send("\\u001Ba\\u0001");send("$shopName\\n");send("STRUK PEMBELIAN\\n");send("--------------------------------\\n");send("\\u001Ba\\u0000");lines.forEach{(p,q)->send(p.name.take(30)+"\\n");send("  $q x "+money(p.price)+" = "+money(p.price*q)+"\\n")};send("--------------------------------\\n");send("TOTAL: "+money(total)+"\\n");send("Terima kasih\\n\\n\\n");send("\\u001DVA\\u0000");out.flush();"Struk berhasil dikirim ke printer"}catch(e:Exception){"Gagal mencetak: "+(e.message?: "Periksa printer dan koneksi Bluetooth")}finally{try{socket?.close()}catch(_:Exception){}}}
+fun printReceipt(device:BluetoothDevice,shopName:String,lines:List<Pair<Product,Int>>,total:Long):String{
+ var socket:BluetoothSocket?=null
+ return try{
+  socket=device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
+  socket.connect()
+  val out=socket.outputStream
+  val enc=java.nio.charset.Charset.forName("CP437")
+  fun send(t:String){out.write(t.toByteArray(enc))}
+  fun rupiah(v:Long)="Rp"+NumberFormat.getNumberInstance(Locale("id","ID")).format(v)
+  send("\u001B@")
+  send("\u001Ba\u0001")
+  send(shopName.take(32)+"\n")
+  send("STRUK PEMBELIAN\n")
+  send("\u001Ba\u0000")
+  send("--------------------------------\n")
+  lines.forEach{(p,q)->
+   val name=p.name.take(32)
+   send(name+"\n")
+   send("  $q x "+rupiah(p.price)+" = "+rupiah(p.price*q)+"\n")
+  }
+  send("--------------------------------\n")
+  send("TOTAL: "+rupiah(total)+"\n")
+  send("Terima kasih\n")
+  send("\n\n\n")
+  out.flush()
+  "Struk berhasil dikirim ke printer"
+ }catch(e:Exception){
+  "Gagal mencetak: "+(e.message?: "Periksa printer dan koneksi Bluetooth")
+ }finally{
+  try{socket?.close()}catch(_:Exception){}
+ }
+}
 fun csvEscape(v:String) = "\"" + v.replace("\"", "\"\"") + "\""
 fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();val quote=34.toChar();val comma=44.toChar();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch==quote){if(quoted&&i+1<line.length&&line[i+1]==quote){cell.append(quote);i++}else quoted=!quoted}else if(ch==comma&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
 
@@ -106,7 +137,7 @@ if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutable
           }else{
            chosenPrinter=device
            showPrinters=false
-           note="Printer dipilih: \${device.name?:device.address}"
+           note="Printer dipilih: ${device.name?:device.address}"
           }
          },
          modifier=Modifier.fillMaxWidth()
