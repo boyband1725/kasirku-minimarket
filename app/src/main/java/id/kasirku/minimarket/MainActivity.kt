@@ -38,7 +38,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,2){
 }
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("in","ID")).format(v)
-fun csvEscape(v:String)="\\""+v.replace("\\"","\\"\\"")+"\\""
+fun csvEscape(v:String) = "\"" + v.replace("\"", "\"\"") + "\""
 fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val cell=StringBuilder();var quoted=false;var i=0;while(i<line.length){val ch=line[i];if(ch=='\\"'){if(quoted&&i+1<line.length&&line[i+1]=='\\"'){cell.append('\\"');i++}else quoted=!quoted}else if(ch==','&&!quoted){out.add(cell.toString());cell.setLength(0)}else cell.append(ch);i++};out.add(cell.toString());return out}
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,5 +67,5 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
  }
 }
 if(add){var name by remember{mutableStateOf("")};var barcode by remember{mutableStateOf("")};var cost by remember{mutableStateOf("")};var price by remember{mutableStateOf("")};var stock by remember{mutableStateOf("")}
- AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal (Rp)")});OutlinedTextField(price,{price=it},label={Text("Harga jual (Rp)")});OutlinedTextField(stock,{stock=it},label={Text("Stok awal")})}},confirmButton={TextButton(onClick={val c=cost.toLongOrNull();val p=price.toLongOrNull();if(name.isNotBlank()&&c!=null&&p!=null&&c>=0&&p>=c){db.save(name,barcode,c,p,stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama, modal, dan harga jual (minimal sama dengan modal)")}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})}
+ AlertDialog(onDismissRequest={add=false},title={Text("Tambah barang")},text={Column(verticalArrangement=Arrangement.spacedBy(6.dp)){OutlinedTextField(name,{name=it},label={Text("Nama barang")});OutlinedTextField(barcode,{barcode=it},label={Text("Barcode")});OutlinedTextField(cost,{cost=it},label={Text("Harga modal (Rp)")});OutlinedTextField(price,{price=it},label={Text("Harga jual (Rp)")});OutlinedTextField(stock,{stock=it},label={Text("Stok awal")})}},confirmButton={TextButton(onClick={val c=cost.toLongOrNull();val p=price.toLongOrNull();if(name.isNotBlank()&&c!=null&&p!=null&&c>=0&&p>=c){db.save(name,barcode,c,p,stock.toIntOrNull()?:0);products=db.all();add=false;note="Barang disimpan"}else note="Periksa nama, modal, dan harga jual (minimal sama dengan modal)"}){Text("Simpan")}},dismissButton={TextButton(onClick={add=false}){Text("Batal")}})}
 }
