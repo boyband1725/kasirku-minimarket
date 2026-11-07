@@ -64,7 +64,7 @@ class StoreDb(c:Context):SQLiteOpenHelper(c,"kasirku.db",null,3){
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{KasirKuApp()}}}
 private fun money(v:Long)=NumberFormat.getCurrencyInstance(Locale("id","ID")).format(v)
 private fun parseCsv(text:String):List<List<String>>{val rows=mutableListOf<List<String>>();var row=mutableListOf<String>();val cell=StringBuilder();var quoted=false;val first=text.substringBefore('\n');val delimiter=if(first.count{it==';'}>first.count{it==','})';' else ',';var i=0;while(i<text.length){val ch=text[i];if(ch=='"'){if(quoted&&i+1<text.length&&text[i+1]=='"'){cell.append('"');i++}else quoted=!quoted}else if(ch==delimiter&&!quoted){row.add(cell.toString());cell.clear()}else if((ch=='\n'||ch=='\r')&&!quoted){if(ch=='\r'&&i+1<text.length&&text[i+1]=='\n')i++;row.add(cell.toString());if(row.any{it.isNotBlank()})rows.add(row);row=mutableListOf();cell.clear()}else cell.append(ch);i++};row.add(cell.toString());if(row.any{it.isNotBlank()})rows.add(row);return rows}
-private fun csvCell(v:String)="\""+v.replace("\"","\\"")+"\""
+private fun csvCell(v:String)="\"" + v.replace("\"", "\"\"") + "\""
 private fun parseAmount(raw:String):Long{var s=raw.trim().replace("Rp","",true).replace(" ","");if(s.contains(',')&&s.contains('.')){s=if(s.lastIndexOf(',')>s.lastIndexOf('.'))s.replace(".","").replace(',','.')else s.replace(",","")}else if(s.contains(',')){s=if(s.substringAfterLast(',').length==2)s.replace(',','.')else s.replace(",","")};return s.filter{it.isDigit()||it=='.'}.substringBefore('.').toLongOrNull()?:0L}
 
 @OptIn(ExperimentalMaterial3Api::class,ExperimentalFoundationApi::class)
