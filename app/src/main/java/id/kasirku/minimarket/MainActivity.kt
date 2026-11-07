@@ -132,26 +132,82 @@ fun parseCsvLine(line:String):List<String>{val out=mutableListOf<String>();val c
  Column(Modifier.padding(padding).padding(14.dp).fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
   if(note.isNotBlank())Text(note,color=MaterialTheme.colorScheme.primary)
   when(tab){
-   0->{OutlinedTextField(search,{search=it},label={Text("Cari barang")},modifier=Modifier.fillMaxWidth());OutlinedTextField(value=code,onValueChange={code=it},label={Text("Scan barcode di sini")},placeholder={Text("Scanner Bluetooth siap — arahkan ke barcode")},modifier=Modifier.fillMaxWidth().focusRequester(scannerFocus).onKeyEvent{event->if(event.type==KeyEventType.KeyUp&&(event.key==Key.Enter||event.key==Key.NumPadEnter||event.key==Key.Tab)){addScannedBarcode(code);true}else false},singleLine=true,keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={addScannedBarcode(code)}))
-    Button(onClick={addScannedBarcode(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("Tambah barcode")}
-    Text("Scanner Bluetooth: siap (mode HID / Keyboard)",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.primary)
-    Text("Daftar barang",style=MaterialTheme.typography.titleMedium)
-    LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=8.dp)){items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->
- Card(modifier=Modifier.fillMaxWidth().heightIn(min=142.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceVariant)){
-  Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)){
-   Box(Modifier.size(34.dp),contentAlignment=androidx.compose.ui.Alignment.Center){
-    Surface(shape=MaterialTheme.shapes.medium,color=MaterialTheme.colorScheme.primaryContainer){Box(Modifier.fillMaxSize().padding(5.dp),contentAlignment=androidx.compose.ui.Alignment.Center){Text(p.name.take(1).uppercase(),fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.onPrimaryContainer)}}
-   }
-   Text(p.name,fontWeight=FontWeight.SemiBold,maxLines=2,overflow=TextOverflow.Ellipsis,minLines=2)
-   Text(money(p.price),style=MaterialTheme.typography.titleMedium,fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
-   Text("Stok: ${p.stock}",style=MaterialTheme.typography.bodySmall,color=if(p.stock<=5)MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
-   Button(onClick={if(p.stock>0&&(cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note=if(p.stock<=0)"Stok habis" else "Stok tidak cukup"},enabled=p.stock>0,modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=8.dp,vertical=4.dp)){Text(if(p.stock>0)"+ Tambah" else "Stok habis")}
-  }
- }
-}}
-    Text("Total: ${money(total)}",style=MaterialTheme.typography.headlineSmall)
-    if(cart.isNotEmpty()){Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"});Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},modifier=Modifier.weight(1f)){Text("Bayar")};OutlinedButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}}
-    if(receiptLines.isNotEmpty()){Text("Printer: ${chosenPrinter?.name?: "Belum dipilih"}");Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED){permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)}else{printerList=pairedPrinters();showPrinters=true}}){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"SEAMART",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)}){Text("Cetak struk")}}}
+   0->{
+    BoxWithConstraints(Modifier.fillMaxSize()){
+     val wide=maxWidth>=700.dp
+     if(wide){
+      Row(Modifier.fillMaxSize(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
+       Column(Modifier.weight(1.15f).fillMaxHeight(),verticalArrangement=Arrangement.spacedBy(8.dp)){
+        Text("Library",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.SemiBold)
+        OutlinedTextField(search,{search=it},label={Text("Cari produk")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+        OutlinedTextField(value=code,onValueChange={code=it},label={Text("Scan barcode")},modifier=Modifier.fillMaxWidth().focusRequester(scannerFocus).onKeyEvent{event->if(event.type==KeyEventType.KeyUp&&(event.key==Key.Enter||event.key==Key.NumPadEnter||event.key==Key.Tab)){addScannedBarcode(code);true}else false},singleLine=true,keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={addScannedBarcode(code)}))
+        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Text("Semua Produk",color=MaterialTheme.colorScheme.primary,fontWeight=FontWeight.Bold);Text("•");Text("Favorit");Text("•");Text("Diskon")}
+        LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+         items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->
+          Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)){
+           Column(Modifier.fillMaxWidth().padding(10.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){
+            Surface(color=MaterialTheme.colorScheme.primaryContainer,shape=MaterialTheme.shapes.medium){Box(Modifier.size(34.dp),contentAlignment=androidx.compose.ui.Alignment.Center){Text(p.name.take(1).uppercase(),fontWeight=FontWeight.Bold)}}
+            Text(p.name,fontWeight=FontWeight.SemiBold,maxLines=2,minLines=2,overflow=TextOverflow.Ellipsis)
+            Text(money(p.price),fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+            Text("Stok ${p.stock}",style=MaterialTheme.typography.bodySmall)
+            Button(onClick={if(p.stock>0&&(cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"},enabled=p.stock>0,modifier=Modifier.fillMaxWidth()){Text("+ Tambah")}
+           }
+          }
+         }
+        }
+       }
+       Card(Modifier.weight(0.85f).fillMaxHeight(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)){
+        Column(Modifier.fillMaxSize().padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+         Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Daftar Bil",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));TextButton(onClick={cart=emptyMap()}){Text("Kosongkan")}}
+         OutlinedButton(onClick={note="Fitur pelanggan akan tersedia pada pengembangan berikutnya"},modifier=Modifier.fillMaxWidth()){Text("+ Tambah Pelanggan")}
+         if(cart.isEmpty())Box(Modifier.weight(1f).fillMaxWidth(),contentAlignment=androidx.compose.ui.Alignment.Center){Text("Tidak Ada Produk",color=MaterialTheme.colorScheme.onSurfaceVariant)}
+         else LazyColumn(Modifier.weight(1f)){items(cart.entries.toList()){entry->
+          val p=products.find{it.id==entry.key}
+          if(p!=null)Row(Modifier.fillMaxWidth().padding(vertical=6.dp),verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
+           Column(Modifier.weight(1f)){Text(p.name,fontWeight=FontWeight.SemiBold);Text("${entry.value} x ${money(p.price)}",style=MaterialTheme.typography.bodySmall)}
+           Text(money(p.price*entry.value),fontWeight=FontWeight.Bold)
+           TextButton(onClick={val q=entry.value-1;cart=if(q<=0)cart-entry.key else cart+(entry.key to q)}){Text("−")}
+           TextButton(onClick={if(entry.value<p.stock)cart=cart+(entry.key to (entry.value+1))}){Text("+")}
+          }
+         }}
+         Divider()
+         Text("Total pembayaran",style=MaterialTheme.typography.bodyMedium)
+         Text(money(total),style=MaterialTheme.typography.headlineMedium,fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+         Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},enabled=cart.isNotEmpty(),modifier=Modifier.fillMaxWidth().height(52.dp)){Text("Bayar ${money(total)}")}
+         if(receiptLines.isNotEmpty())Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)else{printerList=pairedPrinters();showPrinters=true}},modifier=Modifier.weight(1f)){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"SEAMART",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)},modifier=Modifier.weight(1f)){Text("Cetak struk")}}
+        }
+       }
+      }
+     }else{
+      Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(7.dp)){
+       Text("Library",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+       OutlinedTextField(search,{search=it},label={Text("Cari produk")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+       OutlinedTextField(value=code,onValueChange={code=it},label={Text("Scan barcode")},modifier=Modifier.fillMaxWidth().focusRequester(scannerFocus).onKeyEvent{event->if(event.type==KeyEventType.KeyUp&&(event.key==Key.Enter||event.key==Key.NumPadEnter||event.key==Key.Tab)){addScannedBarcode(code);true}else false},singleLine=true,keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={addScannedBarcode(code)}))
+       Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Text("Semua Produk",color=MaterialTheme.colorScheme.primary,fontWeight=FontWeight.Bold);Text("•");Text("Favorit");Text("•");Text("Diskon")}
+       LazyVerticalGrid(columns=GridCells.Fixed(2),modifier=Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+        items(products.filter{it.name.contains(search,true)||it.barcode.contains(search)}){p->
+         Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)){
+          Column(Modifier.fillMaxWidth().padding(9.dp),verticalArrangement=Arrangement.spacedBy(4.dp)){
+           Surface(color=MaterialTheme.colorScheme.primaryContainer,shape=MaterialTheme.shapes.medium){Box(Modifier.size(30.dp),contentAlignment=androidx.compose.ui.Alignment.Center){Text(p.name.take(1).uppercase(),fontWeight=FontWeight.Bold)}}
+           Text(p.name,fontWeight=FontWeight.SemiBold,maxLines=2,minLines=2,overflow=TextOverflow.Ellipsis)
+           Text(money(p.price),fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+           Text("Stok ${p.stock}",style=MaterialTheme.typography.bodySmall)
+           Button(onClick={if(p.stock>0&&(cart[p.id]?:0)<p.stock)cart=cart+(p.id to ((cart[p.id]?:0)+1))else note="Stok tidak cukup"},enabled=p.stock>0,modifier=Modifier.fillMaxWidth()){Text("+ Tambah")}
+          }
+         }
+        }
+       }
+       Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)){
+        Column(Modifier.fillMaxWidth().padding(10.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){
+         Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Daftar Bil • ${cart.values.sum()} item",fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));Text(money(total),fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)}
+         if(cart.isNotEmpty())Text(cart.entries.joinToString{(id,n)->"${products.find{it.id==id}?.name} x$n"},maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
+         Button(onClick={paymentMethod="TUNAI";cashInput=total.toString();showPayment=true},enabled=cart.isNotEmpty(),modifier=Modifier.fillMaxWidth()){Text("Bayar ${money(total)}")}
+        }
+       }
+       if(receiptLines.isNotEmpty())Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(onClick={if(Build.VERSION.SDK_INT>=31&&ContextCompat.checkSelfPermission(ctx,Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)else{printerList=pairedPrinters();showPrinters=true}},modifier=Modifier.weight(1f)){Text("Pilih printer")};Button(enabled=chosenPrinter!=null,onClick={note=printReceipt(chosenPrinter!!,"SEAMART",receiptLines,receiptTotal,receiptPayment,receiptPaid,receiptChange)},modifier=Modifier.weight(1f)){Text("Cetak struk")}}
+      }
+     }
+    }
    }
    1->{
     Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
