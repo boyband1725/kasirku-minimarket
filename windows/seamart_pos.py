@@ -11,7 +11,9 @@ DB=DATA/"seamart.db"
 
 class SeaMart:
  def __init__(self,root):
-  self.root=root; root.title("SeaMart POS"); root.geometry("1200x760"); root.minsize(980,620); root.configure(bg=BG)
+  self.root=root; root.title("SeaMart POS"); root.geometry("1360x850"); root.minsize(1100,700); root.configure(bg=BG)
+  try: root.state("zoomed")
+  except: pass
   self.db=sqlite3.connect(DB); self.db.row_factory=sqlite3.Row
   self.db.executescript("""
   CREATE TABLE IF NOT EXISTS users(username TEXT PRIMARY KEY, password_hash TEXT NOT NULL, role TEXT NOT NULL);
@@ -65,7 +67,7 @@ class SeaMart:
    tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=8)
   body=tk.Frame(self.root,bg=BG); body.pack(fill="both",expand=True,padx=15,pady=15)
   left=tk.Frame(body,bg=WHITE,highlightbackground="#D7E4DB",highlightthickness=1); left.pack(side="left",fill="both",expand=True,padx=(0,10))
-  right=tk.Frame(body,bg=WHITE,width=420,highlightbackground="#D7E4DB",highlightthickness=1); right.pack(side="right",fill="y"); right.pack_propagate(False)
+  right=tk.Frame(body,bg=WHITE,width=390,highlightbackground="#D7E4DB",highlightthickness=1); right.pack(side="right",fill="y"); right.pack_propagate(False)
   tk.Label(left,text="CARI / SCAN BARCODE ATAU KETIK NAMA",bg=WHITE,fg=DARK,font=("Segoe UI",10,"bold")).pack(anchor="w",padx=14,pady=(14,4))
   row=tk.Frame(left,bg=WHITE); row.pack(fill="x",padx=14,pady=(0,10))
   self.q=tk.StringVar(); self.search=tk.Entry(row,textvariable=self.q,font=("Segoe UI",14),relief="solid",bd=1); self.search.pack(side="left",fill="x",expand=True,ipady=8)
@@ -104,7 +106,8 @@ class SeaMart:
   tk.Label(pay,text="Uang diterima",bg=WHITE,fg=INK).pack(side="left")
   self.cash=tk.StringVar(value="0"); tk.Entry(pay,textvariable=self.cash,width=16,justify="right",font=("Segoe UI",11)).pack(side="right",ipady=5)
   tk.Button(right,text="BAYAR & SIMPAN TRANSAKSI",command=self.checkout,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",12,"bold"),pady=13).pack(fill="x",padx=12,pady=(12,6))
-  tk.Button(right,text="CETAK ULANG STRUK",command=self.reprint,bg=DARK,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),pady=9).pack(fill="x",padx=12)
+  tk.Button(right,text="CETAK ULANG STRUK",command=self.reprint,bg=DARK,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),pady=9).pack(fill="x",padx=12,pady=(0,6))
+  tk.Button(right,text="BATAL TRANSAKSI",command=self.cancel_transaction,bg="#FCE8E6",fg="#B42318",relief="flat",font=("Segoe UI",11,"bold"),pady=10).pack(fill="x",padx=12,pady=(0,10))
   tk.Label(self.root,text="SeaMart POS  •  Database lokal di komputer ini  •  Scanner USB/Bluetooth mode keyboard",bg="#E4EEE7",fg="#53675B",anchor="w",padx=15,pady=7).pack(fill="x",side="bottom")
  def master_items(self):
   win=tk.Toplevel(self.root); win.title("Master Barang - SeaMart"); win.geometry("1000x620"); win.configure(bg=BG)
@@ -196,11 +199,11 @@ class SeaMart:
   rows=self.db.execute(sql+" ORDER BY name LIMIT 500",args).fetchall()
   for i,r in enumerate(rows):
    card=tk.Frame(self.product_grid,bg=WHITE,highlightbackground="#D9E6DD",highlightthickness=1,cursor="hand2")
-   card.grid(row=i//3,column=i%3,sticky="nsew",padx=6,pady=6)
+   card.grid(row=i//2,column=i%2,sticky="nsew",padx=8,pady=8)
    self.product_grid.grid_columnconfigure(i%3,weight=1,uniform="product")
-   tk.Label(card,text=r["name"],bg=WHITE,fg=DARK,font=("Segoe UI",11,"bold"),anchor="w",justify="left",wraplength=190).pack(fill="x",padx=10,pady=(10,5))
-   tk.Label(card,text=f'KB{r["id"]:04d}  |  {r["barcode"] or "-"}',bg=WHITE,fg="#718078",font=("Segoe UI",8),anchor="w").pack(fill="x",padx=10)
-   tk.Label(card,text=self.rp(r["price"]),bg=WHITE,fg=GREEN,font=("Segoe UI",15,"bold"),anchor="w").pack(fill="x",padx=10,pady=(7,2))
+   tk.Label(card,text=r["name"],bg=WHITE,fg=DARK,font=("Segoe UI",13,"bold"),anchor="w",justify="left",wraplength=270).pack(fill="x",padx=10,pady=(10,5))
+   tk.Label(card,text=f'KB{r["id"]:04d}  |  {r["barcode"] or "-"}',bg=WHITE,fg="#718078",font=("Segoe UI",9),anchor="w").pack(fill="x",padx=10)
+   tk.Label(card,text=self.rp(r["price"]),bg=WHITE,fg=GREEN,font=("Segoe UI",17,"bold"),anchor="w").pack(fill="x",padx=10,pady=(9,4))
    stock_color="#B42318" if (r["stock"] or 0)<=0 else "#087A45"
    tk.Label(card,text=f'Stok {r["stock"]:g}',bg="#E5F5EB",fg=stock_color,font=("Segoe UI",9,"bold"),anchor="w").pack(anchor="w",padx=10,pady=(0,10))
    for child in card.winfo_children(): child.bind("<Button-1>",lambda e,row=r:self.add(row))
@@ -239,6 +242,11 @@ class SeaMart:
   if k and k in self.cart:del self.cart[k];self.draw_cart()
  def clear(self):
   self.cart.clear();self.draw_cart()
+ def cancel_transaction(self):
+  if not self.cart:
+   messagebox.showinfo("Batal transaksi","Keranjang sudah kosong."); return
+  if messagebox.askyesno("Batal transaksi","Batalkan transaksi yang sedang berjalan? Semua barang di keranjang akan dihapus. Riwayat penjualan tidak akan terhapus."):
+   self.clear(); self.cash.set("0"); self.q.set(""); self.refresh()
  def import_csv(self):
   p=filedialog.askopenfilename(filetypes=[("CSV","*.csv")])
   if not p:return
