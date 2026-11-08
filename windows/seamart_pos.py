@@ -76,12 +76,19 @@ class SeaMart:
   self.root.bind("<F2>",lambda e:self.remove()); self.root.bind("<F4>",lambda e:self.checkout()); self.root.bind("<F5>",lambda e:self.hold_cart()); self.root.bind("<F6>",lambda e:self.recall_cart()); self.root.bind("<F12>",lambda e:self.close_cashier())
   tk.Button(row,text="CARI",command=self.refresh,bg=GREEN,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="left",padx=8)
   self.category=tk.StringVar(value="Semua")
-  self.category_bar=tk.Frame(left,bg=WHITE); self.category_bar.pack(fill="x",padx=12,pady=(0,10))
-  self.product_canvas=tk.Canvas(left,bg="#F4F8F5",highlightthickness=0)
-  self.product_scroll=ttk.Scrollbar(left,orient="vertical",command=self.product_canvas.yview)
+  self.catalog=tk.Frame(left,bg=WHITE); self.catalog.pack(fill="both",expand=True,padx=12,pady=(0,12))
+  catbox=tk.Frame(self.catalog,bg=WHITE,width=190); catbox.pack(side="left",fill="y",padx=(0,10)); catbox.pack_propagate(False)
+  tk.Label(catbox,text="KATEGORI BARANG",bg=DARK,fg=WHITE,font=("Segoe UI",10,"bold"),anchor="w",padx=10,pady=10).pack(fill="x")
+  self.category_tree=ttk.Treeview(catbox,columns=("category",),show="headings",height=18)
+  self.category_tree.heading("category",text="Kelompok Barang"); self.category_tree.column("category",anchor="w",width=175)
+  self.category_tree.pack(fill="both",expand=True)
+  self.category_tree.bind("<<TreeviewSelect>>",self.choose_category)
+  self.product_area=tk.Frame(self.catalog,bg=WHITE); self.product_area.pack(side="left",fill="both",expand=True)
+  self.product_canvas=tk.Canvas(self.product_area,bg="#F4F8F5",highlightthickness=0)
+  self.product_scroll=ttk.Scrollbar(self.product_area,orient="vertical",command=self.product_canvas.yview)
   self.product_canvas.configure(yscrollcommand=self.product_scroll.set)
-  self.product_scroll.pack(side="right",fill="y",padx=(0,8),pady=(0,12))
-  self.product_canvas.pack(fill="both",expand=True,padx=(14,0),pady=(0,14))
+  self.product_scroll.pack(side="right",fill="y",padx=(0,2))
+  self.product_canvas.pack(fill="both",expand=True)
   self.product_grid=tk.Frame(self.product_canvas,bg="#F4F8F5")
   self.product_window=self.product_canvas.create_window((0,0),window=self.product_grid,anchor="nw")
   self.product_grid.bind("<Configure>",lambda e:self.product_canvas.configure(scrollregion=self.product_canvas.bbox("all")))
@@ -272,10 +279,12 @@ class SeaMart:
   for w in self.product_grid.winfo_children(): w.destroy()
   q=self.q.get().strip()
   cats=["Semua"]+[x[0] for x in self.db.execute("SELECT DISTINCT category FROM products WHERE TRIM(COALESCE(category,''))<>'' ORDER BY category").fetchall()]
-  for w in self.category_bar.winfo_children(): w.destroy()
-  for cat in cats[:7]:
-   active=self.category.get()==cat
-   tk.Button(self.category_bar,text=cat,command=lambda value=cat:self.set_category(value),bg=GREEN if active else "#EEF2F0",fg=WHITE if active else INK,relief="flat",font=("Segoe UI",9,"bold"),padx=12,pady=7).pack(side="left",padx=3)
+  self._loading_categories=True
+  self.category_tree.delete(*self.category_tree.get_children())
+  for idx,cat in enumerate(cats):
+   self.category_tree.insert("","end",iid=f"cat{idx}",values=(cat,))
+   if cat==self.category.get(): self.category_tree.selection_set(f"cat{idx}")
+  self._loading_categories=False
   sql="SELECT * FROM products WHERE (name LIKE ? OR barcode LIKE ? OR CAST(id AS TEXT) LIKE ?)"
   args=[f"%{q}%",f"%{q}%",f"%{q}%"]
   if self.category.get()!="Semua":
@@ -284,7 +293,7 @@ class SeaMart:
   for i,r in enumerate(rows):
    card=tk.Frame(self.product_grid,bg=WHITE,highlightbackground="#D9E6DD",highlightthickness=1,cursor="hand2")
    card.grid(row=i//2,column=i%2,sticky="nsew",padx=8,pady=8)
-   self.product_grid.grid_columnconfigure(i%3,weight=1,uniform="product")
+   self.product_grid.grid_columnconfigure(i%2,weight=1,uniform="product")
    tk.Label(card,text=r["name"],bg=WHITE,fg=DARK,font=("Segoe UI",13,"bold"),anchor="w",justify="left",wraplength=270).pack(fill="x",padx=10,pady=(10,5))
    tk.Label(card,text=f'KB{r["id"]:04d}  |  {r["barcode"] or "-"}',bg=WHITE,fg="#718078",font=("Segoe UI",9),anchor="w").pack(fill="x",padx=10)
    tk.Label(card,text=self.rp(r["price"]),bg=WHITE,fg=GREEN,font=("Segoe UI",17,"bold"),anchor="w").pack(fill="x",padx=10,pady=(9,4))
@@ -293,6 +302,12 @@ class SeaMart:
    for child in card.winfo_children(): child.bind("<Button-1>",lambda e,row=r:self.add(row))
    card.bind("<Button-1>",lambda e,row=r:self.add(row))
   self.product_canvas.yview_moveto(0)
+ def choose_category(self,e=None):
+  if getattr(self,"_loading_categories",False): return
+  sel=self.category_tree.selection()
+  if not sel:return
+  value=self.category_tree.item(sel[0],"values")[0]
+  self.set_category(value)
  def set_category(self,value):
   self.category.set(value); self.refresh()
  def scan(self,e=None):
