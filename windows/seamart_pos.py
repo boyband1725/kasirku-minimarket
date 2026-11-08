@@ -63,6 +63,7 @@ class SeaMart:
   tk.Label(h,text=f"KASIR MINIMARKET  •  {self.current_role.upper()} : {self.current_user}",bg=DARK,fg="#C8E4D2",font=("Segoe UI",10)).pack(side="left",padx=18,pady=20)
   tk.Button(h,text="KELUAR",command=self.logout,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=8)
   if self.current_role=="Admin":
+   tk.Button(h,text="REKAP PENJUALAN",command=self.sales_report,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=5)
    tk.Button(h,text="MASTER BARANG",command=self.master_items,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=5)
    tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=8)
   body=tk.Frame(self.root,bg=BG); body.pack(fill="both",expand=True,padx=15,pady=15)
@@ -109,6 +110,58 @@ class SeaMart:
   tk.Button(right,text="CETAK ULANG STRUK",command=self.reprint,bg=DARK,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),pady=9).pack(fill="x",padx=12,pady=(0,6))
   tk.Button(right,text="BATAL TRANSAKSI",command=self.cancel_transaction,bg="#FCE8E6",fg="#B42318",relief="flat",font=("Segoe UI",11,"bold"),pady=10).pack(fill="x",padx=12,pady=(0,10))
   tk.Label(self.root,text="SeaMart POS  •  Database lokal di komputer ini  •  Scanner USB/Bluetooth mode keyboard",bg="#E4EEE7",fg="#53675B",anchor="w",padx=15,pady=7).pack(fill="x",side="bottom")
+ def sales_report(self):
+  win=tk.Toplevel(self.root); win.title("Rekap Penjualan per Barang - SeaMart"); win.geometry("1050x680"); win.minsize(850,520); win.configure(bg=BG)
+  top=tk.Frame(win,bg=WHITE); top.pack(fill="x",padx=14,pady=14)
+  tk.Label(top,text="REKAP PENJUALAN PER BARANG",bg=WHITE,fg=DARK,font=("Segoe UI",16,"bold")).pack(anchor="w",padx=12,pady=(10,4))
+  tk.Label(top,text="Filter tanggal opsional (format YYYY-MM-DD). Kosongkan untuk semua periode.",bg=WHITE,fg="#64756B").pack(anchor="w",padx=12)
+  filters=tk.Frame(top,bg=WHITE); filters.pack(fill="x",padx=12,pady=10)
+  tk.Label(filters,text="Dari tanggal",bg=WHITE,fg=DARK).pack(side="left")
+  start=tk.Entry(filters,width=14); start.pack(side="left",padx=(6,16),ipady=5)
+  tk.Label(filters,text="Sampai tanggal",bg=WHITE,fg=DARK).pack(side="left")
+  end=tk.Entry(filters,width=14); end.pack(side="left",padx=6,ipady=5)
+  tree=ttk.Treeview(win,columns=("barcode","name","qty","trx","revenue"),show="headings")
+  for col,label,width,anchor in [("barcode","Barcode",150,"center"),("name","Nama Barang",360,"w"),("qty","Qty Terjual",100,"e"),("trx","Jumlah Transaksi",130,"e"),("revenue","Total Penjualan",170,"e")]:
+   tree.heading(col,text=label); tree.column(col,width=width,anchor=anchor)
+  tree.pack(fill="both",expand=True,padx=14,pady=(0,8))
+  summary=tk.Label(win,text="Total barang terjual: 0  |  Omzet: Rp 0",bg="#E7F5EC",fg=DARK,font=("Segoe UI",13,"bold"),anchor="w",padx=14,pady=12)
+  summary.pack(fill="x",padx=14,pady=(0,10))
+  current=[]
+  def load():
+   a=start.get().strip(); b=end.get().strip()
+   for value in (a,b):
+    if value:
+     try: datetime.strptime(value,"%Y-%m-%d")
+     except ValueError:
+      messagebox.showwarning("Format tanggal","Gunakan format YYYY-MM-DD.",parent=win); return
+   if a and b and a>b:
+    messagebox.showwarning("Rentang tanggal","Tanggal awal tidak boleh melewati tanggal akhir.",parent=win); return
+   sql="SELECT barcode,name,SUM(qty) AS qty,COUNT(DISTINCT sale_id) AS trx,SUM(subtotal) AS revenue FROM sale_items si JOIN sales s ON s.id=si.sale_id WHERE 1=1"
+   args=[]
+   if a: sql+=" AND substr(s.created,1,10)>=?"; args.append(a)
+   if b: sql+=" AND substr(s.created,1,10)<=?"; args.append(b)
+   sql+=" GROUP BY COALESCE(barcode,''),name ORDER BY revenue DESC,name"
+   rows=self.db.execute(sql,args).fetchall(); current.clear(); current.extend([dict(x) for x in rows])
+   tree.delete(*tree.get_children()); total_qty=0; total_rev=0
+   for i,row in enumerate(rows):
+    qty=row["qty"] or 0; rev=row["revenue"] or 0; total_qty+=qty; total_rev+=rev
+    tree.insert("","end",values=(row["barcode"] or "-",row["name"],f"{qty:g}",row["trx"],self.rp(rev)))
+   summary.config(text=f"Total barang terjual: {total_qty:g}  |  Omzet: {self.rp(total_rev)}  |  Jenis barang: {len(rows)}")
+  def export():
+   if not current:
+    messagebox.showinfo("Ekspor CSV","Tidak ada data untuk diekspor.",parent=win); return
+   path=filedialog.asksaveasfilename(parent=win,defaultextension=".csv",initialfile="rekap_penjualan_per_barang.csv",filetypes=[("CSV","*.csv")])
+   if not path:return
+   try:
+    with open(path,"w",encoding="utf-8-sig",newline="") as f:
+     wr=csv.writer(f); wr.writerow(["barcode","nama_barang","qty_terjual","jumlah_transaksi","total_penjualan"])
+     for row in current: wr.writerow([row["barcode"] or "",row["name"],row["qty"],row["trx"],row["revenue"]])
+    messagebox.showinfo("Ekspor selesai","Rekap berhasil disimpan ke CSV.",parent=win)
+   except Exception as ex: messagebox.showerror("Ekspor gagal",str(ex),parent=win)
+  buttons=tk.Frame(win,bg=BG); buttons.pack(fill="x",padx=14,pady=(0,14))
+  tk.Button(filters,text="TAMPILKAN",command=load,bg=GREEN,fg=WHITE,relief="flat",padx=16,pady=7).pack(side="left",padx=8)
+  tk.Button(buttons,text="EKSPOR CSV",command=export,bg=DARK,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="right")
+  load()
  def master_items(self):
   win=tk.Toplevel(self.root); win.title("Master Barang - SeaMart"); win.geometry("1000x620"); win.configure(bg=BG)
   top=tk.Frame(win,bg=WHITE); top.pack(fill="x",padx=12,pady=12)
