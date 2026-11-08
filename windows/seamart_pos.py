@@ -1,4 +1,4 @@
-import csv, os, sqlite3, sys
+import csv, os, sqlite3, sys, hashlib
 from pathlib import Path
 from datetime import datetime
 import tkinter as tk
@@ -14,11 +14,42 @@ class SeaMart:
   self.root=root; root.title("SeaMart POS"); root.geometry("1200x760"); root.minsize(980,620); root.configure(bg=BG)
   self.db=sqlite3.connect(DB); self.db.row_factory=sqlite3.Row
   self.db.executescript("""
+  CREATE TABLE IF NOT EXISTS users(username TEXT PRIMARY KEY, password_hash TEXT NOT NULL, role TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY, barcode TEXT UNIQUE, name TEXT NOT NULL, category TEXT DEFAULT '', cost REAL DEFAULT 0, price REAL DEFAULT 0, stock REAL DEFAULT 0);
   CREATE TABLE IF NOT EXISTS sales(id INTEGER PRIMARY KEY, invoice TEXT UNIQUE, created TEXT, method TEXT, total REAL, paid REAL, change_due REAL);
   CREATE TABLE IF NOT EXISTS sale_items(id INTEGER PRIMARY KEY, sale_id INTEGER, barcode TEXT, name TEXT, qty REAL, price REAL, subtotal REAL);
-  """); self.db.commit(); self.cart={}; self.last_receipt=""
-  self.style(); self.ui(); self.refresh()
+  """); self.db.commit()
+  for username,password,role in [("admin","admin123","Admin"),("kasir","kasir123","Kasir")]:
+   self.db.execute("INSERT OR IGNORE INTO users(username,password_hash,role) VALUES(?,?,?)",(username,hashlib.sha256(password.encode()).hexdigest(),role))
+  self.db.commit(); self.cart={}; self.last_receipt=""; self.current_user=None; self.current_role=None
+  self.style(); self.login_screen()
+ def login_screen(self):
+  self.root.withdraw()
+  win=tk.Toplevel(self.root); win.title("Login SeaMart POS"); win.geometry("430x480"); win.resizable(False,False); win.configure(bg=BG)
+  win.protocol("WM_DELETE_WINDOW",self.close)
+  tk.Frame(win,bg=GREEN,height=12).pack(fill="x")
+  panel=tk.Frame(win,bg=WHITE); panel.pack(fill="both",expand=True,padx=28,pady=28)
+  tk.Label(panel,text="$",bg=GREEN,fg=WHITE,font=("Segoe UI",30,"bold"),width=3).pack(pady=(28,8))
+  tk.Label(panel,text="SeaMart POS",bg=WHITE,fg=DARK,font=("Segoe UI",22,"bold")).pack()
+  tk.Label(panel,text="Silakan masuk untuk mulai bekerja",bg=WHITE,fg="#64756B").pack(pady=(4,24))
+  tk.Label(panel,text="USERNAME",bg=WHITE,fg=DARK,font=("Segoe UI",9,"bold")).pack(anchor="w",padx=32)
+  user=tk.Entry(panel,font=("Segoe UI",12),relief="solid",bd=1); user.pack(fill="x",padx=32,pady=(5,14),ipady=8)
+  tk.Label(panel,text="PASSWORD",bg=WHITE,fg=DARK,font=("Segoe UI",9,"bold")).pack(anchor="w",padx=32)
+  pwd=tk.Entry(panel,font=("Segoe UI",12),show="*",relief="solid",bd=1); pwd.pack(fill="x",padx=32,pady=(5,18),ipady=8)
+  def submit(event=None):
+   row=self.db.execute("SELECT * FROM users WHERE username=?",(user.get().strip(),)).fetchone()
+   digest=hashlib.sha256(pwd.get().encode()).hexdigest()
+   if not row or row["password_hash"]!=digest:
+    messagebox.showerror("Login gagal","Username atau password salah.",parent=win); pwd.delete(0,"end"); pwd.focus_set(); return
+   self.current_user=row["username"]; self.current_role=row["role"]; win.destroy()
+   self.root.deiconify(); self.ui(); self.refresh()
+  tk.Button(panel,text="MASUK",command=submit,bg=GREEN,fg=WHITE,fg="white",relief="flat",font=("Segoe UI",12,"bold"),pady=12).pack(fill="x",padx=32)
+  tk.Label(panel,text="Akun awal: admin/admin123  |  kasir/kasir123",bg=WHITE,fg="#718078",font=("Segoe UI",8)).pack(pady=14)
+  pwd.bind("<Return>",submit); user.bind("<Return>",lambda e:pwd.focus_set()); user.focus_set()
+ def logout(self):
+  if messagebox.askyesno("Keluar","Keluar dari akun saat ini?"):
+   for w in self.root.winfo_children(): w.destroy()
+   self.current_user=None; self.current_role=None; self.login_screen()
  def style(self):
   s=ttk.Style(); s.theme_use("clam"); s.configure("Treeview",rowheight=30,font=("Segoe UI",10),background=WHITE,fieldbackground=WHITE,foreground=INK)
   s.configure("Treeview.Heading",font=("Segoe UI",10,"bold"),background="#E4EFE8",foreground=DARK)
@@ -26,8 +57,9 @@ class SeaMart:
   h=tk.Frame(self.root,bg=DARK,height=72); h.pack(fill="x"); h.pack_propagate(False)
   tk.Label(h,text="$",bg=GREEN,fg=WHITE,font=("Segoe UI",25,"bold"),width=3).pack(side="left",padx=16,pady=10)
   tk.Label(h,text="SeaMart POS",bg=DARK,fg=WHITE,font=("Segoe UI",21,"bold")).pack(side="left")
-  tk.Label(h,text="KASIR MINIMARKET  •  OFFLINE",bg=DARK,fg="#C8E4D2",font=("Segoe UI",10)).pack(side="left",padx=18,pady=20)
-  tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=18)
+  tk.Label(h,text=f"KASIR MINIMARKET  •  {self.current_role.upper()} : {self.current_user}",bg=DARK,fg="#C8E4D2",font=("Segoe UI",10)).pack(side="left",padx=18,pady=20)
+  tk.Button(h,text="KELUAR",command=self.logout,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=8)
+  if self.current_role=="Admin": tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=18)
   body=tk.Frame(self.root,bg=BG); body.pack(fill="both",expand=True,padx=15,pady=15)
   left=tk.Frame(body,bg=WHITE,highlightbackground="#D7E4DB",highlightthickness=1); left.pack(side="left",fill="both",expand=True,padx=(0,10))
   right=tk.Frame(body,bg=WHITE,width=420,highlightbackground="#D7E4DB",highlightthickness=1); right.pack(side="right",fill="y"); right.pack_propagate(False)
