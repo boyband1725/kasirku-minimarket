@@ -15,6 +15,7 @@ class SeaMart:
   self.db=sqlite3.connect(DB); self.db.row_factory=sqlite3.Row
   self.db.executescript("""
   CREATE TABLE IF NOT EXISTS users(username TEXT PRIMARY KEY, password_hash TEXT NOT NULL, role TEXT NOT NULL);
+  CREATE TABLE IF NOT EXISTS held_transactions(id INTEGER PRIMARY KEY, label TEXT, payload TEXT, created TEXT);
   CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY, barcode TEXT UNIQUE, name TEXT NOT NULL, category TEXT DEFAULT '', cost REAL DEFAULT 0, price REAL DEFAULT 0, stock REAL DEFAULT 0);
   CREATE TABLE IF NOT EXISTS sales(id INTEGER PRIMARY KEY, invoice TEXT UNIQUE, created TEXT, method TEXT, total REAL, paid REAL, change_due REAL);
   CREATE TABLE IF NOT EXISTS sale_items(id INTEGER PRIMARY KEY, sale_id INTEGER, barcode TEXT, name TEXT, qty REAL, price REAL, subtotal REAL);
@@ -59,7 +60,9 @@ class SeaMart:
   tk.Label(h,text="SeaMart POS",bg=DARK,fg=WHITE,font=("Segoe UI",21,"bold")).pack(side="left")
   tk.Label(h,text=f"KASIR MINIMARKET  •  {self.current_role.upper()} : {self.current_user}",bg=DARK,fg="#C8E4D2",font=("Segoe UI",10)).pack(side="left",padx=18,pady=20)
   tk.Button(h,text="KELUAR",command=self.logout,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=8)
-  if self.current_role=="Admin": tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=18)
+  if self.current_role=="Admin":
+   tk.Button(h,text="MASTER BARANG",command=self.master_items,bg="#245743",fg=WHITE,relief="flat",padx=12,pady=9).pack(side="right",padx=5)
+   tk.Button(h,text="IMPOR CSV",command=self.import_csv,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),padx=18,pady=9).pack(side="right",padx=8)
   body=tk.Frame(self.root,bg=BG); body.pack(fill="both",expand=True,padx=15,pady=15)
   left=tk.Frame(body,bg=WHITE,highlightbackground="#D7E4DB",highlightthickness=1); left.pack(side="left",fill="both",expand=True,padx=(0,10))
   right=tk.Frame(body,bg=WHITE,width=420,highlightbackground="#D7E4DB",highlightthickness=1); right.pack(side="right",fill="y"); right.pack_propagate(False)
@@ -67,6 +70,7 @@ class SeaMart:
   row=tk.Frame(left,bg=WHITE); row.pack(fill="x",padx=14,pady=(0,12))
   self.q=tk.StringVar(); self.search=tk.Entry(row,textvariable=self.q,font=("Segoe UI",15),relief="solid",bd=1); self.search.pack(side="left",fill="x",expand=True,ipady=8)
   self.search.bind("<KeyRelease>",lambda e:self.refresh()); self.search.bind("<Return>",self.scan)
+  self.root.bind("<F2>",lambda e:self.remove()); self.root.bind("<F4>",lambda e:self.checkout()); self.root.bind("<F5>",lambda e:self.hold_cart()); self.root.bind("<F6>",lambda e:self.recall_cart()); self.root.bind("<F12>",lambda e:self.close_cashier())
   tk.Button(row,text="CARI",command=self.refresh,bg=GREEN,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="left",padx=8)
   tk.Label(left,text="DAFTAR BARANG  •  klik dua kali untuk menambahkan",bg=WHITE,fg=DARK,font=("Segoe UI",11,"bold")).pack(anchor="w",padx=14,pady=(0,7))
   cols=("barcode","name","price","stock"); self.products=ttk.Treeview(left,columns=cols,show="headings")
@@ -94,6 +98,79 @@ class SeaMart:
   tk.Button(right,text="BAYAR & SIMPAN TRANSAKSI",command=self.checkout,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",12,"bold"),pady=13).pack(fill="x",padx=12,pady=(12,6))
   tk.Button(right,text="CETAK ULANG STRUK",command=self.reprint,bg=DARK,fg=WHITE,relief="flat",font=("Segoe UI",10,"bold"),pady=9).pack(fill="x",padx=12)
   tk.Label(self.root,text="SeaMart POS  •  Database lokal di komputer ini  •  Scanner USB/Bluetooth mode keyboard",bg="#E4EEE7",fg="#53675B",anchor="w",padx=15,pady=7).pack(fill="x",side="bottom")
+ def master_items(self):
+  win=tk.Toplevel(self.root); win.title("Master Barang - SeaMart"); win.geometry("1000x620"); win.configure(bg=BG)
+  top=tk.Frame(win,bg=WHITE); top.pack(fill="x",padx=12,pady=12)
+  q=tk.StringVar(); ent=tk.Entry(top,textvariable=q,font=("Segoe UI",12)); ent.pack(side="left",fill="x",expand=True,ipady=7)
+  tree=ttk.Treeview(win,columns=("id","barcode","name","category","cost","price","stock"),show="headings")
+  for c,t,w in [("id","ID",55),("barcode","Barcode",130),("name","Nama Barang",250),("category","Kategori",130),("cost","Harga Modal",110),("price","Harga Jual",110),("stock","Stok",75)]:
+   tree.heading(c,text=t); tree.column(c,width=w)
+  tree.pack(fill="both",expand=True,padx=12,pady=6)
+  def load(*args):
+   tree.delete(*tree.get_children()); term=q.get().strip()
+   rows=self.db.execute("SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? ORDER BY name",(f"%{term}%",f"%{term}%")).fetchall()
+   for r in rows: tree.insert("","end",iid=str(r["id"]),values=(r["id"],r["barcode"] or "",r["name"],r["category"] or "",self.rp(r["cost"]),self.rp(r["price"]),r["stock"]))
+  def form(existing=None):
+   old=self.db.execute("SELECT * FROM products WHERE id=?",(int(existing),)).fetchone() if existing else None
+   dlg=tk.Toplevel(win); dlg.title("Edit Barang" if old else "Tambah Barang"); dlg.geometry("420x430"); dlg.configure(bg=WHITE)
+   fields=[("Barcode","barcode"),("Nama Barang","name"),("Kategori","category"),("Harga Modal","cost"),("Harga Jual","price"),("Stok","stock")]
+   entries={}
+   for label,key in fields:
+    tk.Label(dlg,text=label,bg=WHITE,fg=DARK).pack(anchor="w",padx=20,pady=(8,0))
+    e=tk.Entry(dlg,font=("Segoe UI",11)); e.pack(fill="x",padx=20,ipady=5); entries[key]=e
+    if old and old[key] is not None:e.insert(0,str(old[key]))
+   def save():
+    v={k:e.get().strip() for k,e in entries.items()}
+    if not v["name"]: messagebox.showwarning("Validasi","Nama barang wajib diisi.",parent=dlg); return
+    try:
+     nums=[float(v[k].replace(".","").replace(",",".") or 0) for k in ("cost","price","stock")]
+     if old:
+      self.db.execute("UPDATE products SET barcode=?,name=?,category=?,cost=?,price=?,stock=? WHERE id=?",(v["barcode"] or None,v["name"],v["category"],*nums,old["id"]))
+     else:
+      self.db.execute("INSERT INTO products(barcode,name,category,cost,price,stock) VALUES(?,?,?,?,?,?)",(v["barcode"] or None,v["name"],v["category"],*nums))
+     self.db.commit(); dlg.destroy(); load(); self.refresh()
+    except Exception as ex: messagebox.showerror("Gagal menyimpan",str(ex),parent=dlg)
+   tk.Button(dlg,text="SIMPAN BARANG",command=save,bg=GREEN,fg=WHITE,relief="flat",pady=10).pack(fill="x",padx=20,pady=14)
+  def selected():
+   sel=tree.selection(); return sel[0] if sel else None
+  bar=tk.Frame(win,bg=BG); bar.pack(fill="x",padx=12,pady=10)
+  tk.Button(top,text="CARI",command=load,bg=GREEN,fg=WHITE,relief="flat",padx=16).pack(side="left",padx=6)
+  tk.Button(bar,text="+ TAMBAH",command=lambda:form(),bg=GREEN,fg=WHITE,relief="flat",padx=16,pady=9).pack(side="left",padx=4)
+  tk.Button(bar,text="EDIT",command=lambda:form(selected()) if selected() else messagebox.showinfo("Pilih barang","Pilih barang dulu."),bg="#2563A6",fg=WHITE,relief="flat",padx=16,pady=9).pack(side="left",padx=4)
+  def delete():
+   key=selected()
+   if key and messagebox.askyesno("Hapus barang","Yakin menghapus barang ini?"):
+    self.db.execute("DELETE FROM products WHERE id=?",(int(key),)); self.db.commit(); load(); self.refresh()
+  tk.Button(bar,text="HAPUS",command=delete,bg="#B42318",fg=WHITE,relief="flat",padx=16,pady=9).pack(side="left",padx=4)
+  q.trace_add("write",load); load()
+ def hold_cart(self):
+  if not self.cart: messagebox.showinfo("Transaksi tertunda","Keranjang masih kosong."); return
+  import json
+  payload=json.dumps(list(self.cart.values()),ensure_ascii=False)
+  cur=self.db.execute("INSERT INTO held_transactions(label,payload,created) VALUES(?,?,?)",(datetime.now().strftime("Tertunda %H:%M:%S"),payload,datetime.now().isoformat(timespec="seconds")))
+  self.db.commit(); self.clear(); messagebox.showinfo("Tersimpan",f"Transaksi tertunda #{cur.lastrowid}")
+ def recall_cart(self):
+  import json
+  rows=self.db.execute("SELECT * FROM held_transactions ORDER BY id").fetchall()
+  if not rows: messagebox.showinfo("Transaksi tertunda","Tidak ada transaksi tertunda."); return
+  win=tk.Toplevel(self.root); win.title("Panggil Transaksi"); win.geometry("520x350")
+  tree=ttk.Treeview(win,columns=("id","label","created"),show="headings")
+  for c,t in [("id","No"),("label","Transaksi"),("created","Waktu")]: tree.heading(c,text=t)
+  tree.pack(fill="both",expand=True,padx=10,pady=10)
+  for r in rows: tree.insert("","end",iid=str(r["id"]),values=(r["id"],r["label"],r["created"]))
+  def load():
+   sel=tree.selection()
+   if not sel: return
+   if self.cart:
+    if not messagebox.askyesno("Keranjang aktif","Simpan keranjang saat ini sebagai transaksi tertunda?"): return
+    self.hold_cart()
+   row=self.db.execute("SELECT * FROM held_transactions WHERE id=?",(int(sel[0]),)).fetchone()
+   for x in json.loads(row["payload"]): self.cart[str(x["id"])]=x
+   self.db.execute("DELETE FROM held_transactions WHERE id=?",(int(sel[0]),)); self.db.commit(); self.draw_cart(); win.destroy()
+  tk.Button(win,text="PANGGIL TRANSAKSI",command=load,bg=GREEN,fg=WHITE,relief="flat",pady=9).pack(fill="x",padx=10,pady=8)
+ def close_cashier(self):
+  if self.cart and not messagebox.askyesno("Tutup kasir","Keranjang masih berisi barang. Tutup halaman kasir?"): return
+  self.clear(); self.logout()
  def rp(self,n): return "Rp "+format(int(round(n or 0)),",").replace(",",".")
  def refresh(self):
   if not hasattr(self,"products"): return
