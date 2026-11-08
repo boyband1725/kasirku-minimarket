@@ -1,0 +1,26 @@
+name: Build SeaMart Windows EXE
+on:
+  push:
+    branches: [windows-pos]
+    paths:
+      - 'windows/**'
+      - '.github/workflows/windows-pos.yml'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip pyinstaller
+      - name: Build EXE
+        run: pyinstaller --noconfirm --clean --windowed --name SeaMartPOS windows/seamart_pos.py
+      - name: Package
+        run: Compress-Archive -Path dist/SeaMartPOS/* -DestinationPath SeaMartPOS-Windows.zip -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SeaMartPOS-Windows
+          path: SeaMartPOS-Windows.zip
+          if-no-files-found: error
