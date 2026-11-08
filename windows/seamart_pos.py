@@ -73,8 +73,8 @@ class SeaMart:
   self.root.bind("<F2>",lambda e:self.remove()); self.root.bind("<F4>",lambda e:self.checkout()); self.root.bind("<F5>",lambda e:self.hold_cart()); self.root.bind("<F6>",lambda e:self.recall_cart()); self.root.bind("<F12>",lambda e:self.close_cashier())
   tk.Button(row,text="CARI",command=self.refresh,bg=GREEN,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="left",padx=8)
   tk.Label(left,text="DAFTAR BARANG  •  klik dua kali untuk menambahkan",bg=WHITE,fg=DARK,font=("Segoe UI",11,"bold")).pack(anchor="w",padx=14,pady=(0,7))
-  cols=("barcode","name","price","stock"); self.products=ttk.Treeview(left,columns=cols,show="headings")
-  for c,t,w,a in [("barcode","Barcode",150,"center"),("name","Nama Barang",360,"w"),("price","Harga Jual",120,"e"),("stock","Stok",70,"center")]:
+  cols=("code","barcode","name","price","stock"); self.products=ttk.Treeview(left,columns=cols,show="headings")
+  for c,t,w,a in [("code","Kode Barang",85,"center"),("barcode","Barcode",145,"center"),("name","Nama Barang",300,"w"),("price","Harga Jual",115,"e"),("stock","Stok",65,"center")]:
    self.products.heading(c,text=t); self.products.column(c,width=w,anchor=a)
   self.products.pack(fill="both",expand=True,padx=14,pady=(0,14)); self.products.bind("<Double-1>",self.add_selected)
   tk.Label(right,text="KERANJANG BELANJA",bg=GREEN,fg=WHITE,font=("Segoe UI",14,"bold"),anchor="w",padx=14,pady=14).pack(fill="x")
@@ -177,7 +177,7 @@ class SeaMart:
   self.products.delete(*self.products.get_children()); q=self.q.get().strip()
   if q: rows=self.db.execute("SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? ORDER BY name LIMIT 500",(f"%{q}%",f"%{q}%")).fetchall()
   else: rows=self.db.execute("SELECT * FROM products ORDER BY name LIMIT 500").fetchall()
-  for r in rows:self.products.insert("","end",iid=str(r["id"]),values=(r["barcode"] or "",r["name"],self.rp(r["price"]),r["stock"]))
+  for r in rows:self.products.insert("","end",iid=str(r["id"]),values=(r["id"],r["barcode"] or "",r["name"],self.rp(r["price"]),r["stock"]))
  def scan(self,e=None):
   q=self.q.get().strip(); r=self.db.execute("SELECT * FROM products WHERE barcode=?",(q,)).fetchone()
   if not r:r=self.db.execute("SELECT * FROM products WHERE name LIKE ? ORDER BY name LIMIT 1",(f"%{q}%",)).fetchone()
