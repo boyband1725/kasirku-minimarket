@@ -387,7 +387,20 @@ class SeaMart:
   if method=="Tunai":lines += ["BAYAR "+self.rp(paid),"KEMBALI "+self.rp(paid-total)]
   lines += ["-"*30,"Terima kasih"]
   self.last_receipt="\n".join(lines); self.cart.clear();self.draw_cart();self.refresh()
-  messagebox.showinfo("Transaksi tersimpan",inv);self.reprint()
+  self.receipt_preview()
+ def receipt_preview(self):
+  if not self.last_receipt:
+   messagebox.showinfo("Struk","Belum ada struk."); return
+  win=tk.Toplevel(self.root); win.title("Preview Struk - SeaMart"); win.geometry("430x690"); win.minsize(360,520); win.configure(bg=BG)
+  tk.Label(win,text="PRATINJAU STRUK PEMBELIAN",bg=DARK,fg=WHITE,font=("Segoe UI",13,"bold"),pady=13).pack(fill="x")
+  paper=tk.Frame(win,bg=WHITE,highlightbackground="#D7E4DB",highlightthickness=1); paper.pack(fill="both",expand=True,padx=24,pady=16)
+  tk.Label(paper,text="PREVIEW KERTAS THERMAL 58 MM",bg=WHITE,fg="#718078",font=("Segoe UI",8,"bold")).pack(pady=(12,4))
+  preview=tk.Text(paper,width=34,height=28,wrap="none",font=("Consolas",10),bg=WHITE,fg="#111111",relief="flat",bd=0,padx=8,pady=8)
+  preview.pack(fill="both",expand=True,padx=8,pady=(0,8))
+  preview.insert("1.0",self.last_receipt); preview.configure(state="disabled")
+  bar=tk.Frame(win,bg=BG); bar.pack(fill="x",padx=24,pady=(0,16))
+  tk.Button(bar,text="TUTUP",command=win.destroy,bg="#E8EEEA",fg=DARK,relief="flat",padx=20,pady=11).pack(side="left")
+  tk.Button(bar,text="CETAK STRUK",command=self.reprint,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",11,"bold"),padx=24,pady=11).pack(side="right")
  def reprint(self):
   if not self.last_receipt:messagebox.showinfo("Struk","Belum ada struk.");return
   p=DATA/"struk_terakhir.txt";p.write_text(self.last_receipt,encoding="utf-8")
