@@ -43,7 +43,7 @@ class SeaMart:
     messagebox.showerror("Login gagal","Username atau password salah.",parent=win); pwd.delete(0,"end"); pwd.focus_set(); return
    self.current_user=row["username"]; self.current_role=row["role"]; win.destroy()
    self.root.deiconify(); self.ui(); self.refresh()
-  tk.Button(panel,text="MASUK",command=submit,bg=GREEN,fg=WHITE,fg="white",relief="flat",font=("Segoe UI",12,"bold"),pady=12).pack(fill="x",padx=32)
+  tk.Button(panel,text="MASUK",command=submit,bg=GREEN,fg=WHITE,relief="flat",font=("Segoe UI",12,"bold"),pady=12).pack(fill="x",padx=32)
   tk.Label(panel,text="Akun awal: admin/admin123  |  kasir/kasir123",bg=WHITE,fg="#718078",font=("Segoe UI",8)).pack(pady=14)
   pwd.bind("<Return>",submit); user.bind("<Return>",lambda e:pwd.focus_set()); user.focus_set()
  def logout(self):
