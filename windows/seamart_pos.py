@@ -147,20 +147,51 @@ class SeaMart:
     qty=row["qty"] or 0; rev=row["revenue"] or 0; total_qty+=qty; total_rev+=rev
     tree.insert("","end",values=(row["barcode"] or "-",row["name"],f"{qty:g}",row["trx"],self.rp(rev)))
    summary.config(text=f"Total barang terjual: {total_qty:g}  |  Omzet: {self.rp(total_rev)}  |  Jenis barang: {len(rows)}")
-  def export():
+  def export(kind):
    if not current:
-    messagebox.showinfo("Ekspor CSV","Tidak ada data untuk diekspor.",parent=win); return
-   path=filedialog.asksaveasfilename(parent=win,defaultextension=".csv",initialfile="rekap_penjualan_per_barang.csv",filetypes=[("CSV","*.csv")])
+    messagebox.showinfo("Ekspor","Tidak ada data untuk diekspor.",parent=win); return
+   ext={"csv":".csv","xlsx":".xlsx","pdf":".pdf"}[kind]
+   path=filedialog.asksaveasfilename(parent=win,defaultextension=ext,initialfile="rekap_penjualan_per_barang"+ext,filetypes=[(kind.upper(), "*"+ext)])
    if not path:return
    try:
-    with open(path,"w",encoding="utf-8-sig",newline="") as f:
-     wr=csv.writer(f); wr.writerow(["barcode","nama_barang","qty_terjual","jumlah_transaksi","total_penjualan"])
-     for row in current: wr.writerow([row["barcode"] or "",row["name"],row["qty"],row["trx"],row["revenue"]])
-    messagebox.showinfo("Ekspor selesai","Rekap berhasil disimpan ke CSV.",parent=win)
+    if kind=="csv":
+     with open(path,"w",encoding="utf-8-sig",newline="") as f:
+      wr=csv.writer(f); wr.writerow(["Barcode","Nama Barang","Qty Terjual","Jumlah Transaksi","Total Penjualan"])
+      for row in current: wr.writerow([row["barcode"] or "",row["name"],row["qty"],row["trx"],row["revenue"]])
+    elif kind=="xlsx":
+     from openpyxl import Workbook
+     from openpyxl.styles import Font, PatternFill, Alignment
+     from openpyxl.utils import get_column_letter
+     wb=Workbook(); ws=wb.active; ws.title="Rekap Penjualan"
+     ws.append(["REKAP PENJUALAN PER BARANG"]); ws.append(["Barcode","Nama Barang","Qty Terjual","Jumlah Transaksi","Total Penjualan"])
+     for row in current: ws.append([row["barcode"] or "",row["name"],row["qty"],row["trx"],row["revenue"]])
+     for cell in ws[1]:
+      cell.font=Font(bold=True,size=14,color="FFFFFF"); cell.fill=PatternFill("solid",fgColor="087A45")
+     for cell in ws[2]:
+      cell.font=Font(bold=True,color="FFFFFF"); cell.fill=PatternFill("solid",fgColor="245743")
+     for row in ws.iter_rows(min_row=3,min_col=5,max_col=5): row[0].number_format='"Rp" #,##0'
+     for col,width in enumerate([18,38,16,20,22],1): ws.column_dimensions[get_column_letter(col)].width=width
+     ws.freeze_panes="A3"; ws.auto_filter.ref=f"A2:E{ws.max_row}"; wb.save(path)
+    else:
+     from reportlab.lib import colors
+     from reportlab.lib.pagesizes import A4, landscape
+     from reportlab.lib.styles import getSampleStyleSheet
+     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+     from reportlab.lib.units import mm
+     doc=SimpleDocTemplate(path,pagesize=landscape(A4),rightMargin=12*mm,leftMargin=12*mm,topMargin=12*mm,bottomMargin=12*mm)
+     data=[["Barcode","Nama Barang","Qty Terjual","Transaksi","Total Penjualan"]]
+     for row in current: data.append([row["barcode"] or "-",str(row["name"]),f'{row["qty"]:g}',str(row["trx"]),self.rp(row["revenue"])])
+     table=Table(data,repeatRows=1,colWidths=[35*mm,105*mm,25*mm,28*mm,42*mm])
+     table.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),colors.HexColor("#087A45")),("TEXTCOLOR",(0,0),(-1,0),colors.white),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),("GRID",(0,0),(-1,-1),0.4,colors.HexColor("#CBD8CF")),("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,colors.HexColor("#F2F6F3")]),("FONTSIZE",(0,0),(-1,-1),8),("VALIGN",(0,0),(-1,-1),"MIDDLE"),("ALIGN",(2,1),(-1,-1),"RIGHT")]))
+     styles=getSampleStyleSheet()
+     doc.build([Paragraph("Rekap Penjualan per Barang",styles["Title"]),Spacer(1,6*mm),table])
+    messagebox.showinfo("Ekspor selesai",f"Rekap berhasil disimpan sebagai {ext.upper()}.",parent=win)
    except Exception as ex: messagebox.showerror("Ekspor gagal",str(ex),parent=win)
   buttons=tk.Frame(win,bg=BG); buttons.pack(fill="x",padx=14,pady=(0,14))
   tk.Button(filters,text="TAMPILKAN",command=load,bg=GREEN,fg=WHITE,relief="flat",padx=16,pady=7).pack(side="left",padx=8)
-  tk.Button(buttons,text="EKSPOR CSV",command=export,bg=DARK,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="right")
+  tk.Button(buttons,text="EKSPOR PDF",command=lambda:export("pdf"),bg="#9B2C2C",fg=WHITE,relief="flat",padx=14,pady=9).pack(side="right",padx=4)
+  tk.Button(buttons,text="EKSPOR EXCEL",command=lambda:export("xlsx"),bg=GREEN,fg=WHITE,relief="flat",padx=14,pady=9).pack(side="right",padx=4)
+  tk.Button(buttons,text="EKSPOR CSV",command=lambda:export("csv"),bg=DARK,fg=WHITE,relief="flat",padx=14,pady=9).pack(side="right",padx=4)
   load()
  def master_items(self):
   win=tk.Toplevel(self.root); win.title("Master Barang - SeaMart"); win.geometry("1000x620"); win.configure(bg=BG)
