@@ -67,12 +67,13 @@ class SeaMart:
   left=tk.Frame(body,bg=WHITE,highlightbackground="#D7E4DB",highlightthickness=1); left.pack(side="left",fill="both",expand=True,padx=(0,10))
   right=tk.Frame(body,bg=WHITE,width=420,highlightbackground="#D7E4DB",highlightthickness=1); right.pack(side="right",fill="y"); right.pack_propagate(False)
   tk.Label(left,text="CARI / SCAN BARCODE ATAU KETIK NAMA",bg=WHITE,fg=DARK,font=("Segoe UI",10,"bold")).pack(anchor="w",padx=14,pady=(14,4))
-  row=tk.Frame(left,bg=WHITE); row.pack(fill="x",padx=14,pady=(0,12))
-  self.q=tk.StringVar(); self.search=tk.Entry(row,textvariable=self.q,font=("Segoe UI",15),relief="solid",bd=1); self.search.pack(side="left",fill="x",expand=True,ipady=8)
+  row=tk.Frame(left,bg=WHITE); row.pack(fill="x",padx=14,pady=(0,10))
+  self.q=tk.StringVar(); self.search=tk.Entry(row,textvariable=self.q,font=("Segoe UI",14),relief="solid",bd=1); self.search.pack(side="left",fill="x",expand=True,ipady=8)
   self.search.bind("<KeyRelease>",lambda e:self.refresh()); self.search.bind("<Return>",self.scan)
   self.root.bind("<F2>",lambda e:self.remove()); self.root.bind("<F4>",lambda e:self.checkout()); self.root.bind("<F5>",lambda e:self.hold_cart()); self.root.bind("<F6>",lambda e:self.recall_cart()); self.root.bind("<F12>",lambda e:self.close_cashier())
   tk.Button(row,text="CARI",command=self.refresh,bg=GREEN,fg=WHITE,relief="flat",padx=18,pady=9).pack(side="left",padx=8)
-  tk.Label(left,text="PILIH PRODUK  •  klik kartu untuk menambahkan ke keranjang",bg=WHITE,fg=DARK,font=("Segoe UI",11,"bold")).pack(anchor="w",padx=14,pady=(0,7))
+  self.category=tk.StringVar(value="Semua")
+  self.category_bar=tk.Frame(left,bg=WHITE); self.category_bar.pack(fill="x",padx=12,pady=(0,10))
   self.product_canvas=tk.Canvas(left,bg="#F4F8F5",highlightthickness=0)
   self.product_scroll=ttk.Scrollbar(left,orient="vertical",command=self.product_canvas.yview)
   self.product_canvas.configure(yscrollcommand=self.product_scroll.set)
@@ -183,20 +184,30 @@ class SeaMart:
   if not hasattr(self,"product_grid"): return
   for w in self.product_grid.winfo_children(): w.destroy()
   q=self.q.get().strip()
-  if q: rows=self.db.execute("SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? OR CAST(id AS TEXT) LIKE ? ORDER BY name LIMIT 500",(f"%{q}%",f"%{q}%",f"%{q}%")).fetchall()
-  else: rows=self.db.execute("SELECT * FROM products ORDER BY name LIMIT 500").fetchall()
+  cats=["Semua"]+[x[0] for x in self.db.execute("SELECT DISTINCT category FROM products WHERE TRIM(COALESCE(category,''))<>'' ORDER BY category").fetchall()]
+  for w in self.category_bar.winfo_children(): w.destroy()
+  for cat in cats[:7]:
+   active=self.category.get()==cat
+   tk.Button(self.category_bar,text=cat,command=lambda value=cat:self.set_category(value),bg=GREEN if active else "#EEF2F0",fg=WHITE if active else INK,relief="flat",font=("Segoe UI",9,"bold"),padx=12,pady=7).pack(side="left",padx=3)
+  sql="SELECT * FROM products WHERE (name LIKE ? OR barcode LIKE ? OR CAST(id AS TEXT) LIKE ?)"
+  args=[f"%{q}%",f"%{q}%",f"%{q}%"]
+  if self.category.get()!="Semua":
+   sql+=" AND category=?"; args.append(self.category.get())
+  rows=self.db.execute(sql+" ORDER BY name LIMIT 500",args).fetchall()
   for i,r in enumerate(rows):
    card=tk.Frame(self.product_grid,bg=WHITE,highlightbackground="#D9E6DD",highlightthickness=1,cursor="hand2")
    card.grid(row=i//3,column=i%3,sticky="nsew",padx=6,pady=6)
    self.product_grid.grid_columnconfigure(i%3,weight=1,uniform="product")
    tk.Label(card,text=r["name"],bg=WHITE,fg=DARK,font=("Segoe UI",11,"bold"),anchor="w",justify="left",wraplength=190).pack(fill="x",padx=10,pady=(10,5))
-   tk.Label(card,text=f'Kode: {r["id"]}  •  Barcode: {r["barcode"] or "-"}',bg=WHITE,fg="#718078",font=("Segoe UI",8),anchor="w").pack(fill="x",padx=10)
+   tk.Label(card,text=f'KB{r["id"]:04d}  |  {r["barcode"] or "-"}',bg=WHITE,fg="#718078",font=("Segoe UI",8),anchor="w").pack(fill="x",padx=10)
    tk.Label(card,text=self.rp(r["price"]),bg=WHITE,fg=GREEN,font=("Segoe UI",15,"bold"),anchor="w").pack(fill="x",padx=10,pady=(7,2))
-   stock_color="#B42318" if (r["stock"] or 0)<=0 else "#64756B"
-   tk.Label(card,text=f'Stok tersedia: {r["stock"]:g}',bg=WHITE,fg=stock_color,font=("Segoe UI",9),anchor="w").pack(fill="x",padx=10,pady=(0,10))
-   for child in card.winfo_children():
-    child.bind("<Button-1>",lambda e,row=r:self.add(row))
+   stock_color="#B42318" if (r["stock"] or 0)<=0 else "#087A45"
+   tk.Label(card,text=f'Stok {r["stock"]:g}',bg="#E5F5EB",fg=stock_color,font=("Segoe UI",9,"bold"),anchor="w").pack(anchor="w",padx=10,pady=(0,10))
+   for child in card.winfo_children(): child.bind("<Button-1>",lambda e,row=r:self.add(row))
    card.bind("<Button-1>",lambda e,row=r:self.add(row))
+  self.product_canvas.yview_moveto(0)
+ def set_category(self,value):
+  self.category.set(value); self.refresh()
  def scan(self,e=None):
   q=self.q.get().strip(); r=self.db.execute("SELECT * FROM products WHERE barcode=?",(q,)).fetchone()
   if not r:r=self.db.execute("SELECT * FROM products WHERE name LIKE ? ORDER BY name LIMIT 1",(f"%{q}%",)).fetchone()
