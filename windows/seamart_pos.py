@@ -78,7 +78,7 @@ class SeaMart:
    self.products.heading(c,text=t); self.products.column(c,width=w,anchor=a)
   self.products.pack(fill="both",expand=True,padx=14,pady=(0,14)); self.products.bind("<Double-1>",self.add_selected)
   tk.Label(right,text="KERANJANG BELANJA",bg=GREEN,fg=WHITE,font=("Segoe UI",14,"bold"),anchor="w",padx=14,pady=14).pack(fill="x")
-  self.cartview=ttk.Treeview(right,columns=("name","qty","sub"),show="headings",height=12)
+  self.cartview=ttk.Treeview(right,columns=("name","qty","sub"),show="headings",height=6)
   for c,t,w,a in [("name","Barang",205,"w"),("qty","Qty",45,"center"),("sub","Subtotal",125,"e")]:
    self.cartview.heading(c,text=t); self.cartview.column(c,width=w,anchor=a)
   self.cartview.pack(fill="both",expand=True,padx=12,pady=10)
