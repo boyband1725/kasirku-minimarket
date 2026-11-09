@@ -2,7 +2,7 @@
 
 This folder contains the first browser-based SeaMart POS interface, separated from the legacy Android and Windows builds.
 
-Publishing is configured to use GitHub Actions through the repository's Pages settings.
+Publishing is configured to use GitHub Actions through the repository's Pages settings. The github-pages environment allows both main and seamart-web-odoo.
 
 ## Included in this preview
 - Odoo-inspired navigation and dashboard
