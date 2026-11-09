@@ -385,7 +385,7 @@ window.seamartPosPhotoLookups=window.seamartPosPhotoLookups||new Set();
 async function hydrateFeaturedProductPhotos(items){
  for(const p of items){
   const barcode=String(p.barcode||'').trim();
-  if(p.foto||!/^\\d{8,14}$/.test(barcode)||window.seamartPosPhotoLookups.has(barcode))continue;
+  if(p.foto||!/^\d{8,14}$/.test(barcode)||window.seamartPosPhotoLookups.has(barcode))continue;
   window.seamartPosPhotoLookups.add(barcode);
   try{
    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
