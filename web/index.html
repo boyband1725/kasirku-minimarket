@@ -123,6 +123,24 @@
  .odoo-product-image{height:84px!important}
 }
 .odoo-pos-layout.categories-hidden{grid-template-columns:170px minmax(0,1fr) 350px!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{display:block!important;padding:10px}.odoo-pos-layout.categories-hidden .odoo-category-panel #poscategories{display:none!important}.odoo-pos-layout.categories-hidden .odoo-category-heading{margin:0}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:none}@media(max-width:1100px){.odoo-pos-layout.categories-hidden{grid-template-columns:1fr!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{width:100%;position:static}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:block}}.pos-category-row{display:flex;align-items:center;gap:5px}.pos-category-row .odoo-cat{flex:1;min-width:0}.pos-category-toggle{flex:0 0 30px;width:30px;height:30px;border:1px solid #dce8e0;border-radius:8px;background:#fff;color:#276447;font-size:20px;line-height:1;cursor:pointer}.pos-category-toggle:hover{background:#eef8f1}.odoo-category-panel.categories-collapsed #poscategories .pos-category-row:not(:first-child){display:none}\n
+
+/* SeaMart final desktop polish */
+@media(min-width:1101px){
+ .odoo-pos-layout{grid-template-columns:190px minmax(480px,1fr) 320px!important;gap:14px!important}
+ .odoo-category-panel{background:#fff!important;border:1px solid #e3ece6!important;border-radius:14px!important;min-height:480px;padding:12px!important}
+ .odoo-category-heading{display:flex!important;align-items:center;justify-content:space-between;margin:0 0 10px!important;padding:8px!important;background:#f6faf7!important;border-radius:9px}
+ .odoo-category-heading .odoo-panel-label{display:block!important;color:#276447!important;font-size:12px!important;padding:0!important}
+ #poscategories{display:flex!important;flex-direction:column!important;gap:4px!important;overflow:visible!important}
+ #poscategories .pos-category-row{width:100%!important}
+ #poscategories .odoo-cat{width:100%!important;min-height:40px!important;display:flex!important;justify-content:flex-start!important}
+ .odoo-category-panel.categories-collapsed #poscategories .pos-category-row:not(:first-child){display:none!important}
+ .odoo-catalog-panel{min-width:0!important;padding:14px!important}
+ #posproducts .pos-featured-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ #posproducts .pos-products-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))!important}
+ #posproducts .odoo-product-image{height:112px!important}
+ #posproducts .odoo-product{padding:10px!important}
+}
+@media(min-width:1101px) and (max-width:1350px){.odoo-pos-layout{grid-template-columns:170px minmax(400px,1fr) 285px!important;gap:10px!important}.odoo-category-panel{padding:8px!important}.odoo-order-body{padding:10px!important}}
 /* Desktop POS layout repair: give the catalog real space between categories and cart */
 @media(min-width:1101px){
  .odoo-pos-layout{display:grid!important;grid-template-columns:160px minmax(420px,1fr) 300px!important;gap:12px!important;align-items:start!important}
