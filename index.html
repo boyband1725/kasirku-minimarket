@@ -201,6 +201,30 @@
  .odoo-order-body{padding:12px!important}
  #posproducts .odoo-product-image{height:100px!important}
 }
+
+/* SeaMart POS desktop refinement: three product columns, wider cart */
+@media (min-width:1101px){
+  .odoo-pos-layout{
+    grid-template-columns:150px minmax(0,1fr) 390px!important;
+    gap:12px!important;
+  }
+  #posproducts .pos-featured-grid,
+  #posproducts .pos-products-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .odoo-order-panel{min-width:0!important}
+  .odoo-order-body{padding:14px 16px!important}
+}
+@media (min-width:1101px) and (max-width:1450px){
+  .odoo-pos-layout{
+    grid-template-columns:140px minmax(0,1fr) 365px!important;
+    gap:10px!important;
+  }
+  .odoo-order-body{padding:12px!important}
+  #posproducts .odoo-product-image{height:96px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
