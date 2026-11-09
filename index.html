@@ -346,6 +346,7 @@ function closeCashierShift(){
  </div>
  <div style="margin-top:10px;padding:9px;background:#fff8e8;border-radius:9px;color:#72531b;font-size:11px">QRIS tidak dihitung sebagai uang tunai di laci. Pastikan jumlah uang fisik sudah dihitung sebelum menyelesaikan tutup kasir.</div>
  <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:12px">
+ <button class="btn-light" type="button" onclick="closeModal()">Batal</button>
  <button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button>
  <button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button>
  </div></div></div>`;
