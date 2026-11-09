@@ -355,3 +355,22 @@ try{page('dashboard')}catch(err){console.error('SeaMart render error:',err);docu
 if(!document.getElementById('view').innerHTML.trim()){document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum tampil</h3><p class="muted">Aplikasi berhasil dibuka, tetapi isi dashboard belum dirender. Silakan kirim screenshot pesan ini.</p></div>';}
 </script>
 </body></html>
+
+/* Mobile POS: keep checkout/payment controls visible above the product list */
+@media(max-width:900px){
+ .odoo-order-panel{
+  position:fixed!important;left:10px!important;right:10px!important;bottom:10px!important;
+  width:auto!important;max-height:42vh!important;overflow-y:auto!important;
+  z-index:999!important;background:#fff!important;border:1px solid #b9d8c6!important;
+  border-radius:16px!important;box-shadow:0 -6px 24px rgba(20,40,30,.22)!important;
+ }
+ .odoo-order-head{padding:9px 12px!important}
+ .odoo-order-body{padding:8px 12px 12px!important}
+ .odoo-order-lines{min-height:0!important;max-height:72px!important;overflow-y:auto!important}
+ .odoo-order-lines .empty{padding:7px!important}
+ .odoo-order-panel .totalrow{padding:5px 0!important}
+ .odoo-order-panel .grand{font-size:17px!important}
+ .odoo-checkout{min-height:46px!important;padding:11px!important;font-size:15px!important}
+ .odoo-order-panel .odoo-scan-hint{display:none!important}
+ #view:has(.odoo-order-panel){padding-bottom:45vh!important}
+}
