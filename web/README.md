@@ -2,6 +2,8 @@
 
 This folder contains the first browser-based SeaMart POS interface, separated from the legacy Android and Windows builds.
 
+Publishing is configured to use GitHub Actions through the repository's Pages settings.
+
 ## Included in this preview
 - Odoo-inspired navigation and dashboard
 - Product master with category, code, barcode, price, and stock
