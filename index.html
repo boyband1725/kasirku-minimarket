@@ -253,6 +253,15 @@
 /* Center login card precisely in the available screen */
 #loginroot .login-screen{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;overflow-y:auto!important;padding:20px!important}
 #loginroot .login-card{display:block!important;flex:0 1 420px!important;width:min(420px,100%)!important;max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;margin:auto!important;box-sizing:border-box!important}
+
+/* Compact centered SeaMart login card */
+#loginroot .login-card{flex:0 1 350px!important;width:min(350px,calc(100vw - 36px))!important;padding:22px!important;border-radius:16px!important;max-height:calc(100dvh - 36px)!important}
+#loginroot .login-brand{width:165px!important;margin:0 auto 10px!important}
+#loginroot .login-card h2{font-size:21px!important;margin-bottom:4px!important}
+#loginroot .login-card label{margin:10px 0 5px!important}
+#loginroot .login-card input{min-height:42px!important;padding:9px 11px!important}
+#loginroot .login-card .btn-primary{min-height:44px!important;margin-top:14px!important;padding:10px 12px!important}
+#loginroot .login-card>p{font-size:12px!important}
 </style>
 <script>
 window.__seamartRuntimeError = '';
