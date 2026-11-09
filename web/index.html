@@ -189,7 +189,19 @@
 .odoo-product-price{background:#d8f9df;color:#075b36;border-radius:9px;padding:7px 8px;font-weight:800}
 .odoo-pos-tools .field,.odoo-pos-tools input{border-radius:13px}
 .scan-focus-btn{background:#e5ffeb;color:#075b36;border:1px solid #18a653;border-radius:12px}
-.pos-featured{margin-bottom:20px;padding:14px;border:1px solid #dcefe3;border-radius:14px;background:linear-gradient(135deg,#f0fff4,#fff)}.pos-featured-title{font-size:14px;font-weight:850;color:#075b36;margin:0 0 12px}.pos-featured-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.pos-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px}@media(max-width:700px){.pos-featured-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
+.pos-featured{margin-bottom:20px;padding:14px;border:1px solid #dcefe3;border-radius:14px;background:linear-gradient(135deg,#f0fff4,#fff)}.pos-featured-title{font-size:14px;font-weight:850;color:#075b36;margin:0 0 12px}.pos-featured-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.pos-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px}@media(max-width:700px){.pos-featured-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* SeaMart POS: three product columns and a wider order panel */
+@media(min-width:1101px){
+ .odoo-pos-layout{grid-template-columns:150px minmax(0,1fr) 380px!important;gap:12px!important}
+ #posproducts .pos-featured-grid,
+ #posproducts .pos-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+}
+@media(min-width:1101px) and (max-width:1450px){
+ .odoo-pos-layout{grid-template-columns:135px minmax(0,1fr) 340px!important;gap:10px!important}
+ .odoo-order-body{padding:12px!important}
+ #posproducts .odoo-product-image{height:100px!important}
+}
+</style>
 <script>
 window.__seamartRuntimeError = '';
 window.addEventListener('error', function(e) {
