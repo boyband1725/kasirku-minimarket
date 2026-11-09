@@ -49,6 +49,17 @@
 @media(max-width:520px){.odoo-pos-head{align-items:flex-start}.odoo-pos-head h1{font-size:22px}.odoo-pos-tools{flex-wrap:wrap}.odoo-pos-tools .search{flex-basis:100%}.odoo-catalog-panel{padding:10px}.odoo-product-image{height:88px}.odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 </style>
+<script>
+window.__seamartRuntimeError = '';
+window.addEventListener('error', function(e) {
+  window.__seamartRuntimeError = (e.message || 'Kesalahan JavaScript') + (e.lineno ? ' · baris ' + e.lineno : '');
+  document.addEventListener('DOMContentLoaded', function() {
+    var v=document.getElementById('view');
+    if(v && !v.innerHTML.trim()) v.innerHTML='<div class="panel"><h3>SeaMart menemukan kesalahan</h3><p class="muted" id="seamart-error-detail"></p><p class="muted">Kirimkan pesan error ini kepada tim SeaMart agar bisa diperbaiki.</p></div>';
+    var d=document.getElementById('seamart-error-detail'); if(d)d.textContent=window.__seamartRuntimeError;
+  }, {once:true});
+});
+</script>
 </head>
 <body>
 <div class="app">
@@ -137,5 +148,6 @@ function sales(){let total=db.sales.reduce((a,s)=>a+s.total,0),map={};db.sales.f
 function exportSales(){let rows=[['transaksi','waktu','produk','qty','harga','subtotal','total','pembayaran']];db.sales.forEach(s=>s.items.forEach(i=>rows.push([s.id,s.time,i.nama,i.qty,i.harga,i.subtotal,s.total,s.pay])));download('seamart-laporan-penjualan.csv',rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
 function settings(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Pengaturan & Data</h1><div class="sub">Kelola data lokal dan siapkan migrasi ke database online.</div></div></div><div class="panel"><h3>Master Barang CSV</h3><p class="muted">Format kompatibel dengan master lama: <b>nama,barcode,harga,stok</b>. Kolom kode dan kategori juga didukung. Pencocokan barcode/kode akan memperbarui produk yang sama tanpa mengganti barcode yang sudah tersimpan.</p><button class="btn-primary" onclick="document.getElementById('csvfile').click()">Impor Master CSV</button> <button class="btn-light" onclick="exportCSV()">Ekspor Master CSV</button></div><div class="panel"><h3>Cadangan Data</h3><p class="muted">Unduh salinan data browser sebagai JSON untuk cadangan.</p><button class="btn-light" onclick="download('seamart-backup.json',JSON.stringify(db,null,2))">Unduh Backup JSON</button></div><div class="panel"><h3>Status Sistem</h3><div class="totalrow"><span>Antarmuka Odoo-inspired</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Penyimpanan browser</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Database cloud bersama</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div><div class="totalrow"><span>Login aman admin/kasir</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div></div><div class="panel"><h3>Zona Reset</h3><p class="muted">Menghapus seluruh data lokal pada browser ini.</p><button class="btn-danger" onclick="if(confirm('Hapus semua data SeaMart pada browser ini? Pastikan sudah membuat backup.')){db={products:[],moves:[],sales:[]};save();settings()}">Reset Data Lokal</button></div>`}
 try{page('dashboard')}catch(err){console.error('SeaMart render error:',err);document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum dapat dimuat</h3><p class="muted">Data lokal sedang diperiksa. Muat ulang halaman. Jika masih muncul, ekspor cadangan data dari menu Pengaturan & Data lalu kirimkan tangkapan layar ini.</p><button class="btn-primary" onclick="location.reload()">Muat Ulang</button></div>';}
+if(!document.getElementById('view').innerHTML.trim()){document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum tampil</h3><p class="muted">Aplikasi berhasil dibuka, tetapi isi dashboard belum dirender. Silakan kirim screenshot pesan ini.</p></div>';}
 </script>
 </body></html>
