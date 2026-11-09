@@ -600,3 +600,31 @@ if(!document.getElementById('view').innerHTML.trim()){document.getElementById('v
  body.mobile-menu-open .sidebar .nav{justify-content:flex-start!important;padding:11px 12px!important}
  body.mobile-menu-open .sidebar .nav .ico{width:18px!important}
 }
+
+
+/* SeaMart mobile POS: keep cart and payment controls visible */
+@media(max-width:900px){
+  .odoo-order-panel{
+    position:fixed!important;
+    left:10px!important;
+    right:10px!important;
+    bottom:10px!important;
+    width:auto!important;
+    max-height:42vh!important;
+    overflow-y:auto!important;
+    z-index:999!important;
+    box-shadow:0 -6px 24px rgba(20,40,30,.22)!important;
+    border:1px solid #b9d8c6!important;
+    border-radius:16px!important;
+    background:#fff!important;
+  }
+  .odoo-order-head{padding:9px 12px!important}
+  .odoo-order-body{padding:8px 12px 12px!important}
+  .odoo-order-lines{max-height:72px!important;min-height:0!important;overflow-y:auto!important}
+  .odoo-order-lines .empty{padding:7px!important}
+  .odoo-order-panel .totalrow{padding:5px 0!important}
+  .odoo-order-panel .grand{font-size:17px!important}
+  .odoo-checkout{min-height:46px!important;padding:11px!important;font-size:15px!important}
+  .odoo-order-panel .odoo-scan-hint{display:none!important}
+  #view:has(.odoo-order-panel){padding-bottom:45vh!important}
+}
