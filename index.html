@@ -345,28 +345,27 @@ async function printCashierClosing(shiftId){
  const total=cash+qris,expected=Number(sh.opening||0)+cash;
  const actualInput=document.getElementById('cashierClosingActual');
  const actual=actualInput?Number(actualInput.value||0):Number(sh.actualCash??expected);
- const diff=actual-expected;
- const fmt=n=>rupiah(Number(n)||0);
+ const diff=actual-expected,fmt=n=>rupiah(Number(n)||0);
+ const line=(label,value)=>({type:'text',text:label+': '+value});
  const content=[
-  {type:'text',text:'SEAMART POS',align:'center',bold:true,size:'large'},
+  {type:'text',text:'SEAMART POS',align:'center',bold:true},
   {type:'text',text:'RINGKASAN TUTUP KASIR',align:'center',bold:true},
-  {type:'text',text:'Sesi: '+String(sh.id),align:'center'},
+  {type:'text',text:'Sesi '+String(sh.id),align:'center'},
   {type:'text',text:new Date().toLocaleString('id-ID'),align:'center'},
-  {type:'divider'},
-  {type:'row',left:'Kasir',right:String(sh.nama||sh.username||'-')},
-  {type:'row',left:'Jumlah transaksi',right:String(sales.length)},
-  {type:'divider'},
-  {type:'row',left:'Penjualan tunai',right:fmt(cash)},
-  {type:'row',left:'Penjualan QRIS',right:fmt(qris)},
-  {type:'row',left:'Total penjualan',right:fmt(total),bold:true},
-  {type:'divider'},
-  {type:'row',left:'Modal awal kas',right:fmt(sh.opening)},
-  {type:'row',left:'Kas seharusnya',right:fmt(expected),bold:true},
-  {type:'row',left:'Uang tunai fisik',right:fmt(actual)},
-  {type:'row',left:'Selisih kas',right:diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff)),bold:true},
-  {type:'divider'},
+  {type:'text',text:'--------------------------------'},
+  line('Kasir',String(sh.nama||sh.username||'-')),
+  line('Jumlah transaksi',String(sales.length)),
+  {type:'text',text:'--------------------------------'},
+  line('Penjualan tunai',fmt(cash)),
+  line('Penjualan QRIS',fmt(qris)),
+  line('TOTAL PENJUALAN',fmt(total)),
+  {type:'text',text:'--------------------------------'},
+  line('Modal awal kas',fmt(sh.opening)),
+  line('Kas seharusnya',fmt(expected)),
+  line('Uang tunai fisik',fmt(actual)),
+  line('Selisih kas',diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff))),
+  {type:'text',text:'--------------------------------'},
   {type:'text',text:'Kasir: ____________________'},
-  {type:'feed',lines:1},
   {type:'text',text:'Admin: ____________________'},
   {type:'feed',lines:3}
  ];
@@ -381,9 +380,8 @@ async function printCashierClosing(shiftId){
   alert('Ringkasan tutup kasir berhasil dikirim ke printer '+(status.printer?.name||'RPP02N')+'.');
  }catch(e){
   const msg=String(e&&e.message||e);
-  if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('fetch')){
-   alert('Printer RPP02N belum bisa diakses langsung dari browser. Instal aplikasi Cleanter di HP, buka aplikasinya, pilih RPP02N sebagai printer utama, lalu coba Cetak Ringkasan lagi.');
-  }else alert('Cetak gagal: '+msg);
+  if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('fetch'))alert('Printer RPP02N belum bisa diakses langsung dari browser. Pastikan Cleanter aktif dan RPP02N terpilih.');
+  else alert('Cetak gagal: '+msg);
  }
 }
 
