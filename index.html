@@ -286,6 +286,20 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const dateNow=()=>new Date().toLocaleString('id-ID');
 function page(p){document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent=({dashboard:'Dashboard',kasir:'Kasir / Point of Sale',produk:'Produk & Kategori',stok:'Stok & Mutasi',penjualan:'Laporan Penjualan',pengaturan:'Pengaturan & Data'})[p];({dashboard:dashboard,kasir:pos,produk:products,ubahbarang:editProductsPage,stok:stock,penjualan:sales,pengaturan:settings}[p])()}
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>page(b.dataset.page));
+let seamartLastPage='dashboard';
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page!=='kasir')seamartLastPage=b.dataset.page;}));
+document.addEventListener('keydown',function(e){
+ if(e.key!=='F12')return;
+ const active=document.querySelector('.nav.active')?.dataset.page;
+ if(active!=='kasir')return;
+ e.preventDefault();
+ const pending=cart.reduce((n,x)=>n+Number(x.qty||0),0);
+ const message=pending
+  ? 'Tutup sesi kasir sekarang?\n\nMasih ada '+pending+' barang di keranjang. Keranjang akan tetap disimpan sementara dan tidak diproses sebagai penjualan.'
+  : 'Yakin ingin menutup sesi kasir dan kembali ke Dashboard?';
+ if(!window.confirm(message))return;
+ page('dashboard');
+});
 function dashboard(){
  const total=db.products.length,qty=db.products.reduce((a,p)=>a+Number(p.stok||0),0),today=new Date().toDateString(),sold=db.sales.filter(s=>new Date(s.time).toDateString()===today),revenue=sold.reduce((a,s)=>a+s.total,0);
  document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ringkasan</h1><div class="sub">Selamat datang di operasional SeaMart.</div></div><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div>
