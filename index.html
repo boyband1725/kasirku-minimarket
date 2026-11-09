@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SeaMart POS — Web</title>
+<style>
+:root{--ink:#20252b;--muted:#77808b;--line:#e8ebef;--bg:#f5f7f9;--green:#16845b;--green2:#e8f5ef;--nav:#202a34;--white:#fff;--shadow:0 5px 22px #17212b0b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:600}.app{display:flex;min-height:100vh}.sidebar{width:238px;background:var(--nav);color:#dce4e9;padding:20px 14px;flex-shrink:0}.brand{display:flex;align-items:center;gap:9px;padding:5px 8px 25px;color:white}.brandmark{width:100%;max-width:190px;height:auto;display:block;filter:drop-shadow(0 3px 8px #00d45a30)}.brandmark text{font-family:Inter,system-ui,sans-serif;font-weight:900;letter-spacing:-2px}.brandmark .sea{fill:#fff}.brandmark .mart{fill:#a7ff24}.navlabel{font-size:10px;letter-spacing:1.2px;color:#8795a2;padding:14px 12px 7px}.nav{width:100%;text-align:left;background:transparent;color:#cbd5dd;margin:2px 0;padding:11px 12px;border-radius:8px;display:flex;gap:12px;align-items:center}.nav:hover,.nav.active{background:#34434e;color:#fff}.nav .ico{width:18px;text-align:center}.sidefoot{position:sticky;top:calc(100vh - 70px);margin-top:35px;padding:12px;color:#9eabb5;font-size:12px;border-top:1px solid #3a4650}.main{flex:1;min-width:0}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:4}.crumb{font-weight:700}.user{display:flex;align-items:center;gap:10px;color:var(--muted)}.avatar{width:32px;height:32px;border-radius:50%;background:var(--green2);color:var(--green);display:grid;place-items:center;font-weight:800}.content{padding:26px 30px;max-width:1500px;margin:auto}.pagehead{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.pagehead h1{font-size:24px;margin:0 0 5px}.sub{color:var(--muted)}.btn-primary{background:var(--green);color:#fff}.btn-light{background:#fff;border:1px solid var(--line);color:#34404b}.btn-danger{background:#fff0ef;color:#bb4038}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}.stat{padding:18px}.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:12px}.stat small{color:var(--green);display:block;margin-top:5px}.grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.panel{padding:19px;margin-bottom:17px}.panel h3{margin:0 0 16px;font-size:15px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;font-size:11px;letter-spacing:.3px;color:#89929c;background:#fafbfc;padding:12px 10px;border-bottom:1px solid var(--line)}td{padding:13px 10px;border-bottom:1px solid #f0f2f4}tr:last-child td{border-bottom:0}.pill{padding:4px 8px;border-radius:20px;background:var(--green2);color:var(--green);font-size:11px;font-weight:700}.muted{color:var(--muted)}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}.field{border:1px solid #dfe4e8;border-radius:8px;padding:10px 12px;background:#fff;min-width:180px;outline:none}.field:focus{border-color:#57a884;box-shadow:0 0 0 3px #16845b14}.search{flex:1;min-width:220px}.hidden{display:none!important}.poslayout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.8fr);gap:16px}.productgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.product{border:1px solid var(--line);border-radius:10px;padding:13px;background:white;text-align:left}.product:hover{border-color:#65b18f;box-shadow:0 4px 15px #16845b12}.product .tile{height:72px;background:#f1f5f3;border-radius:8px;display:grid;place-items:center;font-size:28px;margin-bottom:10px;overflow:hidden}.product .tile img{width:100%;height:100%;object-fit:cover}.product b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.product small{color:var(--muted)}.product strong{display:block;color:var(--green);margin-top:8px}.cartline{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}.qty{display:flex;align-items:center;gap:7px}.qty button{padding:3px 8px;background:#f0f3f4}.totalrow{display:flex;justify-content:space-between;padding:8px 0}.grand{font-size:20px;font-weight:800;border-top:1px solid var(--line);margin-top:8px;padding-top:15px}.empty{padding:35px;text-align:center;color:var(--muted)}.notice{background:#fff8e8;border:1px solid #f0dfb7;color:#75551b;padding:12px 14px;border-radius:9px;margin-bottom:18px;font-size:12px}.modalback{position:fixed;inset:0;background:#10182080;display:grid;place-items:center;padding:18px;z-index:9}.modal{background:white;border-radius:13px;padding:22px;width:min(480px,100%);box-shadow:0 20px 70px #0003}.modal h2{margin:0 0 18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formgrid label{font-size:12px;color:var(--muted)}.formgrid input,.formgrid select{width:100%;margin-top:6px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.emptyhint{color:var(--muted);font-size:12px;margin-top:5px}
+@media(max-width:900px){.sidebar{width:68px;padding:15px 8px}.brand{padding:5px 8px 22px}.brand span,.navlabel,.nav .navtxt,.sidefoot{display:none}.nav{justify-content:center;padding:13px 5px}.cards{grid-template-columns:repeat(2,1fr)}.grid2,.poslayout{grid-template-columns:1fr}.content{padding:20px 16px}.topbar{padding:0 16px}}
+@media(max-width:520px){.cards{gap:8px}.stat{padding:13px}.stat strong{font-size:19px}.pagehead{align-items:flex-start;flex-direction:column}.formgrid{grid-template-columns:1fr}.topbar{height:56px}}
+
+/* Odoo-inspired POS workspace */
+.odoo-pos-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.odoo-pos-head h1{margin:0 0 4px;font-size:25px}
+.odoo-pos-tools{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.odoo-pos-tools .search{min-width:160px}
+.odoo-pos-layout{display:grid;grid-template-columns:178px minmax(0,1fr) 350px;gap:14px;align-items:start}
+.odoo-category-panel,.odoo-catalog-panel,.odoo-order-panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.odoo-category-panel{padding:12px;position:sticky;top:82px}
+.odoo-panel-label{font-size:10px;font-weight:800;letter-spacing:1px;color:#89929c;padding:5px 8px 10px}
+.odoo-cat{width:100%;display:flex;align-items:center;gap:9px;text-align:left;background:transparent;color:#47525d;padding:10px 9px;margin:2px 0;border-radius:8px;font-weight:600}
+.odoo-cat:hover{background:#f3f7f5}.odoo-cat.active{background:var(--green2);color:var(--green)}
+.odoo-cat-icon{width:25px;height:25px;display:grid;place-items:center;background:#f0f3f2;border-radius:7px;font-size:14px}
+.odoo-cat.active .odoo-cat-icon{background:#d4eddf}
+.odoo-catalog-panel{padding:15px;min-height:480px}
+.odoo-catalog-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.odoo-catalog-top h3{margin:0;font-size:15px}.odoo-count{font-size:11px;color:var(--muted);background:#f4f6f7;padding:5px 8px;border-radius:20px}
+.odoo-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px}
+.odoo-product{position:relative;border:1px solid #e9edef;border-radius:10px;padding:9px;background:#fff;text-align:left;min-width:0;transition:.15s}
+.odoo-product:hover{border-color:#69b18e;box-shadow:0 5px 15px #16845b12;transform:translateY(-1px)}
+.odoo-product-image{height:104px;background:#f4f6f5;border-radius:7px;display:grid;place-items:center;overflow:hidden;font-size:34px;margin-bottom:9px}
+.odoo-product-image img{width:100%;height:100%;object-fit:cover}
+.odoo-product-name{font-size:12px;line-height:1.4;font-weight:700;min-height:34px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.odoo-product-meta{font-size:10px;color:#8a949d;margin-top:5px}
+.odoo-product-price{font-size:13px;font-weight:800;color:var(--green);margin-top:7px}
+.odoo-order-panel{position:sticky;top:82px;padding:0;overflow:hidden}
+.odoo-order-head{padding:16px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.odoo-order-head h3{margin:0;font-size:15px}
+.odoo-order-body{padding:13px 16px}
+.odoo-order-lines{min-height:145px;max-height:36vh;overflow:auto}
+.odoo-order-lines .empty{padding:38px 10px}
+.odoo-order-panel .cartline{align-items:center}
+.odoo-order-panel .grand{font-size:21px}
+.odoo-pay-label{font-size:11px;color:var(--muted);font-weight:700}
+.odoo-checkout{font-size:14px;padding:13px}
+.odoo-scan-hint{font-size:11px;color:#87919a;margin-top:10px;text-align:center}
+@media(max-width:1120px){.odoo-pos-layout{grid-template-columns:145px minmax(0,1fr) 310px;gap:10px}.odoo-products{grid-template-columns:repeat(auto-fill,minmax(125px,1fr))}}
+@media(max-width:900px){.odoo-pos-layout{grid-template-columns:1fr}.odoo-category-panel{position:static;display:flex;gap:5px;overflow-x:auto;padding:8px}.odoo-panel-label{display:none}.odoo-cat{width:auto;white-space:nowrap;flex-shrink:0}.odoo-order-panel{position:static}.odoo-order-lines{max-height:260px}.odoo-products{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))}}
+@media(max-width:520px){.odoo-pos-head{align-items:flex-start}.odoo-pos-head h1{font-size:22px}.odoo-pos-tools{flex-wrap:wrap}.odoo-pos-tools .search{flex-basis:100%}.odoo-catalog-panel{padding:10px}.odoo-product-image{height:88px}.odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Mobile cashier: keep checkout reachable while browsing products */
+@media(max-width:900px){
+ .odoo-pos-layout{gap:10px}
+ .odoo-category-panel{position:sticky;top:58px;z-index:3;background:#fff;box-shadow:0 3px 12px #17212b10}
+ .odoo-catalog-panel{min-height:0}
+ .odoo-order-panel{position:sticky;bottom:6px;z-index:5;max-height:48vh;overflow:auto;box-shadow:0 -5px 24px #17212b20;border:1px solid #cfd9d3}
+ .odoo-order-head{padding:11px 13px}
+ .odoo-order-body{padding:9px 12px}
+ .odoo-order-lines{min-height:0;max-height:100px;overflow:auto}
+ .odoo-order-lines .empty{padding:12px 8px}
+ .odoo-order-panel .cartline{padding:7px 0}
+ .odoo-order-panel .grand{font-size:18px;padding-top:9px;margin-top:4px}
+ .odoo-checkout{padding:15px;font-size:16px}
+ .odoo-scan-hint{display:none}
+}
+@media(max-width:520px){
+ .odoo-pos-head{margin-bottom:12px}
+ .odoo-pos-tools{position:sticky;top:56px;z-index:4;background:var(--bg);padding:5px 0}
+ .odoo-pos-tools .field{min-height:48px}
+ .odoo-pos-tools button{min-height:44px}
+ .odoo-cat{padding:9px 11px;font-size:13px}
+ .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .odoo-product{padding:8px;min-height:0}
+ .odoo-product-image{height:70px}
+ .odoo-product-name{font-size:12px;min-height:32px}
+ .odoo-product-price{font-size:13px}
+ .odoo-order-panel{max-height:44vh}
+}
+
+
+/* Mobile layout correction: full-width cashier, horizontal categories, no cart overlay */
+@media(max-width:900px){
+ .sidebar{display:none!important}
+ .app{display:block;min-height:100vh}
+ .main{width:100%;min-width:0}
+ .content{padding:12px 10px}
+ .odoo-pos-layout{display:flex;flex-direction:column;gap:10px;width:100%}
+ .odoo-category-panel{display:block;position:static!important;width:100%;padding:8px;overflow:hidden}
+ #poscategories{display:flex;flex-direction:row;gap:6px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;padding-bottom:3px}
+ .odoo-cat{display:inline-flex;flex:0 0 auto;width:auto;white-space:nowrap}
+ .odoo-catalog-panel{width:100%;min-width:0}
+ .odoo-order-panel{position:static!important;width:100%;max-height:none!important;overflow:visible!important;z-index:auto;box-shadow:var(--shadow)}
+ .odoo-order-lines{max-height:180px;overflow:auto}
+}
+@media(max-width:520px){
+ .topbar{padding:0 12px}
+ .odoo-pos-tools{position:static}
+ .odoo-pos-tools .search{flex-basis:100%;width:100%}
+ .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .odoo-product-image{height:84px}
+ .odoo-order-panel{margin-bottom:16px}
+}
+
+/* Force compact/mobile workspace for narrow Android browser viewports */
+@media(max-width:1100px){
+ .sidebar{display:none!important}
+ .app{display:block!important;min-height:100vh}
+ .main{width:100%!important;min-width:0!important}
+ .content{padding:12px 10px!important}
+ .odoo-pos-layout{display:flex!important;flex-direction:column!important;gap:10px!important;width:100%!important}
+ .odoo-category-panel{display:block!important;position:static!important;width:100%!important;order:1}
+ #poscategories{display:flex!important;flex-direction:row!important;gap:6px;overflow-x:auto;white-space:nowrap}
+ .odoo-cat{display:inline-flex!important;flex:0 0 auto!important;width:auto!important;white-space:nowrap}
+ .odoo-catalog-panel{display:block!important;width:100%!important;min-width:0!important;order:2}
+ .odoo-order-panel{display:block!important;position:static!important;width:100%!important;max-height:none!important;overflow:visible!important;order:3;z-index:auto!important}
+ .odoo-order-lines{max-height:180px!important;overflow:auto}
+}
+@media(max-width:520px){
+ .odoo-pos-tools{position:static!important}
+ .odoo-pos-tools .search{width:100%!important;flex-basis:100%!important}
+ .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .odoo-product-image{height:84px!important}
+}
+.odoo-pos-layout.categories-hidden{grid-template-columns:170px minmax(0,1fr) 350px!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{display:block!important;padding:10px}.odoo-pos-layout.categories-hidden .odoo-category-panel #poscategories{display:none!important}.odoo-pos-layout.categories-hidden .odoo-category-heading{margin:0}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:none}@media(max-width:1100px){.odoo-pos-layout.categories-hidden{grid-template-columns:1fr!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{width:100%;position:static}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:block}}.pos-category-row{display:flex;align-items:center;width:100%;min-width:0}.pos-category-row .odoo-cat{flex:1;min-width:0}.odoo-category-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.pos-category-toggle{flex:0 0 30px;width:30px;height:30px;display:grid;place-items:center;border:1px solid #dce8e0;border-radius:8px;background:#fff;color:#276447;font-size:18px;line-height:1;cursor:pointer}.pos-category-toggle:hover{background:#eef8f1}.odoo-category-panel.categories-collapsed #poscategories .pos-category-row:not(:first-child){display:none}\n
+
+/* SeaMart final desktop polish */
+@media(min-width:1101px){
+ .odoo-pos-layout{grid-template-columns:190px minmax(480px,1fr) 320px!important;gap:14px!important}
+ .odoo-category-panel{background:#fff!important;border:1px solid #e3ece6!important;border-radius:14px!important;min-height:480px;padding:12px!important}
+ .odoo-category-heading{display:flex!important;align-items:center;justify-content:space-between;margin:0 0 10px!important;padding:8px!important;background:#f6faf7!important;border-radius:9px}
+ .odoo-category-heading .odoo-panel-label{display:block!important;color:#276447!important;font-size:12px!important;padding:0!important}
+ #poscategories{display:flex!important;flex-direction:column!important;gap:4px!important;overflow:visible!important}
+ #poscategories .pos-category-row{width:100%!important}
+ #poscategories .odoo-cat{width:100%!important;min-height:40px!important;display:flex!important;justify-content:flex-start!important}
+ .odoo-category-panel.categories-collapsed #poscategories .pos-category-row:not(:first-child){display:none!important}
+ .odoo-catalog-panel{min-width:0!important;padding:14px!important}
+ #posproducts .pos-featured-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ #posproducts .pos-products-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))!important}
+ #posproducts .odoo-product-image{height:112px!important}
+ #posproducts .odoo-product{padding:10px!important}
+}
+@media(min-width:1101px) and (max-width:1350px){.odoo-pos-layout{grid-template-columns:170px minmax(400px,1fr) 285px!important;gap:10px!important}.odoo-category-panel{padding:8px!important}.odoo-order-body{padding:10px!important}}
+/* Desktop POS layout repair: give the catalog real space between categories and cart */
+@media(min-width:1101px){
+ .odoo-pos-layout{display:grid!important;grid-template-columns:160px minmax(420px,1fr) 300px!important;gap:12px!important;align-items:start!important}
+ .odoo-category-panel,.odoo-catalog-panel,.odoo-order-panel{min-width:0!important;width:auto!important}
+ .odoo-catalog-panel{grid-column:2!important;display:block!important;overflow:hidden}
+ .odoo-category-panel{grid-column:1!important}
+ .odoo-order-panel{grid-column:3!important}
+ #posproducts.odoo-products{display:block!important;width:100%!important;min-width:0!important}
+ #posproducts .pos-featured,#posproducts .pos-all-products{display:block!important;width:100%!important;max-width:100%!important;margin:0 0 16px!important;box-sizing:border-box!important}
+ #posproducts .pos-featured-grid,#posproducts .pos-products-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(125px,1fr))!important;width:100%!important;gap:10px!important}
+ #posproducts .odoo-product{width:100%!important;min-width:0!important}
+}
+@media(min-width:1101px) and (max-width:1450px){
+ .odoo-pos-layout{grid-template-columns:140px minmax(340px,1fr) 270px!important;gap:9px!important}
+ .odoo-category-panel{padding:8px!important}
+ .odoo-catalog-panel{padding:10px!important}
+ .odoo-order-body{padding:10px!important}
+}
+/* POS section wrappers must span the full catalog width; only product cards form grids */
+.odoo-products{display:block!important;width:100%;min-width:0}
+.pos-featured,.pos-all-products{display:block;width:100%;min-width:0;box-sizing:border-box}
+.pos-featured-grid,.pos-products-grid{width:100%;box-sizing:border-box}
+/* SeaMart POS reference design */
+:root{--green:#087b43;--green2:#d9f8e2;--nav:#064d35;--line:#e2eee7;--shadow:0 5px 18px rgba(8,90,53,.08)}
+.sidebar{background:linear-gradient(180deg,#005b3d 0%,#06452f 100%);color:#e9fff1}
+.brand{padding-bottom:25px}
+.nav{color:#d7f3e2;border-radius:12px;padding:13px 14px}
+.nav:hover{background:#087b43;color:#fff}
+.nav.active{background:linear-gradient(135deg,#16bd53,#078b3c);color:#fff;box-shadow:0 5px 14px #002e1d55}
+.topbar{background:linear-gradient(90deg,#078a45,#10a84c);color:#fff;border-bottom:0}
+.topbar .crumb,.topbar .user{color:#fff}
+.topbar .avatar{background:#d8ffe4;color:#087b43}
+.content{background:#f5faf7}
+.odoo-pos-head h1{color:#075b36}
+.odoo-category-panel{padding:0 12px 14px;overflow:hidden;border-radius:16px}
+.odoo-category-heading{margin:0 0 8px;padding:5px 8px;background:transparent;color:#47525d;border:0}
+.odoo-category-heading .odoo-panel-label{color:#47525d;font-size:12px;letter-spacing:.5px;padding:0}
+.odoo-cat{padding:11px 9px;border-radius:10px}
+.odoo-cat.active{background:#bdf7ca;color:#064d2d}
+.odoo-cat.active .odoo-cat-icon{background:#e4ffea}
+.odoo-catalog-panel,.odoo-order-panel{border-radius:16px;border-color:#e5f0e9;box-shadow:0 5px 18px rgba(8,90,53,.07)}
+.odoo-catalog-top h3{color:#075b36}
+.odoo-product{border-radius:15px;border-color:#e5efea;padding:10px;box-shadow:0 3px 10px rgba(12,82,49,.06)}
+.odoo-product:hover{border-color:#19a75a;box-shadow:0 7px 18px rgba(12,140,65,.13)}
+.odoo-product-image{background:#f4faf6;border-radius:10px}
+.odoo-product-price{background:#d8f9df;color:#075b36;border-radius:9px;padding:7px 8px;font-weight:800}
+.odoo-pos-tools .field,.odoo-pos-tools input{border-radius:13px}
+.scan-focus-btn{background:#e5ffeb;color:#075b36;border:1px solid #18a653;border-radius:12px}
+.pos-featured{margin-bottom:20px;padding:14px;border:1px solid #dcefe3;border-radius:14px;background:linear-gradient(135deg,#f0fff4,#fff)}.pos-featured-title{font-size:14px;font-weight:850;color:#075b36;margin:0 0 12px}.pos-featured-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.pos-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px}@media(max-width:700px){.pos-featured-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* SeaMart POS: three product columns and a wider order panel */
+@media(min-width:1101px){
+ .odoo-pos-layout{grid-template-columns:150px minmax(0,1fr) 380px!important;gap:12px!important}
+ #posproducts .pos-featured-grid,
+ #posproducts .pos-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+}
+@media(min-width:1101px) and (max-width:1450px){
+ .odoo-pos-layout{grid-template-columns:135px minmax(0,1fr) 340px!important;gap:10px!important}
+ .odoo-order-body{padding:12px!important}
+ #posproducts .odoo-product-image{height:100px!important}
+}
+
+/* SeaMart POS desktop refinement: three product columns, wider cart */
+@media (min-width:1101px){
+  .odoo-pos-layout{
+    grid-template-columns:150px minmax(0,1fr) 390px!important;
+    gap:12px!important;
+  }
+  #posproducts .pos-featured-grid,
+  #posproducts .pos-products-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .odoo-order-panel{min-width:0!important}
+  .odoo-order-body{padding:14px 16px!important}
+}
+@media (min-width:1101px) and (max-width:1450px){
+  .odoo-pos-layout{
+    grid-template-columns:140px minmax(0,1fr) 365px!important;
+    gap:10px!important;
+  }
+  .odoo-order-body{padding:12px!important}
+  #posproducts .odoo-product-image{height:96px!important}
+}
+
+
+.odoo-catalog-top{flex-wrap:wrap}
+.odoo-catalog-search{display:flex;align-items:center;gap:9px;flex:1;justify-content:flex-end;min-width:260px}
+.odoo-catalog-search .field{width:min(100%,360px);min-width:180px;height:40px;border:1px solid #b9d9c5;border-radius:10px;background:#fbfffc;padding:9px 12px}
+.odoo-catalog-search .field:focus{border-color:#087b43;box-shadow:0 0 0 3px #087b4318;outline:none}
+@media(max-width:700px){.odoo-catalog-search{width:100%;min-width:0;justify-content:stretch}.odoo-catalog-search .field{flex:1;width:100%;min-width:0}}
+.odoo-pos-tools #posbarcode{flex:1;min-width:220px;background:#fff;border:1px solid #b9d9c5;border-radius:10px}.odoo-pos-tools #posbarcode:focus{border-color:#087b43;box-shadow:0 0 0 3px #087b4318;outline:none}@media(max-width:700px){.odoo-pos-tools #posbarcode{width:100%;min-width:0;flex-basis:100%}}\n/* Tombol jumlah langsung pada kartu barang */\n.product-qty-control{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #edf0f1}\n.product-qty-control button{width:34px;height:32px;padding:0;border-radius:7px;background:#eaf5ef;color:#16845b;font-size:19px;font-weight:800}\n.product-qty-control button:disabled{opacity:.35;cursor:not-allowed}\n.product-qty-control span{font-size:13px;font-weight:800;min-width:20px;text-align:center}\n
+/* SeaMart quantity stepper: jelas, modern, mudah ditekan */
+.product-qty-control{display:grid!important;grid-template-columns:42px minmax(42px,1fr) 42px!important;align-items:center!important;justify-content:stretch!important;gap:8px!important;margin-top:11px!important;padding:9px 0 0!important;border-top:1px solid #e8efeb!important}
+.product-qty-control button{width:42px!important;height:38px!important;min-width:42px!important;padding:0!important;border:1px solid #cfe4d7!important;border-radius:11px!important;background:#f0f8f3!important;color:#137a4c!important;font-size:23px!important;line-height:1!important;font-weight:800!important;box-shadow:0 2px 5px #123b2410!important;transition:transform .12s,background .12s!important}
+.product-qty-control button.qty-plus{background:linear-gradient(180deg,#1b9b65,#087849)!important;border-color:#087849!important;color:#fff!important;box-shadow:0 3px 8px #08784930!important}
+.product-qty-control button:active{transform:scale(.94)!important}
+.product-qty-control button:disabled{opacity:.35!important;cursor:not-allowed!important;box-shadow:none!important}
+.product-qty-control .qty-value{display:flex!important;align-items:center!important;justify-content:center!important;min-height:38px!important;border:1px solid #e1eae4!important;border-radius:10px!important;background:#f8fbf9!important;color:#263a30!important;font-size:16px!important;font-weight:800!important;font-variant-numeric:tabular-nums!important}
+@media(max-width:520px){.product-qty-control{grid-template-columns:38px minmax(34px,1fr) 38px!important;gap:6px!important}.product-qty-control button{width:38px!important;min-width:38px!important;height:36px!important}.product-qty-control .qty-value{min-height:36px!important}}
+
+/* FIX: quantity controls stay on one horizontal line on every product card */
+#posproducts .odoo-product{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0!important}
+#posproducts .product-qty-control{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-width:0!important;gap:7px!important;padding:8px 0 0!important;margin:9px 0 0!important;border-top:1px solid #e8efeb!important}
+#posproducts .product-qty-control button{display:flex!important;flex:0 0 34px!important;align-items:center!important;justify-content:center!important;width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;margin:0!important;border-radius:9px!important;font-size:21px!important;line-height:1!important}
+#posproducts .product-qty-control .qty-value{display:flex!important;flex:1 1 auto!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:auto!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0 4px!important;border:1px solid #e1eae4!important;border-radius:9px!important;background:#f8fbf9!important;font-size:15px!important;font-weight:800!important}
+#posproducts .product-qty-control .qty-minus{background:#f1f7f3!important;border:1px solid #cfe4d7!important;color:#137a4c!important}
+#posproducts .product-qty-control .qty-plus{background:#10834f!important;border:1px solid #10834f!important;color:#fff!important}
+@media(max-width:520px){#posproducts .product-qty-control{gap:5px!important}#posproducts .product-qty-control button{flex-basis:32px!important;width:32px!important;min-width:32px!important;max-width:32px!important;height:32px!important;min-height:32px!important}#posproducts .product-qty-control .qty-value{height:32px!important;min-height:32px!important}}
+\n/* Login and cashier shift controls */\n.login-screen{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#064d35,#087b43);display:grid;place-items:center;padding:18px}.login-card{width:min(420px,100%);background:#fff;border-radius:18px;padding:28px;box-shadow:0 24px 80px #001d12aa}.login-brand{width:205px;max-width:80%;margin:0 auto 16px}.login-brand svg{display:block;width:100%;height:auto;filter:drop-shadow(0 3px 5px #087b4320)}.login-card h2{margin:0 0 6px;color:#075b36}.login-card label{display:block;margin:14px 0 6px;color:#53615a;font-size:12px;font-weight:700}.login-card input{width:100%;margin-top:6px}.login-card .btn-primary{width:100%;margin-top:18px}.shift-state{font-size:11px;font-weight:800;border-radius:20px;padding:6px 9px;background:#fff3d9;color:#8b5a00}.shift-state.open{background:#d9f8e2;color:#075b36}@media(max-width:600px){.topbar .user{gap:5px}.topbar .user>span{font-size:11px}.topbar .user button{padding:7px;font-size:11px}}\n.cart-remove{background:#fff0ef!important;color:#bd3c35!important;border:1px solid #f4d1ce!important;padding:5px 7px!important;min-width:30px;height:30px;display:grid;place-items:center;font-size:13px;line-height:1}.cart-remove:hover{background:#ffe0dd!important;border-color:#e7aaa5!important}.odoo-order-panel .qty{gap:5px;flex-shrink:0}.odoo-order-panel .qty button{min-width:28px;min-height:28px}
+/* Center login card precisely in the available screen */
+#loginroot .login-screen{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;overflow-y:auto!important;padding:20px!important}
+#loginroot .login-card{display:block!important;flex:0 1 420px!important;width:min(420px,100%)!important;max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;margin:auto!important;box-sizing:border-box!important}
+
+/* Compact centered SeaMart login card */
+#loginroot .login-card{flex:0 1 350px!important;width:min(350px,calc(100vw - 36px))!important;padding:22px!important;border-radius:16px!important;max-height:calc(100dvh - 36px)!important}
+#loginroot .login-brand{width:165px!important;margin:0 auto 10px!important}
+#loginroot .login-card h2{font-size:21px!important;margin-bottom:4px!important}
+#loginroot .login-card label{margin:10px 0 5px!important}
+#loginroot .login-card input{min-height:42px!important;padding:9px 11px!important}
+#loginroot .login-card .btn-primary{min-height:44px!important;margin-top:14px!important;padding:10px 12px!important}
+#loginroot .login-card>p{font-size:12px!important}
+.pos-clock{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:5px 11px;border:1px solid #dcebe1;background:#f4faf6;border-radius:10px;min-width:150px}.pos-clock strong{font-size:19px;line-height:1.15;color:#075b36;font-variant-numeric:tabular-nums;letter-spacing:.5px}.pos-clock span{font-size:10px;color:#61746a;text-transform:capitalize}@media(max-width:600px){.pos-clock{align-items:flex-start;min-width:0;padding:5px 8px}.pos-clock strong{font-size:16px}.pos-clock span{font-size:9px}}</style>
+<script>
+window.__seamartRuntimeError = '';
+window.addEventListener('error', function(e) {
+  window.__seamartRuntimeError = (e.message || 'Kesalahan JavaScript') + (e.lineno ? ' · baris ' + e.lineno : '');
+  document.addEventListener('DOMContentLoaded', function() {
+    var v=document.getElementById('view');
+    if(v && !v.innerHTML.trim()) v.innerHTML='<div class="panel"><h3>SeaMart menemukan kesalahan</h3><p class="muted" id="seamart-error-detail"></p><p class="muted">Kirimkan pesan error ini kepada tim SeaMart agar bisa diperbaiki.</p></div>';
+    var d=document.getElementById('seamart-error-detail'); if(d)d.textContent=window.__seamartRuntimeError;
+  }, {once:true});
+});
+</script>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand" aria-label="SeaMart"><div class="brand-lockup"><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg></div></div>
+ <div class="navlabel">WORKSPACE</div>
+ <button class="nav active" data-page="dashboard"><span class="ico">▦</span><span class="navtxt">Dashboard</span></button>
+ <button class="nav" data-page="kasir"><span class="ico">▣</span><span class="navtxt">Kasir / Point of Sale</span></button>
+ <div class="navlabel">INVENTARIS</div>
+ <button class="nav" data-page="produk"><span class="ico">▤</span><span class="navtxt">Produk & Kategori</span></button>
+ <button class="nav" data-page="ubahbarang"><span class="ico">✎</span><span class="navtxt">Ubah Data Barang</span></button>
+ <button class="nav" data-page="stok"><span class="ico">⇄</span><span class="navtxt">Stok & Mutasi</span></button>
+ <div class="navlabel">LAPORAN</div>
+ <button class="nav" data-page="penjualan"><span class="ico">▥</span><span class="navtxt">Penjualan</span></button>
+ <div class="navlabel">KEUANGAN</div>
+ <button class="nav" data-page="akun"><span class="ico">▦</span><span class="navtxt">Daftar Akun (COA)</span></button>
+ <button class="nav" data-page="pengaturan"><span class="ico">⚙</span><span class="navtxt">Pengaturan & Data</span></button>
+ <div class="sidefoot">SeaMart POS · Web Preview</div>
+</aside>
+<main class="main">
+ <header class="topbar"><button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div><div class="user"><span id="sessionUser">Belum login</span><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header>
+ <section class="content">
+ <div class="notice">Mode pratinjau web: data tersimpan di browser perangkat ini. Login aman, database cloud multi-perangkat, dan sinkronisasi online perlu konfigurasi server sebelum dipakai untuk operasional.</div>
+ <div id="view"></div>
+ </section>
+</main>
+</div>
+<div id="modalroot"></div><div id="loginroot"></div>
+<input id="csvfile" type="file" accept=".csv,text/csv" class="hidden">
+<script>
+const KEY='seamart_web_preview_v1';
+let db=load(),cart=[];
+db.users=Array.isArray(db.users)?db.users:[];
+if(!db.users.some(u=>u.username==='admin'))db.users.push({username:'admin',password:'admin123',nama:'Administrator',role:'admin'});
+if(!db.users.some(u=>u.username==='kasir'))db.users.push({username:'kasir',password:'kasir123',nama:'Kasir',role:'kasir'});
+db.shifts=Array.isArray(db.shifts)?db.shifts:[];
+let currentUser=null;
+let currentShift=()=>db.shifts.find(x=>x.status==='open'&&x.username===currentUser?.username);
+function showLogin(){const root=document.getElementById('loginroot');root.style.cssText='display:block!important;position:fixed!important;inset:0!important;z-index:99999!important;visibility:visible!important;opacity:1!important';root.innerHTML='<div class="login-screen" style="display:grid!important;position:fixed!important;inset:0!important;z-index:100000!important;visibility:visible!important;opacity:1!important"><form class="login-card" onsubmit="event.preventDefault();doLogin()"><div class="login-brand" aria-label="SeaMart"><svg viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="loginSeaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#loginSeaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#loginSeaGlow)"/><text x="8" y="55" font-size="51" font-family="Inter,system-ui,sans-serif" font-weight="900" letter-spacing="-2" fill="#075b36">Sea</text><text x="102" y="55" font-size="51" font-family="Inter,system-ui,sans-serif" font-weight="900" letter-spacing="-2" fill="#16a34a">Mart</text></svg></div><h2>Login SeaMart</h2><p class="muted">Masuk sebagai Admin atau Kasir</p><label>Username<input id="loginUser" class="field" autocomplete="username" required placeholder="Username"></label><label>Password<input id="loginPass" class="field" type="password" autocomplete="current-password" required placeholder="Password"></label><button class="btn-primary" type="submit">Masuk</button><p class="muted" style="font-size:11px;margin-top:14px">Awal: admin / admin123 · kasir / kasir123. Ganti password awal sebelum operasional.</p></form></div>';}
+function doLogin(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value,user=db.users.find(x=>x.username===u&&x.password===p);if(!user)return alert('Username atau password salah.');currentUser=user;document.getElementById('loginroot').innerHTML='';document.getElementById('loginroot').style.display='none';document.getElementById('sessionUser').textContent=user.nama+' · '+(user.role==='admin'?'Admin':'Kasir');document.getElementById('sessionAvatar').textContent=user.nama.slice(0,1).toUpperCase();document.querySelectorAll('.nav').forEach(b=>{b.style.display=user.role==='kasir'&&!['kasir'].includes(b.dataset.page)?'none':''});document.getElementById('shiftAction').style.display='';updateShiftButton();page(user.role==='kasir'?'kasir':'dashboard');}
+function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
+function updateShiftButton(){const b=document.getElementById('shiftAction');if(!b)return;const sh=currentShift();b.textContent=sh?'Tutup Kasir':'Buka Kasir';b.classList.toggle('btn-primary',!!sh);b.classList.toggle('btn-light',!sh);b.title=sh?'Sesi dibuka '+sh.openedAt:'Mulai sesi kasir';}
+function toggleCashierShift(){if(!currentUser)return showLogin();if(currentShift())return closeCashierShift();const raw=prompt('Masukkan modal awal kas (Rp):','0');if(raw===null)return;const opening=Number(String(raw).replace(/[^0-9]/g,''));if(!Number.isFinite(opening)||opening<0)return alert('Modal awal tidak valid.');db.shifts.push({id:'SH-'+Date.now(),username:currentUser.username,nama:currentUser.nama,openedAt:new Date().toISOString(),opening,status:'open'});save();updateShiftButton();alert('Sesi kasir berhasil function closeCashierShift(){
+ const sh=currentShift();if(!sh)return;
+ const sales=db.sales.filter(x=>x.shiftId===sh.id||( !x.shiftId && new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime()));
+ const cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0);
+ const qris=sales.filter(x=>String(x.pay||'').toUpperCase()==='QRIS').reduce((a,x)=>a+Number(x.total||0),0);
+ const total=cash+qris,expected=Number(sh.opening||0)+cash;
+ const id='cashierClosingActual';
+ document.getElementById('modalroot').innerHTML=`<div class="modalback" style="position:fixed;inset:0;background:#17212b99;z-index:100001;display:grid;place-items:center;padding:16px;overflow:auto">
+ <div class="modal" style="width:min(100%,650px);max-height:94vh;overflow:auto;background:#fff;border-radius:16px;padding:22px;box-shadow:0 20px 60px #0004">
+ <div style="display:flex;justify-content:space-between;align-items:start;gap:12px"><div><div style="font-size:11px;font-weight:800;letter-spacing:1px;color:#16845b">SEAMART POS</div><h2 style="margin:5px 0 3px;font-size:22px">Ringkasan Tutup Kasir</h2><div class="muted">Sesi ${esc(sh.id)} · ${esc(sh.nama||sh.username)}</div></div><button class="btn-light" onclick="closeModal()" type="button">Tutup</button></div>
+ <div style="margin:16px 0;padding:12px;background:#f3f8f5;border-radius:10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span><b>Tanggal buka</b><br>${new Date(sh.openedAt).toLocaleString('id-ID')}</span><span><b>Waktu tutup</b><br>${new Date().toLocaleString('id-ID')}</span></div>
+ <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+ <div class="panel"><div class="muted">Jumlah transaksi</div><div style="font-size:24px;font-weight:800">${sales.length}</div></div>
+ <div class="panel"><div class="muted">Total penjualan</div><div style="font-size:20px;font-weight:800;color:#16845b">${rupiah(total)}</div></div>
+ <div class="panel"><div class="muted">Penjualan tunai</div><b style="font-size:17px">${rupiah(cash)}</b></div>
+ <div class="panel"><div class="muted">Penjualan QRIS</div><b style="font-size:17px">${rupiah(qris)}</b></div>
+ </div>
+ <div style="margin-top:15px;border:1px solid #e8ebef;border-radius:12px;padding:14px">
+ <h3 style="margin:0 0 10px">Perhitungan kas tunai</h3>
+ <div class="totalrow"><span>Modal awal kas</span><b>${rupiah(sh.opening)}</b></div>
+ <div class="totalrow"><span>Penjualan tunai</span><b>${rupiah(cash)}</b></div>
+ <div class="totalrow" style="font-size:16px"><b>Kas seharusnya</b><b id="closingExpectedValue">${rupiah(expected)}</b></div>
+ <label style="display:grid;gap:7px;margin-top:14px;font-weight:700">Uang tunai fisik di laci (Rp)
+ <input id="${id}" type="number" min="0" step="1" inputmode="numeric" value="${expected}" oninput="updateCloseCashierDifference()" style="width:100%;padding:13px;border:1px solid #cbd8d0;border-radius:9px;font-size:18px">
+ </label>
+ <div class="totalrow" style="margin-top:12px;background:#f3f8f5;padding:12px;border-radius:8px"><b>Selisih kas</b><b id="closingDifferenceValue">Seimbang</b></div>
+ </div>
+ <div style="margin-top:14px;padding:11px;background:#fff8e8;border-radius:9px;color:#72531b;font-size:12px">QRIS tidak dihitung sebagai uang tunai di laci. Pastikan jumlah uang fisik sudah dihitung sebelum menyelesaikan tutup kasir.</div>
+ <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:18px">
+ <button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button>
+ <button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button>
+ </div></div></div>`;
+ updateCloseCashierDifference();
+}
+function updateCloseCashierDifference(){const sh=currentShift();const input=document.getElementById('cashierClosingActual'),out=document.getElementById('closingDifferenceValue');if(!sh||!input||!out)return;const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime())),cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0),expected=Number(sh.opening||0)+cash,actual=Number(input.value||0),diff=actual-expected;out.textContent=diff===0?'Seimbang':(diff>0?'Lebih '+rupiah(diff):'Kurang '+rupiah(Math.abs(diff)));out.style.color=diff===0?'#16845b':'#b45309';}
+function finalizeCashierClosing(shiftId){const sh=currentShift();if(!sh||sh.id!==shiftId)return alert('Sesi kasir tidak ditemukan.');const input=document.getElementById('cashierClosingActual');if(!input||input.value===''||!Number.isFinite(Number(input.value))||Number(input.value)<0)return alert('Masukkan jumlah uang tunai fisik yang valid.');const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime())),cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0),qris=sales.filter(x=>String(x.pay||'').toUpperCase()==='QRIS').reduce((a,x)=>a+Number(x.total||0),0),actual=Number(input.value),expected=Number(sh.opening||0)+cash;sh.closedAt=new Date().toISOString();sh.status='closed';sh.transactionCount=sales.length;sh.cashSales=cash;sh.qrisSales=qris;sh.totalSales=cash+qris;sh.expectedCash=expected;sh.actualCash=actual;sh.difference=actual-expected;save();updateShiftButton();document.getElementById('modalroot').innerHTML='<div class="modalback" style="position:fixed;inset:0;background:#17212b99;z-index:100001;display:grid;place-items:center;padding:16px"><div class="modal" style="width:min(100%,520px);background:#fff;border-radius:16px;padding:24px;text-align:center"><div style="font-size:42px;color:#16845b">✓</div><h2>Kasir berhasil ditutup</h2><p class="muted">Ringkasan sesi tersimpan di perangkat ini.</p><div class="totalrow"><span>Total penjualan</span><b>'+rupiah(sh.totalSales)+'</b></div><div class="totalrow"><span>Kas seharusnya</span><b>'+rupiah(sh.expectedCash)+'</b></div><div class="totalrow"><span>Kas fisik</span><b>'+rupiah(sh.actualCash)+'</b></div><div class="totalrow"><span>Selisih</span><b>'+ (sh.difference===0?'Seimbang':(sh.difference>0?'Lebih ':'Kurang ')+rupiah(Math.abs(sh.difference)))+'</b></div><div class="actions" style="justify-content:center"><button class="btn-light" onclick="closeModal()">Selesai</button><button class="btn-primary" onclick="printCashierClosing(\''+sh.id+'\')">Cetak Ringkasan</button></div></div></div>';}
+function printCashierClosing(shiftId){const sh=db.shifts.find(x=>x.id===shiftId);if(!sh)return alert('Data sesi kasir tidak ditemukan.');const w=window.open('','_blank','width=650,height=800');if(!w)return alert('Izinkan pop-up untuk mencetak ringkasan.');const rows=[['Jumlah transaksi',sh.transactionCount??db.sales.filter(x=>x.shiftId===sh.id).length],['Penjualan tunai',rupiah(sh.cashSales)],['Penjualan QRIS',rupiah(sh.qrisSales)],['Total penjualan',rupiah(sh.totalSales)],['Modal awal kas',rupiah(sh.opening)],['Kas seharusnya',rupiah(sh.expectedCash)],['Uang tunai fisik',rupiah(sh.actualCash)],['Selisih kas',sh.difference===0?'Seimbang':(sh.difference>0?'Lebih ':'Kurang ')+rupiah(Math.abs(sh.difference))]];w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Ringkasan Tutup Kasir SeaMart</title><style>body{font:14px Arial;color:#20252b;max-width:600px;margin:30px auto;padding:15px}h1{text-align:center;color:#16845b;margin-bottom:4px}.sub{text-align:center;color:#77808b;margin-bottom:24px}.row{display:flex;justify-content:space-between;gap:15px;padding:12px 8px;border-bottom:1px solid #e8ebef}.row b{text-align:right}.sign{display:flex;justify-content:space-between;margin-top:65px}.sign div{width:40%;text-align:center;border-top:1px solid #888;padding-top:8px}</style></head><body><h1>SeaMart POS</h1><div class="sub">RINGKASAN TUTUP KASIR<br>'+esc(sh.id)+' · '+new Date(sh.closedAt||Date.now()).toLocaleString('id-ID')+'</div>'+rows.map(x=>'<div class="row"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')+'<div class="sign"><div>Kasir<br><br><br><br>'+(esc(sh.nama||sh.username))+'</div><div>Admin / Pemeriksa<br><br><br><br>(........................)</div></div><script>window.onload=()=>window.print();<\\/script></body></html>');w.document.close();}
+
+function requireOpenShift(){if(!currentUser)return alert('Silakan login terlebih dahulu.'),false;if(!currentShift())return alert('Kasir belum dibuka. Tekan tombol Buka Kasir terlebih dahulu.'),false;return true;}
+
+// Normalize browser data from older preview versions so one incomplete record cannot blank the whole screen.
+if(!db||typeof db!=='object'||Array.isArray(db))db={};
+db.products=Array.isArray(db.products)?db.products.filter(p=>p&&typeof p==='object'):[];
+db.moves=Array.isArray(db.moves)?db.moves.filter(m=>m&&typeof m==='object'):[];
+db.sales=Array.isArray(db.sales)?db.sales.filter(t=>t&&typeof t==='object'):[];
+db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+const rupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dateNow=()=>new Date().toLocaleString('id-ID');
+function toggleMobileMenu(){document.body.classList.toggle('mobile-menu-open')}
+function closeMobileMenu(){document.body.classList.remove('mobile-menu-open')}
+function page(p){if(!currentUser){showLogin();return}if(currentUser.role==='kasir'&&p!=='kasir'){alert('Akun kasir hanya dapat membuka menu Kasir.');return}if(p==='kasir'&&!requireOpenShift())return;document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent=({dashboard:'Dashboard',kasir:'Kasir / Point of Sale',produk:'Produk & Kategori',stok:'Stok & Mutasi',penjualan:'Laporan Penjualan',pengaturan:'Pengaturan & Data',akun:'Daftar Akun (COA)'})[p];({dashboard:dashboard,kasir:pos,produk:products,ubahbarang:editProductsPage,stok:stock,penjualan:sales,pengaturan:settings,akun:accounts}[p])()}
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{page(b.dataset.page);closeMobileMenu()});
+let seamartLastPage='dashboard';
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page!=='kasir')seamartLastPage=b.dataset.page;}));
+document.addEventListener('keydown',function(e){
+ const active=document.querySelector('.nav.active')?.dataset.page;
+ if(active!=='kasir')return;
+ const modal=document.querySelector('#modalroot .modalback');
+ if(e.key==='Escape'){
+  if(modal){closeModal();return}
+  e.preventDefault();page('dashboard');return;
+ }
+ if(e.key==='F1'){e.preventDefault();showKeyboardHelp();return}
+ if(e.key==='F12'){
+  e.preventDefault();
+  const pending=cart.reduce((n,x)=>n+Number(x.qty||0),0);
+  const message=pending?'Tutup sesi kasir sekarang?\\n\\nMasih ada '+pending+' barang di keranjang. Keranjang tetap dipertahankan dan tidak diproses sebagai penjualan.':'Yakin ingin menutup sesi kasir dan kembali ke Dashboard?';
+  if(window.confirm(message))page('dashboard');
+  return;
+ }
+ if(modal)return;
+ if(e.key==='F2'){e.preventDefault();document.getElementById('possearch')?.focus();return}
+ if(e.key==='F3'){e.preventDefault();document.getElementById('posbarcode')?.focus();return}
+ if(e.key==='F4'){e.preventDefault();document.getElementById('paymethod')?.focus();return}
+ if(e.key==='F5'){e.preventDefault();renderPosProducts();return}
+ if(e.key==='F9'){e.preventDefault();if(cart.length&&window.confirm('Lanjutkan proses pembayaran sekarang?'))checkout();return}
+ if(e.key==='F10'){e.preventDefault();const last=db.sales[db.sales.length-1];if(last)printReceipt(last.id);else alert('Belum ada transaksi untuk dicetak.');return}
+ if(e.key==='Delete'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();if(cart.length&&window.confirm('Kosongkan semua barang di keranjang?')){cart=[];renderCart()}return}
+});
+function showKeyboardHelp(){
+ const rows=[['F1','Bantuan tombol keyboard'],['F2','Cari nama barang'],['F3','Fokus scan barcode'],['F4','Pilih metode pembayaran'],['F5','Refresh daftar barang'],['F9','Proses pembayaran (dengan konfirmasi)'],['F10','Cetak struk transaksi terakhir'],['F12','Tutup sesi kasir'],['ESC','Kembali ke Dashboard'],['Delete','Kosongkan keranjang (dengan konfirmasi)']];
+ document.getElementById('modalroot').innerHTML='<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>⌨ Tombol Pintas SeaMart</h2><p class="muted">Gunakan tombol keyboard untuk mempercepat pekerjaan kasir.</p>'+rows.map(r=>'<div class="totalrow"><b style="min-width:64px"><kbd style="display:inline-block;padding:4px 9px;border:1px solid #cbd5cf;border-radius:6px;background:#f5f8f6">'+r[0]+'</kbd></b><span>'+r[1]+'</span></div>').join('')+'<div class="actions"><button class="btn-primary" onclick="closeModal()">Mengerti</button></div></div></div>';
+}
+function dashboard(){
+ const total=db.products.length,qty=db.products.reduce((a,p)=>a+Number(p.stok||0),0),today=new Date().toDateString(),sold=db.sales.filter(s=>new Date(s.time).toDateString()===today),revenue=sold.reduce((a,s)=>a+s.total,0);
+ document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ringkasan</h1><div class="sub">Selamat datang di operasional SeaMart.</div></div><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div>
+ <div class="cards"><div class="stat"><div class="stat-top">Total Produk <span>▤</span></div><strong>${total.toLocaleString('id-ID')}</strong><small>Master barang</small></div><div class="stat"><div class="stat-top">Total Stok <span>▦</span></div><strong>${qty.toLocaleString('id-ID')}</strong><small>Unit tersedia</small></div><div class="stat"><div class="stat-top">Penjualan Hari Ini <span>↗</span></div><strong>${rupiah(revenue)}</strong><small>${sold.length} transaksi</small></div><div class="stat"><div class="stat-top">Nilai Persediaan <span>◈</span></div><strong>${rupiah(db.products.reduce((a,p)=>a+p.harga*p.stok,0))}</strong><small>Estimasi harga jual × stok</small></div></div>
+ <div class="grid2"><div class="panel"><h3>Transaksi Terbaru</h3>${salesTable(db.sales.slice(-6).reverse())}</div><div class="panel"><h3>Stok Menipis</h3>${lowStock()}</div></div>`;
+}
+function salesTable(rows){if(!rows.length)return '<div class="empty">Belum ada transaksi.</div>';return '<div class="tablewrap"><table><thead><tr><th>No. Transaksi</th><th>Waktu</th><th>Total</th><th>Bayar</th><th>Aksi</th></tr></thead><tbody>'+rows.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.time)}</td><td>${rupiah(s.total)}</td><td><span class="pill">${esc(s.pay)}</span></td><td><button class="btn-light" onclick="editSale('${esc(s.id)}')">Ubah</button> <button class="btn-danger" onclick="showDeleteSaleConfirm('${esc(s.id)}')">Hapus</button></td></tr>`).join('')+'</tbody></table></div>'}
+function showDeleteSaleConfirm(id){const s=db.sales.find(x=>x.id===id);if(!s)return alert('Transaksi tidak ditemukan.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Hapus Transaksi?</h2><p>Hapus transaksi <b>${esc(s.id)}</b> senilai <b>${rupiah(s.total)}</b>?</p><p class="muted">Stok barang pada transaksi ini akan dikembalikan.</p><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-danger" onclick="deleteSaleHistory('${esc(s.id)}')">Ya, Hapus</button></div></div></div>`}
+function deleteSaleHistory(id){const s=db.sales.find(x=>x.id===id);if(!s)return alert('Transaksi tidak ditemukan.');for(const i of (s.items||[])){const p=db.products.find(x=>x.nama===i.nama);if(p)p.stok=Number(p.stok||0)+Number(i.qty||0)}db.moves=(db.moves||[]).filter(m=>m.keterangan!==id);db.sales=db.sales.filter(x=>x.id!==id);save();closeModal();sales();alert('Transaksi '+id+' berhasil dihapus.');}
+function editSale(id){let s=db.sales.find(x=>x.id===id);if(!s)return alert('Transaksi tidak ditemukan.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Ubah Data Transaksi</h2><p class="muted">${esc(s.id)} · ${esc(s.time)}</p><label>Total Transaksi<input id="edit_sale_total" class="field" type="number" min="0" step="1" value="${Number(s.total||0)}" style="width:100%;margin:6px 0 12px"></label><label>Metode Pembayaran<select id="edit_sale_pay" class="field" style="width:100%;margin:6px 0 12px"><option value="Tunai" ${s.pay==='Tunai'?'selected':''}>Tunai</option><option value="QRIS" ${s.pay==='QRIS'?'selected':''}>QRIS</option></select></label><p class="muted">Perubahan ini mengubah total dan metode pembayaran pada riwayat transaksi, tidak mengubah jumlah barang atau stok.</p><div class="actions"><button class="btn-light" onclick="closeModal();sales()">Batal</button><button class="btn-primary" onclick="saveSaleEdit('${esc(s.id)}')">Simpan Perubahan</button></div></div></div>`}
+function saveSaleEdit(id){let s=db.sales.find(x=>x.id===id),total=Number(document.getElementById('edit_sale_total')?.value),pay=document.getElementById('edit_sale_pay')?.value;if(!s)return alert('Transaksi tidak ditemukan.');if(!Number.isFinite(total)||total<0)return alert('Total transaksi tidak valid.');if(!['Tunai','QRIS'].includes(pay))return alert('Metode pembayaran tidak valid.');s.total=total;s.pay=pay;save();closeModal();sales();alert('Perubahan transaksi berhasil disimpan.')}
+function showClearSalesConfirm(){if(!Array.isArray(db.sales)||!db.sales.length)return alert('Belum ada riwayat transaksi.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Konfirmasi Hapus Riwayat</h2><p>Yakin ingin menghapus <b>${db.sales.length} transaksi</b> penjualan?</p><p class="muted">Stok barang akan dikembalikan sesuai jumlah yang terjual. Riwayat transaksi yang dihapus tidak dapat dipulihkan. Pastikan sudah ekspor CSV atau backup JSON.</p><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-danger" onclick="clearSalesHistory()">Ya, Hapus Riwayat</button></div></div></div>`}
+function clearSalesHistory(){if(!Array.isArray(db.sales)||!db.sales.length){closeModal();return alert('Belum ada riwayat transaksi.')}const ids=new Set(db.sales.map(x=>x.id));for(const sale of db.sales){for(const item of (sale.items||[])){const p=db.products.find(x=>x.nama===item.nama);if(p)p.stok=Number(p.stok||0)+Number(item.qty||0)}}db.moves=(db.moves||[]).filter(m=>!ids.has(m.keterangan));db.sales=[];save();closeModal();sales();alert('Berhasil! Semua riwayat transaksi dihapus dan stok dikembalikan.');}
+function lowStock(){let a=db.products.filter(p=>p.stok<=5).slice(0,7);return a.length?a.map(p=>`<div class="cartline"><div><b>${esc(p.nama)}</b><div class="muted">${esc(p.barcode||'-')}</div></div><span class="pill" style="background:#fff0e8;color:#b65b20">${p.stok} unit</span></div>`).join(''):'<div class="empty">Tidak ada stok menipis.</div>'}
+function categoryIcon(p){let s=((p.kategori||'')+' '+(p.nama||'')).toLowerCase();if(/minum|air|susu|kopi|teh|sirup/.test(s))return '🥤';if(/beras|sembako|mie|tepung|gula|minyak|bumbu/.test(s))return '🍚';if(/frozen|beku|es krim|ice cream/.test(s))return '🧊';if(/buah|sayur/.test(s))return '🍎';if(/sabun|shampoo|detergen|mandi|kosmetik/.test(s))return '🧴';if(/obat|vitamin|kesehatan/.test(s))return '🩹';if(/alat|perkakas|rumah tangga/.test(s))return '🧰';if(/rokok|sigaret/.test(s))return '🚬';return '📦'}
+function productPicture(p){return p.foto?'<img src="'+p.foto+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">':categoryIcon(p)}
+/* Auto-load verified product photos for featured POS items when a real barcode is available. */
+window.seamartPosPhotoLookups=window.seamartPosPhotoLookups||new Set();
+async function hydrateFeaturedProductPhotos(items){
+ for(const p of items){
+  const barcode=String(p.barcode||'').trim(),key=barcode||String(p.nama||'').trim().toLowerCase();
+  if(p.foto||!key||window.seamartPosPhotoLookups.has(key))continue;
+  window.seamartPosPhotoLookups.add(key);
+  try{
+   let product=null;
+   if(/^\d{8,14}$/.test(barcode)){
+    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
+    if(response.ok){const data=await response.json();if(data.status===1)product=data.product;}
+   }
+   if(!product?.selected_images?.front){
+    const response=await fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(p.nama)+'&search_simple=1&action=process&json=1&page_size=8&fields=code,product_name,selected_images');
+    if(response.ok){const data=await response.json(),found=data.products||[];product=found.find(x=>x.product_name&&x.selected_images?.front)||product;}
+   }
+   const front=product?.selected_images?.front,images=front?.display||front?.small||front;
+   const url=typeof images==='string'?images:(images&&typeof images==='object'?(images.en||Object.values(images)[0]||''):'');
+   if(!url||!product?.product_name)continue;
+   await validateProductPhoto(url,p.nama,product.product_name);
+   p.foto=url;save();
+   const tile=[...document.querySelectorAll('[data-product-photo]')].find(el=>el.dataset.productPhoto===String(p.id));
+   if(tile)tile.innerHTML=productPicture(p);
+  }catch(err){console.info('Foto otomatis belum tersedia untuk '+p.nama,err)}
+ }
+}
+function products(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Produk & Kategori</h1><div class="sub">Kelola master barang SeaMart.</div></div><button class="btn-primary" onclick="productModal()">＋ Tambah Produk</button></div><div class="toolbar"><input id="psearch" class="field search" placeholder="Cari nama, kode, atau barcode…" oninput="filterProducts()"><button class="btn-light" onclick="document.getElementById('csvfile').click()">⇧ Impor CSV</button><button class="btn-light" onclick="exportCSV()">⇩ Ekspor CSV</button></div><div class="panel"><div id="ptable"></div></div>`;filterProducts()}
+function filterProducts(){let q=(document.getElementById('psearch')?.value||'').toLowerCase(),a=db.products.filter(p=>[p.nama,p.barcode,p.kode,p.kategori].join(' ').toLowerCase().includes(q));document.getElementById('ptable').innerHTML=a.length?'<div class="tablewrap"><table><thead><tr><th>Nama Produk</th><th>Kode</th><th>Barcode</th><th>Kategori</th><th>Harga Beli</th><th>Jual 1 (Kasir)</th><th>Jual 2</th><th>Jual 3</th><th>Stok</th><th></th></tr></thead><tbody>'+a.map(p=>`<tr><td><b>${esc(p.nama)}</b></td><td>${esc(p.kode||'-')}</td><td>${esc(p.barcode||'-')}</td><td>${esc(p.kategori||'Umum')}</td><td>${rupiah(p.harga_beli||0)}</td><td><b>${rupiah(p.harga_jual_1??p.harga)}</b></td><td>${rupiah(p.harga_jual_2||0)}</td><td>${rupiah(p.harga_jual_3||0)}</td><td>${p.stok}</td><td class="muted">—</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Belum ada produk. Impor master CSV untuk mulai mengisi barang.</div>'}
+function editProductsPage(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ubah Data Barang</h1><div class="sub">Formulir perubahan berada di atas. Cari dan pilih barang pada daftar di bawah.</div></div></div><div class="panel"><h3>Formulir Ubah Data Barang</h3><div id="inline_edit_form"><div class="empty">Pilih barang dari daftar di bawah untuk menampilkan formulir di sini.</div></div></div><div class="panel"><h3>Cari Barang</h3><input id="edit_product_search" class="field" style="width:100%;max-width:620px" placeholder="Ketik nama barang, kode, atau barcode..." oninput="renderEditProductOptions()"><div id="edit_product_results" style="margin-top:14px"></div></div>`;window.selectedEditProductId='';window.pendingInlinePhoto=null;renderEditProductOptions()}
+function renderEditProductOptions(){let q=(document.getElementById('edit_product_search')?.value||'').toLowerCase(),a=db.products.filter(p=>[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)).slice(0,40),el=document.getElementById('edit_product_results');if(!el)return;el.innerHTML=a.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Kategori</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>'+a.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+esc(p.kategori||'Umum')+'</td><td>'+Number(p.stok||0)+'</td><td><button class="btn-light" data-id="'+esc(p.id)+'" onclick="selectProductForEdit(this.dataset.id)">Pilih</button></td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Barang tidak ditemukan.</div>'}
+function selectProductForEdit(id){window.selectedEditProductId=id;window.pendingInlinePhoto=null;let p=db.products.find(x=>x.id===id),el=document.getElementById('inline_edit_form');if(!p||!el)return;el.innerHTML=`<div class="formgrid"><label>Nama Barang<input id="if_nama" class="field" value="${esc(p.nama)}"></label><label>Kode Barang<input id="if_kode" class="field" value="${esc(p.kode||'')}"></label><label>Barcode<input id="if_barcode" class="field" value="${esc(p.barcode||'')}"></label><label>Kelompok Barang<input id="if_kategori" class="field" value="${esc(p.kategori||'Umum')}"></label><label>Harga Beli<input id="if_hb" type="number" class="field" value="${Number(p.harga_beli||0)}"></label><label>Harga Jual 1 (Kasir)<input id="if_h1" type="number" class="field" value="${Number(p.harga_jual_1??p.harga??0)}"></label><label>Harga Jual 2<input id="if_h2" type="number" class="field" value="${Number(p.harga_jual_2||0)}"></label><label>Harga Jual 3<input id="if_h3" type="number" class="field" value="${Number(p.harga_jual_3||0)}"></label><label>Stok<input id="if_stok" type="number" class="field" value="${Number(p.stok||0)}"></label></div><label style="display:block;margin-top:14px">Foto Produk<input type="file" accept="image/*" class="field" style="display:block;width:100%;margin-top:6px" onchange="previewInlineProductPhoto(this)"></label><div id="inline_photo_preview" style="margin-top:8px">${p.foto?'<img src="'+p.foto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px">':'<span class="emptyhint">Belum ada foto. Ikon kategori akan digunakan.</span>'}</div><button type="button" class="btn-light" style="margin-top:9px" onclick="lookupInlineProductPhoto()">Cari Foto Otomatis dari Barcode</button><div id="inline_photo_status" class="emptyhint" style="margin-top:6px">Foto dicari memakai barcode barang di atas.</div><div class="actions"><button class="btn-light" onclick="editProductsPage()">Batal</button><button class="btn-primary" onclick="saveInlineProduct()">Simpan Perubahan</button></div>`;el.scrollIntoView({behavior:'smooth',block:'start'})}
+
+async function validateProductPhoto(url,targetName,sourceName){
+  const tokens=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(x=>x.length>=3&&!['produk','barang','pack','pcs','piece','gram','gr'].includes(x));
+ const wanted=tokens(targetName),found=tokens(sourceName),shared=wanted.filter(x=>found.includes(x));
+ if(!wanted.length||!shared.length)throw new Error('Nama produk tidak cocok dengan data foto. Foto ditolak.');
+ const img=new Image();img.crossOrigin='anonymous';
+ await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat. Foto ditolak.'));img.src=url});
+ if(img.naturalWidth<250||img.naturalHeight<250)throw new Error('Resolusi foto terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Foto ditolak.');
+ const ratio=img.naturalWidth/img.naturalHeight;
+ if(ratio<0.45||ratio>2.2)throw new Error('Proporsi gambar tidak layak untuk foto produk. Foto ditolak.');
+ return {width:img.naturalWidth,height:img.naturalHeight,matched:shared.join(', ')};
+}
+async function lookupInlineProductPhoto(){
+ const barcode=(document.getElementById('if_barcode')?.value||'').trim(),name=(document.getElementById('if_nama')?.value||'').trim(),status=document.getElementById('inline_photo_status');
+ window.pendingInlinePhoto=null;
+ if(!barcode){if(status)status.textContent='Isi barcode barang terlebih dahulu.';return}
+ if(status)status.textContent='Memeriksa kecocokan nama dan kualitas foto…';
+ try{
+  const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
+  if(!response.ok)throw new Error('Server foto memberi HTTP '+response.status+(response.status===503?' (sedang sibuk / batas permintaan). Coba lagi beberapa menit.':response.status===429?' (terlalu banyak permintaan). Tunggu sebelum mencoba lagi.':' . Coba lagi nanti.'));
+  const data=await response.json(),front=data.product?.selected_images?.front,images=front?.display||front?.small||front;
+  const url=typeof images==='string'?images:(images&&typeof images==='object'?(images.en||Object.values(images)[0]||''):'');
+  if(data.status!==1||!url)throw new Error('Foto untuk barcode ini belum tersedia. Coba unggah dari galeri.');
+  const check=await validateProductPhoto(url,name,data.product.product_name);
+  window.pendingInlinePhoto=url;
+  const preview=document.getElementById('inline_photo_preview');
+  if(preview)preview.innerHTML='<img src="'+esc(url)+'" style="width:120px;height:120px;object-fit:contain;border-radius:9px;background:#f5f7f9">';
+  if(status)status.textContent='Lolos pemeriksaan dasar ('+check.width+'×'+check.height+'). Cocok nama: '+check.matched+'. Periksa gambar sebelum menyimpan.';
+ }catch(err){window.pendingInlinePhoto=null;if(status)status.textContent=err.message||'Foto tidak lolos pemeriksaan. Unggah foto yang benar dari galeri.'}
+}
+function previewInlineProductPhoto(input){let file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/'))return alert('Pilih file gambar.');let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,500/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);window.pendingInlinePhoto=canvas.toDataURL('image/jpeg',0.76);document.getElementById('inline_photo_preview').innerHTML='<img src="'+window.pendingInlinePhoto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px>'};img.src=reader.result};reader.readAsDataURL(file)}
+function saveInlineProduct(){let id=window.selectedEditProductId,p=db.products.find(x=>x.id===id);if(!p)return alert('Pilih barang terlebih dahulu.');let nama=document.getElementById('if_nama').value.trim();if(!nama)return alert('Nama barang wajib diisi.');p.nama=nama;p.kode=document.getElementById('if_kode').value.trim();p.barcode=document.getElementById('if_barcode').value.trim();p.kategori=document.getElementById('if_kategori').value.trim()||'Umum';p.harga_beli=Number(document.getElementById('if_hb').value)||0;p.harga_jual_1=Number(document.getElementById('if_h1').value)||0;p.harga=p.harga_jual_1;p.harga_jual_2=Number(document.getElementById('if_h2').value)||0;p.harga_jual_3=Number(document.getElementById('if_h3').value)||0;p.stok=Number(document.getElementById('if_stok').value)||0;if(window.pendingInlinePhoto)p.foto=window.pendingInlinePhoto;save();window.pendingInlinePhoto=null;alert('Data barang berhasil diperbarui.');editProductsPage()}
+function productModal(id){window.pendingProductPhoto=null;let p=db.products.find(x=>x.id===id)||{id:'p'+Date.now(),nama:'',kode:'',barcode:'',kategori:'Umum',harga:0,harga_beli:0,harga_jual_1:0,harga_jual_2:0,harga_jual_3:0,stok:0};document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>${id?'Edit':'Tambah'} Produk</h2><div class="formgrid"><label>Nama Produk<input id="f_nama" class="field" value="${esc(p.nama)}"></label><label>Kode Barang<input id="f_kode" class="field" value="${esc(p.kode)}"></label><label>Barcode<input id="f_barcode" class="field" value="${esc(p.barcode)}"></label><label>Kategori<input id="f_kategori" class="field" value="${esc(p.kategori)}"></label><label>Harga Beli<input id="f_harga_beli" type="number" class="field" value="${p.harga_beli||0}"></label><label>Harga Jual 1 (Kasir)<input id="f_harga" type="number" class="field" value="${p.harga_jual_1??p.harga??0}"></label><label>Harga Jual 2<input id="f_harga2" type="number" class="field" value="${p.harga_jual_2||0}"></label><label>Harga Jual 3<input id="f_harga3" type="number" class="field" value="${p.harga_jual_3||0}"></label><label>Stok<input id="f_stok" type="number" class="field" value="${p.stok}"></label></div><label style="display:block;margin-top:14px">Foto Produk <span class="emptyhint">(opsional, JPG/PNG)</span><input id="f_foto" type="file" accept="image/*" class="field" style="display:block;width:100%;margin-top:6px" onchange="previewProductPhoto(this)"></label><div id="foto_preview" style="margin-top:8px">${p.foto?'<img src="'+p.foto+'" style="width:88px;height:88px;object-fit:cover;border-radius:10px">':'<span class="emptyhint">Belum ada foto — ikon kelompok barang akan ditampilkan.</span>'}</div><button type="button" class="btn-light" style="margin-top:9px" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button><div id="foto_lookup_status" class="emptyhint" style="margin-top:6px">Mencari foto berdasarkan barcode produk.</div><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveProduct('${p.id}')">Simpan</button></div></div></div>`}
+function previewProductPhoto(input){let file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/'))return alert('Pilih file gambar.');let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,500/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);window.pendingProductPhoto=canvas.toDataURL('image/jpeg',0.76);document.getElementById('foto_preview').innerHTML='<img src="'+window.pendingProductPhoto+'" style="width:88px;height:88px;object-fit:cover;border-radius:10px">'};img.src=reader.result};reader.readAsDataURL(file)}
+
+async function lookupProductPhoto(){
+ const barcode=(document.getElementById('f_barcode')?.value||'').trim(),name=(document.getElementById('f_nama')?.value||'').trim(),status=document.getElementById('foto_lookup_status');
+ window.pendingProductPhoto=null;
+ if(!barcode){if(status)status.textContent='Barcode belum diisi.';return}
+ if(status)status.textContent='Memeriksa kecocokan nama dan kualitas foto…';
+ try{
+  const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
+  if(!response.ok)throw new Error('Server foto memberi HTTP '+response.status+(response.status===503?' (sedang sibuk / batas permintaan). Coba lagi beberapa menit.':response.status===429?' (terlalu banyak permintaan). Tunggu sebelum mencoba lagi.':' . Coba lagi nanti.'));
+  const data=await response.json(),front=data.product?.selected_images?.front,images=front?.display||front?.small||front;
+  const url=typeof images==='string'?images:(images&&typeof images==='object'?(images.en||Object.values(images)[0]||''):'');
+  if(data.status!==1||!url)throw new Error('Foto untuk barcode ini belum tersedia di database.');
+  const check=await validateProductPhoto(url,name,data.product.product_name);
+  window.pendingProductPhoto=url;
+  const preview=document.getElementById('foto_preview');
+  if(preview)preview.innerHTML='<img src="'+esc(url)+'" style="width:120px;height:120px;object-fit:contain;border-radius:10px;background:#f5f7f9">';
+  if(status)status.textContent='Lolos pemeriksaan dasar ('+check.width+'×'+check.height+'). Cocok nama: '+check.matched+'. Periksa gambar sebelum menyimpan.';
+ }catch(err){window.pendingProductPhoto=null;if(status)status.textContent=err.message||'Foto tidak lolos pemeriksaan. Coba unggah foto dari galeri.'}
+}
+function saveProduct(id){let nama=document.getElementById('f_nama').value.trim();if(!nama)return alert('Nama produk wajib diisi.');let h1=Number(document.getElementById('f_harga').value);let p={id,nama,kode:document.getElementById('f_kode').value.trim(),barcode:document.getElementById('f_barcode').value.trim(),kategori:document.getElementById('f_kategori').value.trim()||'Umum',harga:h1,harga_beli:Number(document.getElementById('f_harga_beli').value),harga_jual_1:h1,harga_jual_2:Number(document.getElementById('f_harga2').value),harga_jual_3:Number(document.getElementById('f_harga3').value),stok:Number(document.getElementById('f_stok').value),foto:window.pendingProductPhoto||db.products.find(x=>x.id===id)?.foto||''};window.pendingProductPhoto=null;let i=db.products.findIndex(x=>x.id===id);if(i<0)db.products.push(p);else db.products[i]=p;save();closeModal();products()}
+function closeModal(){document.getElementById('modalroot').innerHTML=''}
+function parseCSV(text){let rows=[],row=[],v='',q=false;for(let i=0;i<text.length;i++){let c=text[i];if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){row.push(v);v=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v=''}else v+=c}row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows}
+document.getElementById('csvfile').onchange=async e=>{let f=e.target.files[0];if(!f)return;let csvText=(await f.text()).replace(/^\\uFEFF/,''),rows=parseCSV(csvText),head=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\\uFEFF/,'')),idx=(...names)=>head.findIndex(h=>names.includes(h));let ni=idx('nama','name','nama_barang'),bi=idx('barcode'),hi=idx('harga','price','harga_jual_1'),hbi=idx('harga_beli'),h2i=idx('harga_jual_2'),h3i=idx('harga_jual_3'),si=idx('stok','stock'),ki=idx('kode','kode_barang','sku'),ci=idx('kategori','category','kelompok_barang');if(ni<0){alert('Kolom nama_barang/nama tidak ditemukan.');return}let added=0;rows.forEach(r=>{let barcode=(r[bi]||'').trim(),kode=(r[ki]||'').trim(),old=db.products.find(p=>(kode&&p.kode===kode)||(barcode&&p.barcode===barcode));let num=i=>i<0?0:Number((r[i]||'0').replace(/[^\d.-]/g,''))||0;let h1=num(hi);if(h1<=0&&h2i>=0&&num(h2i)>0&&hi<0)h1=num(h2i);let p={id:old?.id||'csv'+Date.now()+Math.random(),nama:r[ni]||'',barcode:old?.barcode||barcode,kode:old?.kode||kode,harga:h1,harga_beli:num(hbi),harga_jual_1:h1,harga_jual_2:num(h2i),harga_jual_3:num(h3i),stok:num(si),kategori:r[ci]||old?.kategori||'Umum'};if(old)Object.assign(old,p);else db.products.push(p);added++});save();e.target.value='';alert(added+' baris produk ERGO berhasil diimpor. Kasir memakai Harga Jual 1; Harga Jual 2 dan 3 tersimpan di master.');products()}
+function exportCSV(){let lines=[['kode_barang','nama_barang','barcode','harga_beli','harga_jual_1','harga_jual_2','harga_jual_3','stok','kelompok_barang'],...db.products.map(p=>[p.kode,p.nama,p.barcode,p.harga_beli||0,p.harga_jual_1??p.harga,p.harga_jual_2||0,p.harga_jual_3||0,p.stok,p.kategori])];download('seamart-master-barang.csv',lines.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
+function download(name,data){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function pos(){window.posCategory='Semua';document.getElementById('view').innerHTML=`<div class="odoo-pos-head"><div><h1>Point of Sale</h1><div class="sub">Penjualan cepat · SeaMart POS</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pos-clock"><strong id="posClockTime">00:00:00</strong><span id="posClockDate">Memuat tanggal…</span></div><button class="btn-light" type="button" onclick="showKeyboardHelp()">⌨ Tombol Keyboard</button><span class="pill">Sesi Kasir</span></div></div><div class="odoo-pos-tools"><input id="posbarcode" class="field search" placeholder="Pindai barcode barang di sini..." autocomplete="off"><button class="btn-light" onclick="document.getElementById('posbarcode').focus()">Fokus Barcode</button><span class="muted" style="font-size:11px">Scanner USB / Bluetooth siap</span></div><div class="odoo-pos-layout" id="odooPosLayout"><aside class="odoo-category-panel" id="odooCategoryPanel"><div class="odoo-category-heading"><div class="odoo-panel-label">KATEGORI</div><button type="button" class="pos-category-toggle" id="togglePosCategories" onclick="togglePosCategories()" aria-label="Sembunyikan atau tampilkan kategori">−</button></div><div id="poscategories"></div></aside><section class="odoo-catalog-panel"><div class="odoo-catalog-top"><h3 id="pos-category-title">Semua Produk</h3><div class="odoo-catalog-search"><input id="possearch" class="field" type="search" placeholder="Cari nama barang, kode, barcode..." autocomplete="off" aria-label="Cari dari semua produk"><span class="odoo-count" id="pos-product-count">0 produk</span></div></div><div class="odoo-products" id="posproducts"></div></section><aside class="odoo-order-panel"><div class="odoo-order-head"><h3>Pesanan</h3><span class="pill" id="cartcount">0 item</span></div><div class="odoo-order-body"><div class="odoo-order-lines" id="cartlines"></div><div class="totalrow"><span class="muted">Subtotal</span><b id="subtotal">Rp 0</b></div><div class="totalrow grand"><span>Total</span><span id="grandtotal">Rp 0</span></div><div class="odoo-pay-label">METODE PEMBAYARAN</div><select id="paymethod" class="field" style="width:100%;margin:7px 0 13px"><option>Tunai</option><option>QRIS</option></select><button class="btn-primary odoo-checkout" style="width:100%" onclick="checkout()">Bayar Sekarang →</button><button class="btn-danger" style="width:100%;margin-top:8px" onclick="cancelOrder()">Batal Transaksi</button><div class="odoo-scan-hint">Pindai barcode lalu tekan Enter untuk menambahkan barang</div></div></aside></div>`;window.posCategoriesHidden=false;localStorage.removeItem('seamart_pos_categories_hidden');document.getElementById('odooPosLayout').classList.remove('categories-hidden');document.getElementById('odooCategoryPanel').classList.remove('categories-collapsed');updatePosCategoryToggle();renderPosProducts();renderCart();startPosClock();let search=document.getElementById('possearch');search.oninput=()=>renderPosProducts();let scanner=document.getElementById('posbarcode');scanner.onkeydown=e=>{if(e.key==='Enter'){let code=e.target.value.trim();let p=db.products.find(x=>String(x.barcode||'').trim()===code||String(x.kode||'').trim()===code);if(p){addCart(p.id);e.target.value='';scanner.focus()}else if(code){alert('Barcode / kode barang tidak ditemukan.');e.target.select()}}};}let posClockTimer=null;function startPosClock(){if(posClockTimer)clearInterval(posClockTimer);const tick=()=>{const now=new Date(),time=document.getElementById('posClockTime'),date=document.getElementById('posClockDate');if(!time||!date)return;time.textContent=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Makassar',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);date.textContent=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Makassar',weekday:'long',day:'2-digit',month:'long',year:'numeric'}).format(now)};tick();posClockTimer=setInterval(tick,1000);}
+function updatePosCategoryToggle(){const b=document.getElementById('togglePosCategories');const panel=document.getElementById('odooCategoryPanel');if(b)b.textContent=panel&&panel.classList.contains('categories-collapsed')?'+':'−';}
+function togglePosCategories(){const panel=document.getElementById('odooCategoryPanel');if(!panel)return;panel.classList.toggle('categories-collapsed');localStorage.setItem('seamart_pos_categories_hidden',panel.classList.contains('categories-collapsed')?'1':'0');updatePosCategoryToggle();}
+function renderPosProducts(){let q=(document.getElementById('possearch')?.value||'').toLowerCase(),defaultCats=['Minuman','Makanan','Mie Instan','Es Krim','Frozen Food','Snack','Sembako','Perlengkapan Rumah','Rokok','Umum'],productCats=[...new Set(db.products.map(p=>String(p.kategori||'Umum').trim()||'Umum'))],cats=['Semua',...defaultCats,...productCats.filter(cat=>!defaultCats.some(d=>d.toLocaleLowerCase('id-ID')===cat.toLocaleLowerCase('id-ID')))],c=window.posCategory||'Semua',a=db.products.filter(p=>(c==='Semua'||posProductMatchesCategory(p,c))&&[p.nama,p.barcode,p.kode].join(' ').toLowerCase().includes(q));let catEl=document.getElementById('poscategories');if(catEl)catEl.innerHTML=cats.map((cat,i)=>'<div class="pos-category-row"><button class="odoo-cat '+(c===cat?'active':'')+'" onclick="setPosCategory('+JSON.stringify(cat).replace(/"/g,'&quot;')+')"><span class="odoo-cat-icon">'+(cat==='Semua'?'▦':categoryIcon({kategori:cat,nama:''}))+'</span>'+esc(cat)+'</button>'+'</div>').join('');let title=document.getElementById('pos-category-title'),count=document.getElementById('pos-product-count');if(title)title.textContent=c==='Semua'?'Semua Produk':c;if(count)count.textContent=a.length+' produk';let el=document.getElementById('posproducts');if(!el)return;const card=p=>{const id=JSON.stringify(p.id).replace(/"/g,'&quot;'),qty=cart.find(x=>x.id===p.id)?.qty||0;return '<div class="odoo-product" role="group" aria-label="'+esc(p.nama)+'"><div class="odoo-product-image" data-product-photo="'+esc(p.id)+'" onclick="addCart('+id+')">'+productPicture(p)+'</div><div class="odoo-product-name" onclick="addCart('+id+')">'+esc(p.nama)+'</div><div class="odoo-product-meta">'+esc(p.kode||p.barcode||p.kategori||'')+' · Stok '+Number(p.stok||0)+'</div><div class="odoo-product-price">'+rupiah(p.harga)+'</div><div class="product-qty-control"><button class="qty-minus" type="button" aria-label="Kurangi '+esc(p.nama)+'" '+(qty?'':'disabled')+' onclick="changeQty('+id+',-1)">−</button><span class="qty-value">'+qty+'</span><button class="qty-plus" type="button" aria-label="Tambah '+esc(p.nama)+'" onclick="addCart('+id+')">+</button></div></div>'};let featured=[];if(c==='Semua'&&!q){const featuredCodes=['02010007','02010008','02017526','02017546','02020041','05120039'];const normCode=v=>String(v??'').trim().replace(/\.0$/,'');featuredCodes.forEach(code=>{const p=a.find(x=>normCode(x.kode)===code);if(p&&!featured.some(x=>x.id===p.id))featured.push(p)});}const rest=a.filter(p=>!featured.some(x=>x.id===p.id));el.innerHTML=(featured.length?'<section class="pos-featured"><div class="pos-featured-title">Barang Unggulan</div><div class="pos-featured-grid">'+featured.map(card).join('')+'</div></section>':'')+(rest.length?'<section class="pos-all-products">'+(featured.length?'<div class="pos-featured-title">Semua Produk</div>':'')+'<div class="pos-products-grid">'+rest.map(card).join('')+'</div></section>':'')||'<div class="empty">Produk tidak ditemukan.</div>';if(featured.length)hydrateFeaturedProductPhotos(featured)}
+function posProductMatchesCategory(product,category){const p=normalizePosCategory(product.kategori||'Umum'),c=normalizePosCategory(category);if(p===c||p.startsWith(c+' ')||c.startsWith(p+' '))return true;const groups={'minuman':['minuman','minuman ringan','air minum'],'makanan':['makanan','makanan ringan','snack','cemilan'],'mie instan':['mie instan','mi instan'],'es krim':['es krim','eskrim','ice cream','icecream'],'frozen food':['frozen food','makanan beku'],'perlengkapan rumah':['perlengkapan rumah','peralatan rumah tangga']};const terms=groups[c]||[c];return terms.some(t=>p===normalizePosCategory(t)||p.startsWith(normalizePosCategory(t)+' '));}
+function normalizePosCategory(value){return String(value||'Umum').trim().toLocaleLowerCase('id-ID').replace(/[._-]+/g,' ').replace(/\s+/g,' ')}
+function setPosCategory(category){window.posCategory=category;const search=document.getElementById('possearch');if(search)search.value='';renderPosProducts()}
+function addCart(id){let p=db.products.find(x=>x.id===id);if(!p)return alert('Barang tidak ditemukan.');let x=cart.find(x=>x.id===id);if(x)x.qty++;else cart.push({id,qty:1});renderCart()}
+function renderCart(){let el=document.getElementById('cartlines');if(!el)return;el.innerHTML=cart.length?cart.map(x=>{let p=db.products.find(y=>y.id===x.id);return `<div class="cartline"><div style="min-width:0;flex:1"><b>${esc(p?.nama||'Produk')}</b><div class="muted">${rupiah(p?.harga)} × ${x.qty}</div></div><div class="qty"><button title="Kurangi jumlah" onclick="changeQty('${x.id}',-1)">−</button><b style="min-width:14px;text-align:center">${x.qty}</b><button title="Tambah jumlah" onclick="changeQty('${x.id}',1)">+</button><button class="cart-remove" title="Hapus barang dari keranjang" aria-label="Hapus ${esc(p?.nama||'produk')}" onclick="removeCartItem('${x.id}')">🗑</button></div></div>`}).join(''):'<div class="empty">Keranjang masih kosong.</div>';let sum=cart.reduce((a,x)=>a+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);document.getElementById('subtotal').textContent=rupiah(sum);document.getElementById('grandtotal').textContent=rupiah(sum);document.getElementById('cartcount').textContent='('+cart.reduce((a,x)=>a+x.qty,0)+' item)'}
+function removeCartItem(id){const item=cart.find(x=>x.id===id);if(!item)return;cart=cart.filter(x=>x.id!==id);renderCart();}
+function changeQty(id,d){let x=cart.find(x=>x.id===id);if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(x=>x.id!==id);renderCart()}
+function cancelOrder(){if(!cart.length)return alert('Tidak ada pesanan yang perlu dibatalkan.');if(!confirm('Batalkan transaksi ini? Semua barang di keranjang akan dihapus.'))return;cart=[];renderCart();}
+function checkout(){if(!requireOpenShift())return;if(!cart.length)return alert('Keranjang masih kosong.');for(let x of cart){let p=db.products.find(p=>p.id===x.id);if(!p)return alert('Barang tidak ditemukan: '+(p?.nama||''))}let items=cart.map(x=>{let p=db.products.find(p=>p.id===x.id);return {nama:p.nama,qty:x.qty,harga:p.harga,subtotal:p.harga*x.qty}}),total=items.reduce((a,x)=>a+x.subtotal,0),id='SM-'+Date.now().toString().slice(-8);cart.forEach(x=>{let p=db.products.find(p=>p.id===x.id);p.stok-=x.qty;db.moves.push({id:'M'+Date.now()+Math.random(),time:dateNow(),at:new Date().toISOString(),produk:p.nama,jenis:'Keluar / Terjual',qty:x.qty,delta:-x.qty,keterangan:id})});db.sales.push({id,time:dateNow(),at:new Date().toISOString(),cashier:currentUser?.nama||'',shiftId:currentShift()?.id||'',total,pay:document.getElementById('paymethod').value,items});save();cart=[];document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Pembayaran: ${esc(db.sales.at(-1).pay)}</p><div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Preview</button></div></div></div>`;renderCart()}
+function printReceipt(id){let s=db.sales.find(x=>x.id===id);let w=window.open('','_blank','width=380,height=650');if(!w)return alert('Izinkan pop-up untuk mencetak struk.');w.document.write('<html><head><title>Struk '+id+'</title><style>body{font:12px monospace;width:280px;margin:10px auto}h3,p{text-align:center;margin:4px}hr{border:0;border-top:1px dashed #000}.r{display:flex;justify-content:space-between;margin:6px 0}</style></head><body><h3>SEAMART</h3><p>MINIMARKET</p><hr><p>'+id+'</p><p>'+s.time+'</p><hr>'+s.items.map(x=>'<div>'+esc(x.nama)+'<div class="r"><span>'+x.qty+' x '+rupiah(x.harga)+'</span><b>'+rupiah(x.subtotal)+'</b></div></div>').join('')+'<hr><div class="r"><b>TOTAL</b><b>'+rupiah(s.total)+'</b></div><p>Bayar: '+esc(s.pay)+'</p><hr><p>Terima kasih</p><script>window.print()<\\/script></body></html>');w.document.close()}
+function moveDate(m){if(m.at){const d=new Date(m.at);if(!isNaN(d))return d}const t=String(m.time||'');const x=t.match(/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})(?:,?\s+([0-9]{1,2})[.:]([0-9]{2})(?:[.:]([0-9]{2}))?)?/);if(x)return new Date(Number(x[3]),Number(x[2])-1,Number(x[1]),Number(x[4]||0),Number(x[5]||0),Number(x[6]||0));const d=new Date(t);return isNaN(d)?null:d}
+function movementDelta(m){if(Number.isFinite(Number(m.delta)))return Number(m.delta);if(String(m.jenis||'').includes('Masuk'))return Number(m.qty||0);if(String(m.jenis||'').includes('Keluar'))return -Number(m.qty||0);return 0}
+function stock(){const now=new Date(),today=now.toISOString().slice(0,10),monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10),oldStart=document.getElementById('stock_start')?.value,oldEnd=document.getElementById('stock_end')?.value,oldSearch=document.getElementById('stock_search')?.value||'';document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Posisi & Mutasi Stok Barang</h1><div class="sub">Rincian stok awal, tambahan dari pemasok/cabang, barang keluar atau terjual, dan stok akhir.</div></div><div class="toolbar"><button class="btn-light" onclick="exportStockReport()">⇩ Ekspor CSV</button><button class="btn-primary" onclick="printStockReport()">Cetak PDF</button><button class="btn-light" onclick="moveModal()">＋ Catat Mutasi</button></div></div><div class="panel"><div class="toolbar"><label class="muted">Periode awal <input id="stock_start" type="date" class="field" value="${oldStart||monthStart}" onchange="stock()"></label><label class="muted">Periode akhir <input id="stock_end" type="date" class="field" value="${oldEnd||today}" onchange="stock()"></label><input id="stock_search" class="field search" placeholder="Cari nama, kode, barcode, kelompok..." value="${esc(oldSearch)}" oninput="stock()"></div><div class="emptyhint">Nilai persediaan dihitung memakai harga beli/modal; bila belum diisi, harga jual dipakai sebagai perkiraan.</div></div><div id="stock_report"></div><div class="panel"><h3>Riwayat Mutasi Terbaru</h3>${db.moves.length?'<div class="tablewrap"><table><thead><tr><th>Waktu</th><th>Barang</th><th>Jenis</th><th>Qty</th><th>Keterangan</th></tr></thead><tbody>'+db.moves.slice().reverse().slice(0,100).map(m=>`<tr><td>${esc(m.time||'-')}</td><td>${esc(m.produk||'-')}</td><td>${esc(m.jenis||'-')}</td><td>${Number(m.qty||0)}</td><td>${esc(m.keterangan||'-')}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Belum ada mutasi stok.</div>'}</div>`;renderStockReport()}
+function getStockRows(){const start=document.getElementById('stock_start')?.value||'1900-01-01',end=document.getElementById('stock_end')?.value||new Date().toISOString().slice(0,10),q=(document.getElementById('stock_search')?.value||'').toLowerCase(),sd=new Date(start+'T00:00:00'),ed=new Date(end+'T23:59:59.999');return db.products.filter(p=>[p.nama,p.kode,p.barcode,p.kategori].join(' ').toLowerCase().includes(q)).map(p=>{const all=db.moves.filter(m=>m.produk===p.nama),deltas=all.map(m=>({date:moveDate(m),delta:movementDelta(m)})).filter(x=>x.date),after=deltas.filter(x=>x.date>=sd).reduce((a,x)=>a+x.delta,0),period=deltas.filter(x=>x.date>=sd&&x.date<=ed),incoming=period.filter(x=>x.delta>0).reduce((a,x)=>a+x.delta,0),outgoing=-period.filter(x=>x.delta<0).reduce((a,x)=>a+x.delta,0),opening=Number(p.stok||0)-after,ending=opening+incoming-outgoing,cost=Number(p.harga_beli||0)||Number(p.harga||0);return {...p,opening,incoming,outgoing,ending,cost,openingValue:opening*cost,incomingValue:incoming*cost,outgoingValue:outgoing*cost,endingValue:ending*cost}})}
+function renderStockReport(){const rows=getStockRows(),sum=k=>rows.reduce((a,p)=>a+Number(p[k]||0),0),groups={};rows.forEach(p=>(groups[p.kategori||'Umum']??=[]).push(p));const body=Object.entries(groups).map(([cat,items])=>'<tr><td colspan="12" style="background:#f4f7f5;font-weight:800;color:#3d6653">'+esc(cat)+'</td></tr>'+items.map(p=>`<tr><td>${esc(p.kode||p.barcode||'-')}</td><td><b>${esc(p.nama)}</b></td><td>${esc(p.satuan||'pcs')}</td><td class="num">${p.opening}</td><td class="num">${rupiah(p.openingValue)}</td><td class="num">${p.incoming}</td><td class="num">${rupiah(p.incomingValue)}</td><td class="num">${p.outgoing}</td><td class="num">${rupiah(p.outgoingValue)}</td><td class="num"><b>${p.ending}</b></td><td class="num"><b>${rupiah(p.endingValue)}</b></td><td>${rupiah(p.cost)}</td></tr>`).join('')).join('');document.getElementById('stock_report').innerHTML=`<div class="cards"><div class="stat"><div class="stat-top">Stok Awal</div><strong>${sum('opening').toLocaleString('id-ID')}</strong><small>Nilai ${rupiah(sum('openingValue'))}</small></div><div class="stat"><div class="stat-top">Barang Masuk</div><strong>${sum('incoming').toLocaleString('id-ID')}</strong><small>Nilai ${rupiah(sum('incomingValue'))}</small></div><div class="stat"><div class="stat-top">Barang Keluar</div><strong>${sum('outgoing').toLocaleString('id-ID')}</strong><small>Nilai ${rupiah(sum('outgoingValue'))}</small></div><div class="stat"><div class="stat-top">Stok Akhir</div><strong>${sum('ending').toLocaleString('id-ID')}</strong><small>Nilai persediaan ${rupiah(sum('endingValue'))}</small></div></div><div class="panel"><div class="pagehead"><div><h3 style="margin:0">Laporan Posisi dan Mutasi Stok Barang</h3><div class="sub">Periode: ${esc(document.getElementById('stock_start').value)} – ${esc(document.getElementById('stock_end').value)}</div></div><span class="pill">${rows.length} barang</span></div><div class="tablewrap"><table id="stock_table"><thead><tr><th rowspan="2">Kode</th><th rowspan="2">Nama Barang</th><th rowspan="2">Satuan</th><th colspan="2">AWAL</th><th colspan="2">MASUK</th><th colspan="2">KELUAR</th><th colspan="2">AKHIR</th><th rowspan="2">Harga Modal/Unit</th></tr><tr><th>Qty</th><th>Nilai Persediaan</th><th>Qty</th><th>Nilai Persediaan</th><th>Qty</th><th>Nilai Persediaan</th><th>Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${body||'<tr><td colspan="12" class="empty">Tidak ada barang yang cocok.</td></tr>'}</tbody><tfoot><tr style="font-weight:800;background:#f5f7f8"><td colspan="3">TOTAL</td><td>${sum('opening')}</td><td>${rupiah(sum('openingValue'))}</td><td>${sum('incoming')}</td><td>${rupiah(sum('incomingValue'))}</td><td>${sum('outgoing')}</td><td>${rupiah(sum('outgoingValue'))}</td><td>${sum('ending')}</td><td>${rupiah(sum('endingValue'))}</td><td>—</td></tr></tfoot></table></div></div>`}
+function exportStockReport(){const rows=getStockRows(),head=['kode','nama','kelompok','satuan','stok_awal_qty','stok_awal_nilai','masuk_qty','masuk_nilai','keluar_qty','keluar_nilai','stok_akhir_qty','stok_akhir_nilai','harga_modal_unit'],data=rows.map(p=>[p.kode||p.barcode,p.nama,p.kategori,p.satuan||'pcs',p.opening,p.openingValue,p.incoming,p.incomingValue,p.outgoing,p.outgoingValue,p.ending,p.endingValue,p.cost]);download('seamart-posisi-mutasi-stok.csv',[head,...data].map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\\r\\n'))}
+function printStockReport(){const rows=getStockRows(),start=document.getElementById('stock_start').value,end=document.getElementById('stock_end').value,w=window.open('','_blank','width=1200,height=800');if(!w)return alert('Izinkan pop-up untuk mencetak atau menyimpan PDF.');const cells=rows.map(p=>`<tr><td>${esc(p.kode||p.barcode||'-')}</td><td>${esc(p.nama)}</td><td>${esc(p.kategori||'Umum')}</td><td>${p.opening}</td><td>${rupiah(p.openingValue)}</td><td>${p.incoming}</td><td>${rupiah(p.incomingValue)}</td><td>${p.outgoing}</td><td>${rupiah(p.outgoingValue)}</td><td>${p.ending}</td><td>${rupiah(p.endingValue)}</td></tr>`).join('');w.document.write(`<!doctype html><html><head><title>SeaMart - Posisi & Mutasi Stok</title><style>body{font:10px Arial;padding:18px;color:#222}h2,p{text-align:center;margin:4px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #bbb;padding:5px;text-align:right}th:nth-child(1),th:nth-child(2),th:nth-child(3),td:nth-child(1),td:nth-child(2),td:nth-child(3){text-align:left}th{background:#eef3f0}@page{size:landscape;margin:10mm}.brand{padding-bottom:20px}.brand-lockup{width:100%;display:flex;flex-direction:column;align-items:center;gap:3px}.odoo-category-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.odoo-category-heading .odoo-panel-label{margin:0}.category-toggle-btn{border:0;background:linear-gradient(135deg,#087b43,#16b85a);color:#fff;border-radius:8px;padding:7px 11px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 3px 8px #087b4333;transition:background .18s,transform .18s}.category-toggle-btn:hover{background:linear-gradient(135deg,#066536,#0c9848);transform:translateY(-1px)}.category-toggle-btn:active{transform:translateY(0)}</style></head><body><h2>SEAMART — POSISI DAN MUTASI STOK BARANG</h2><p>Periode: ${start} – ${end}</p><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kelompok</th><th>Awal Qty</th><th>Awal Nilai</th><th>Masuk Qty</th><th>Masuk Nilai</th><th>Keluar Qty</th><th>Keluar Nilai</th><th>Akhir Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${cells}</tbody></table><script>window.print()<\\/script></body></html>`);w.document.close()}
+function moveModal(){let opts=db.products.map(p=>`<option value="${p.id}">${esc(p.nama)}</option>`).join('');document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>Catat Mutasi Stok</h2><label>Produk<select id="m_prod" class="field" style="width:100%;margin:6px 0 12px">${opts}</select></label><label>Jenis<select id="m_type" class="field" style="width:100%;margin:6px 0 12px"><option>Masuk / Pembelian</option><option>Keluar / Mutasi Cabang</option><option>Penyesuaian Stok</option></select></label><label>Jumlah<input id="m_qty" type="number" min="1" class="field" style="width:100%;margin:6px 0 12px"></label><label>Keterangan<input id="m_note" class="field" style="width:100%;margin:6px 0"></label><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveMove()">Simpan Mutasi</button></div></div></div>`}
+function saveMove(){let p=db.products.find(x=>x.id===document.getElementById('m_prod').value),type=document.getElementById('m_type').value,q=Number(document.getElementById('m_qty').value);if(!p||q<=0)return alert('Pilih produk dan jumlah yang valid.');let delta=0;if(type==='Masuk / Pembelian'){p.stok+=q;delta=q}else if(type==='Keluar / Mutasi Cabang'){if(p.stok<q)return alert('Stok tidak cukup.');p.stok-=q;delta=-q}else{let before=Number(p.stok||0);p.stok=q;delta=q-before}db.moves.push({time:dateNow(),at:new Date().toISOString(),produk:p.nama,jenis:type,qty:q,delta,keterangan:document.getElementById('m_note').value});save();closeModal();stock()}
+function sales(){let total=db.sales.reduce((a,s)=>a+Number(s.total||0),0),map={};db.sales.forEach(s=>(s.items||[]).forEach(i=>{map[i.nama]=(map[i.nama]||0)+Number(i.qty||0)}));document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Laporan Penjualan</h1><div class="sub">Rekap transaksi dan penjualan per barang.</div></div><div class="toolbar"><button class="btn-light" onclick="exportSales()">⇩ Ekspor CSV</button><button class="btn-danger" onclick="showClearSalesConfirm()">⌫ Hapus Riwayat</button></div></div><div class="notice">Gunakan tombol Ubah untuk memperbaiki total atau metode pembayaran. Hapus Riwayat akan menghapus semua transaksi dan mengembalikan stok barang yang terjual.</div><div class="cards"><div class="stat"><div class="stat-top">Total Transaksi</div><strong>${db.sales.length}</strong></div><div class="stat"><div class="stat-top">Total Penjualan</div><strong>${rupiah(total)}</strong></div><div class="stat"><div class="stat-top">Tunai</div><strong>${db.sales.filter(s=>s.pay==='Tunai').length}</strong></div><div class="stat"><div class="stat-top">QRIS</div><strong>${db.sales.filter(s=>s.pay==='QRIS').length}</strong></div></div><div class="grid2"><div class="panel"><div class="pagehead" style="margin-bottom:12px"><h3>Riwayat Transaksi</h3><button class="btn-danger" onclick="showClearSalesConfirm()">⌫ Hapus Semua</button></div>${salesTable(db.sales.slice().reverse())}</div><div class="panel"><h3>Penjualan per Barang</h3>${Object.keys(map).length?'<div class="tablewrap"><table><thead><tr><th>Barang</th><th>Terjual</th></tr></thead><tbody>'+Object.entries(map).map(([n,q])=>`<tr><td>${esc(n)}</td><td>${q}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Belum ada penjualan.</div>'}</div></div>`}
+function exportSales(){let rows=[['transaksi','waktu','produk','qty','harga','subtotal','total','pembayaran']];db.sales.forEach(s=>s.items.forEach(i=>rows.push([s.id,s.time,i.nama,i.qty,i.harga,i.subtotal,s.total,s.pay])));download('seamart-laporan-penjualan.csv',rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
+function accounts(){
+ if(!Array.isArray(db.accounts)||!db.accounts.length){
+  db.accounts=[
+   {kode:'1-1000',nama:'Kas',jenis:'Aset',kelompok:'Kas & Setara Kas'},
+   {kode:'1-1100',nama:'Bank / QRIS',jenis:'Aset',kelompok:'Kas & Setara Kas'},
+   {kode:'1-2000',nama:'Piutang Usaha',jenis:'Aset',kelompok:'Aset Lancar'},
+   {kode:'1-3000',nama:'Persediaan Barang Dagang',jenis:'Aset',kelompok:'Persediaan'},
+   {kode:'2-1000',nama:'Utang Usaha',jenis:'Liabilitas',kelompok:'Utang Lancar'},
+   {kode:'3-1000',nama:'Modal Pemilik',jenis:'Ekuitas',kelompok:'Modal'},
+   {kode:'4-1000',nama:'Penjualan',jenis:'Pendapatan',kelompok:'Pendapatan Usaha'},
+   {kode:'5-1000',nama:'Harga Pokok Penjualan',jenis:'Beban',kelompok:'HPP'},
+   {kode:'6-1000',nama:'Beban Operasional',jenis:'Beban',kelompok:'Beban Operasional'}
+  ];save();
+ }
+ document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Daftar Akun (COA)</h1><div class="sub">Bagan akun dasar SeaMart sebagai fondasi jurnal dan laporan keuangan.</div></div></div><div class="notice">Tahap awal akuntansi. Akun ini menjadi tujuan debit/kredit saat jurnal otomatis dibangun. Saldo kas belum berubah hanya karena akun dibuat.</div><div class="panel"><div class="tablewrap"><table><thead><tr><th>Kode Akun</th><th>Nama Akun</th><th>Jenis</th><th>Kelompok</th></tr></thead><tbody>${db.accounts.map(a=>`<tr><td><b>${esc(a.kode)}</b></td><td>${esc(a.nama)}</td><td>${esc(a.jenis)}</td><td>${esc(a.kelompok)}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+function settings(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Pengaturan & Data</h1><div class="sub">Kelola data lokal dan siapkan migrasi ke database online.</div></div></div><div class="panel"><h3>Master Barang CSV</h3><p class="muted">Format kompatibel dengan master lama: <b>nama,barcode,harga,stok</b>. Kolom kode dan kategori juga didukung. Pencocokan barcode/kode akan memperbarui produk yang sama tanpa mengganti barcode yang sudah tersimpan.</p><button class="btn-primary" onclick="document.getElementById('csvfile').click()">Impor Master CSV</button> <button class="btn-light" onclick="exportCSV()">Ekspor Master CSV</button></div><div class="panel"><h3>Cadangan Data</h3><p class="muted">Unduh salinan data browser sebagai JSON untuk cadangan.</p><button class="btn-light" onclick="download('seamart-backup.json',JSON.stringify(db,null,2))">Unduh Backup JSON</button></div><div class="panel"><h3>Status Sistem</h3><div class="totalrow"><span>Antarmuka Odoo-inspired</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Penyimpanan browser</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Database cloud bersama</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div><div class="totalrow"><span>Login aman admin/kasir</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div></div><div class="panel"><h3>Zona Reset</h3><p class="muted">Menghapus seluruh data lokal pada browser ini.</p><button class="btn-danger" onclick="if(confirm('Hapus semua data SeaMart pada browser ini? Pastikan sudah membuat backup.')){db={products:[],moves:[],sales:[]};save();settings()}">Reset Data Lokal</button></div>`}
+document.getElementById('shiftAction').style.display='none';showLogin();try{page('dashboard')}catch(err){console.error('SeaMart render error:',err);document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum dapat dimuat</h3><p class="muted">Data lokal sedang diperiksa. Muat ulang halaman. Jika masih muncul, ekspor cadangan data dari menu Pengaturan & Data lalu kirimkan tangkapan layar ini.</p><button class="btn-primary" onclick="location.reload()">Muat Ulang</button></div>';}
+if(!document.getElementById('view').innerHTML.trim()){document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum tampil</h3><p class="muted">Aplikasi berhasil dibuka, tetapi isi dashboard belum dirender. Silakan kirim screenshot pesan ini.</p></div>';}
+</script>
+</body></html>
+/* Mobile navigation: expose all admin pages on phones and tablets */
+.mobile-menu-btn{display:none;background:#e8f5ef;color:#176b49;border:1px solid #cfe6d8;padding:8px 11px;border-radius:8px;font-size:13px;white-space:nowrap}
+@media(max-width:1100px){
+ .mobile-menu-btn{display:inline-flex!important;align-items:center;gap:6px}
+ .topbar{justify-content:flex-start!important;gap:10px!important}
+ .topbar .crumb{flex:1;min-width:0}
+ body.mobile-menu-open:before{content:'';position:fixed;inset:0;background:#10182080;z-index:99}
+ body.mobile-menu-open .sidebar{display:block!important;position:fixed!important;inset:0 auto 0 0!important;width:min(280px,82vw)!important;height:100dvh!important;overflow-y:auto!important;z-index:100!important;padding:16px 12px!important;box-shadow:12px 0 32px #0003}
+ body.mobile-menu-open .sidebar .brand span,body.mobile-menu-open .sidebar .navlabel,body.mobile-menu-open .sidebar .nav .navtxt,body.mobile-menu-open .sidebar .sidefoot{display:block!important}
+ body.mobile-menu-open .sidebar .brand{padding:5px 8px 22px!important}
+ body.mobile-menu-open .sidebar .brandmark{max-width:175px}
+ body.mobile-menu-open .sidebar .nav{justify-content:flex-start!important;padding:11px 12px!important}
+ body.mobile-menu-open .sidebar .nav .ico{width:18px!important}
+}
