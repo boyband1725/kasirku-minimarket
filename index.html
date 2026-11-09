@@ -346,27 +346,27 @@ async function printCashierClosing(shiftId){
  const actualInput=document.getElementById('cashierClosingActual');
  const actual=actualInput?Number(actualInput.value||0):Number(sh.actualCash??expected);
  const diff=actual-expected,fmt=n=>rupiah(Number(n)||0);
- const line=(label,value)=>({type:'text',text:label+': '+value});
+ const line=(label,value)=>({type:'text',text:label+': '+value,align:'center'});
  const content=[
   {type:'text',text:'SEAMART POS',align:'center',bold:true},
   {type:'text',text:'RINGKASAN TUTUP KASIR',align:'center',bold:true},
   {type:'text',text:'Sesi '+String(sh.id),align:'center'},
   {type:'text',text:new Date().toLocaleString('id-ID'),align:'center'},
-  {type:'text',text:'--------------------------------'},
+  {type:'text',text:'--------------------------------',align:'center'},
   line('Kasir',String(sh.nama||sh.username||'-')),
   line('Jumlah transaksi',String(sales.length)),
-  {type:'text',text:'--------------------------------'},
+  {type:'text',text:'--------------------------------',align:'center'},
   line('Penjualan tunai',fmt(cash)),
   line('Penjualan QRIS',fmt(qris)),
   line('TOTAL PENJUALAN',fmt(total)),
-  {type:'text',text:'--------------------------------'},
+  {type:'text',text:'--------------------------------',align:'center'},
   line('Modal awal kas',fmt(sh.opening)),
   line('Kas seharusnya',fmt(expected)),
   line('Uang tunai fisik',fmt(actual)),
   line('Selisih kas',diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff))),
-  {type:'text',text:'--------------------------------'},
-  {type:'text',text:'Kasir: ____________________'},
-  {type:'text',text:'Admin: ____________________'},
+  {type:'text',text:'--------------------------------',align:'center'},
+  {type:'text',text:'Kasir: ____________________',align:'center'},
+  {type:'text',text:'Admin: ____________________',align:'center'},
   {type:'feed',lines:3}
  ];
  try{
