@@ -48,6 +48,36 @@
 @media(max-width:900px){.odoo-pos-layout{grid-template-columns:1fr}.odoo-category-panel{position:static;display:flex;gap:5px;overflow-x:auto;padding:8px}.odoo-panel-label{display:none}.odoo-cat{width:auto;white-space:nowrap;flex-shrink:0}.odoo-order-panel{position:static}.odoo-order-lines{max-height:260px}.odoo-products{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))}}
 @media(max-width:520px){.odoo-pos-head{align-items:flex-start}.odoo-pos-head h1{font-size:22px}.odoo-pos-tools{flex-wrap:wrap}.odoo-pos-tools .search{flex-basis:100%}.odoo-catalog-panel{padding:10px}.odoo-product-image{height:88px}.odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+/* Mobile cashier: keep checkout reachable while browsing products */
+@media(max-width:900px){
+ .odoo-pos-layout{gap:10px}
+ .odoo-category-panel{position:sticky;top:58px;z-index:3;background:#fff;box-shadow:0 3px 12px #17212b10}
+ .odoo-catalog-panel{min-height:0}
+ .odoo-order-panel{position:sticky;bottom:6px;z-index:5;max-height:48vh;overflow:auto;box-shadow:0 -5px 24px #17212b20;border:1px solid #cfd9d3}
+ .odoo-order-head{padding:11px 13px}
+ .odoo-order-body{padding:9px 12px}
+ .odoo-order-lines{min-height:0;max-height:100px;overflow:auto}
+ .odoo-order-lines .empty{padding:12px 8px}
+ .odoo-order-panel .cartline{padding:7px 0}
+ .odoo-order-panel .grand{font-size:18px;padding-top:9px;margin-top:4px}
+ .odoo-checkout{padding:15px;font-size:16px}
+ .odoo-scan-hint{display:none}
+}
+@media(max-width:520px){
+ .odoo-pos-head{margin-bottom:12px}
+ .odoo-pos-tools{position:sticky;top:56px;z-index:4;background:var(--bg);padding:5px 0}
+ .odoo-pos-tools .field{min-height:48px}
+ .odoo-pos-tools button{min-height:44px}
+ .odoo-cat{padding:9px 11px;font-size:13px}
+ .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .odoo-product{padding:8px;min-height:0}
+ .odoo-product-image{height:70px}
+ .odoo-product-name{font-size:12px;min-height:32px}
+ .odoo-product-price{font-size:13px}
+ .odoo-order-panel{max-height:44vh}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
