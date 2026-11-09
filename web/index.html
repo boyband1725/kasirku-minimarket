@@ -122,7 +122,35 @@
  .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .odoo-product-image{height:84px!important}
 }
-.odoo-pos-layout.categories-hidden{grid-template-columns:170px minmax(0,1fr) 350px!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{display:block!important;padding:10px}.odoo-pos-layout.categories-hidden .odoo-category-panel #poscategories{display:none!important}.odoo-pos-layout.categories-hidden .odoo-category-heading{margin:0}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:none}@media(max-width:1100px){.odoo-pos-layout.categories-hidden{grid-template-columns:1fr!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{width:100%;position:static}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:block}}</style>
+.odoo-pos-layout.categories-hidden{grid-template-columns:170px minmax(0,1fr) 350px!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{display:block!important;padding:10px}.odoo-pos-layout.categories-hidden .odoo-category-panel #poscategories{display:none!important}.odoo-pos-layout.categories-hidden .odoo-category-heading{margin:0}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:none}@media(max-width:1100px){.odoo-pos-layout.categories-hidden{grid-template-columns:1fr!important}.odoo-pos-layout.categories-hidden .odoo-category-panel{width:100%;position:static}.odoo-pos-layout.categories-hidden .odoo-category-heading .odoo-panel-label{display:block}}/* SeaMart POS reference design */
+:root{--green:#087b43;--green2:#d9f8e2;--nav:#064d35;--line:#e2eee7;--shadow:0 5px 18px rgba(8,90,53,.08)}
+.sidebar{background:linear-gradient(180deg,#005b3d 0%,#06452f 100%);color:#e9fff1}
+.brand{padding-bottom:25px}
+.nav{color:#d7f3e2;border-radius:12px;padding:13px 14px}
+.nav:hover{background:#087b43;color:#fff}
+.nav.active{background:linear-gradient(135deg,#16bd53,#078b3c);color:#fff;box-shadow:0 5px 14px #002e1d55}
+.topbar{background:linear-gradient(90deg,#078a45,#10a84c);color:#fff;border-bottom:0}
+.topbar .crumb,.topbar .user{color:#fff}
+.topbar .avatar{background:#d8ffe4;color:#087b43}
+.content{background:#f5faf7}
+.odoo-pos-head h1{color:#075b36}
+.odoo-category-panel{padding:0 12px 14px;overflow:hidden;border-radius:16px}
+.odoo-category-heading{margin:0 -12px 12px;padding:15px 13px;background:linear-gradient(135deg,#079b46,#10bd55);color:#fff}
+.odoo-category-heading .odoo-panel-label{color:#fff;font-size:13px;letter-spacing:.7px}
+.category-toggle-btn{background:#fff;color:#075b36;box-shadow:none;border:1px solid #d5f3df}
+.category-toggle-btn:hover{background:#e8ffef;color:#064a2e}
+.odoo-cat{padding:11px 9px;border-radius:10px}
+.odoo-cat.active{background:#bdf7ca;color:#064d2d}
+.odoo-cat.active .odoo-cat-icon{background:#e4ffea}
+.odoo-catalog-panel,.odoo-order-panel{border-radius:16px;border-color:#e5f0e9;box-shadow:0 5px 18px rgba(8,90,53,.07)}
+.odoo-catalog-top h3{color:#075b36}
+.odoo-product{border-radius:15px;border-color:#e5efea;padding:10px;box-shadow:0 3px 10px rgba(12,82,49,.06)}
+.odoo-product:hover{border-color:#19a75a;box-shadow:0 7px 18px rgba(12,140,65,.13)}
+.odoo-product-image{background:#f4faf6;border-radius:10px}
+.odoo-product-price{background:#d8f9df;color:#075b36;border-radius:9px;padding:7px 8px;font-weight:800}
+.odoo-pos-tools .field,.odoo-pos-tools input{border-radius:13px}
+.scan-focus-btn{background:#e5ffeb;color:#075b36;border:1px solid #18a653;border-radius:12px}
+</style>
 <script>
 window.__seamartRuntimeError = '';
 window.addEventListener('error', function(e) {
