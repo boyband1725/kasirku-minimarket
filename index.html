@@ -240,6 +240,15 @@
 .product-qty-control button:disabled{opacity:.35!important;cursor:not-allowed!important;box-shadow:none!important}
 .product-qty-control .qty-value{display:flex!important;align-items:center!important;justify-content:center!important;min-height:38px!important;border:1px solid #e1eae4!important;border-radius:10px!important;background:#f8fbf9!important;color:#263a30!important;font-size:16px!important;font-weight:800!important;font-variant-numeric:tabular-nums!important}
 @media(max-width:520px){.product-qty-control{grid-template-columns:38px minmax(34px,1fr) 38px!important;gap:6px!important}.product-qty-control button{width:38px!important;min-width:38px!important;height:36px!important}.product-qty-control .qty-value{min-height:36px!important}}
+
+/* FIX: quantity controls stay on one horizontal line on every product card */
+#posproducts .odoo-product{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0!important}
+#posproducts .product-qty-control{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-width:0!important;gap:7px!important;padding:8px 0 0!important;margin:9px 0 0!important;border-top:1px solid #e8efeb!important}
+#posproducts .product-qty-control button{display:flex!important;flex:0 0 34px!important;align-items:center!important;justify-content:center!important;width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;margin:0!important;border-radius:9px!important;font-size:21px!important;line-height:1!important}
+#posproducts .product-qty-control .qty-value{display:flex!important;flex:1 1 auto!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:auto!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0 4px!important;border:1px solid #e1eae4!important;border-radius:9px!important;background:#f8fbf9!important;font-size:15px!important;font-weight:800!important}
+#posproducts .product-qty-control .qty-minus{background:#f1f7f3!important;border:1px solid #cfe4d7!important;color:#137a4c!important}
+#posproducts .product-qty-control .qty-plus{background:#10834f!important;border:1px solid #10834f!important;color:#fff!important}
+@media(max-width:520px){#posproducts .product-qty-control{gap:5px!important}#posproducts .product-qty-control button{flex-basis:32px!important;width:32px!important;min-width:32px!important;max-width:32px!important;height:32px!important;min-height:32px!important}#posproducts .product-qty-control .qty-value{height:32px!important;min-height:32px!important}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
