@@ -796,7 +796,7 @@ async function printReceiptNow(id){
  const fmt=n=>Number(n||0).toLocaleString('id-ID');
  const logoBase64=await seamartReceiptLogoBase64();
  const content=[
-  {type:'image',base64:logoBase64,align:'center'},
+  {type:'image',base64:logoBase64,align:'center',dither:false},
   
   {type:'divider'},
   {type:'row',left:'No. Transaksi',right:String(s.id)},
