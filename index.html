@@ -453,11 +453,11 @@ function toggleCashierShift(){
  if(currentShift())return closeCashierShift();
  const username=currentUser.username||'';
  const cashierName=currentUser.nama||'';
- document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><form class="modal" style="width:min(440px,100%)" onsubmit="event.preventDefault();confirmOpenCashierShift()">
- <div style="text-align:center;margin-bottom:18px"><div style="font-size:30px">🧾</div><h2 style="margin:6px 0">Buka Kasir</h2><div class="muted">Isi identitas kasir dan modal awal sebelum mulai transaksi.</div></div>
- <label style="display:block;margin:12px 0;font-weight:700">Username Kasir<input id="openShiftUsername" class="field" style="width:100%;margin-top:6px" value="${esc(username)}" readonly></label>
- <label style="display:block;margin:12px 0;font-weight:700">Nama Kasir<input id="openShiftName" class="field" style="width:100%;margin-top:6px" value="${esc(cashierName)}" required placeholder="Masukkan nama kasir"></label>
- <label style="display:block;margin:12px 0;font-weight:700">Saldo Awal / Modal Kas (Rp)<input id="openShiftBalance" class="field" style="width:100%;margin-top:6px;font-size:18px" type="number" min="0" step="1" inputmode="numeric" value="0" required placeholder="Contoh: 200000"></label>
+ document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><form class="modal" style="width:min(360px,100%);max-height:85vh;overflow:auto;padding:18px" onsubmit="event.preventDefault();confirmOpenCashierShift()">
+ <div style="text-align:center;margin-bottom:12px"><div style="font-size:24px">🧾</div><h2 style="margin:4px 0;font-size:19px">Buka Kasir</h2><div class="muted" style="font-size:12px">Isi identitas dan modal awal.</div></div>
+ <label style="display:block;margin:9px 0;font-weight:700;font-size:12px">ID Kasir / Admin<input id="openShiftUsername" class="field" style="width:100%;margin-top:5px;padding:9px 10px" value="${esc(username)}" readonly></label>
+ <label style="display:block;margin:9px 0;font-weight:700;font-size:12px">Nama Kasir / Admin<input id="openShiftName" class="field" style="width:100%;margin-top:5px;padding:9px 10px" value="${esc(cashierName)}" required placeholder="Masukkan nama"></label>
+ <label style="display:block;margin:9px 0;font-weight:700;font-size:12px">Saldo Awal / Modal Kas (Rp)<input id="openShiftBalance" class="field" style="width:100%;margin-top:5px;padding:10px;font-size:16px" type="number" min="0" step="1" inputmode="numeric" value="0" required placeholder="Contoh: 200000"></label>
  <div class="actions"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-primary" type="submit">Buka Sesi Kasir</button></div>
  </form></div>`;
  setTimeout(()=>document.getElementById('openShiftName')?.focus(),50);
