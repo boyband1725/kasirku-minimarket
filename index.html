@@ -280,6 +280,49 @@
   #view:has(#odooPosLayout){padding-bottom:46vh!important}
 }
 
+
+/* Mobile navigation: expose all admin pages on phones and tablets */
+.mobile-menu-btn{display:none;background:#e8f5ef;color:#176b49;border:1px solid #cfe6d8;padding:8px 11px;border-radius:8px;font-size:13px;white-space:nowrap}
+@media(max-width:1100px){
+ .mobile-menu-btn{display:inline-flex!important;align-items:center;gap:6px}
+ .topbar{justify-content:flex-start!important;gap:10px!important}
+ .topbar .crumb{flex:1;min-width:0}
+ body.mobile-menu-open:before{content:'';position:fixed;inset:0;background:#10182080;z-index:99}
+ body.mobile-menu-open .sidebar{display:block!important;position:fixed!important;inset:0 auto 0 0!important;width:min(280px,82vw)!important;height:100dvh!important;overflow-y:auto!important;z-index:100!important;padding:16px 12px!important;box-shadow:12px 0 32px #0003}
+ body.mobile-menu-open .sidebar .brand span,body.mobile-menu-open .sidebar .navlabel,body.mobile-menu-open .sidebar .nav .navtxt,body.mobile-menu-open .sidebar .sidefoot{display:block!important}
+ body.mobile-menu-open .sidebar .brand{padding:5px 8px 22px!important}
+ body.mobile-menu-open .sidebar .brandmark{max-width:175px}
+ body.mobile-menu-open .sidebar .nav{justify-content:flex-start!important;padding:11px 12px!important}
+ body.mobile-menu-open .sidebar .nav .ico{width:18px!important}
+}
+
+
+/* SeaMart mobile POS: keep cart and payment controls visible */
+@media(max-width:900px){
+  .odoo-order-panel{
+    position:fixed!important;
+    left:10px!important;
+    right:10px!important;
+    bottom:10px!important;
+    width:auto!important;
+    max-height:42vh!important;
+    overflow-y:auto!important;
+    z-index:999!important;
+    box-shadow:0 -6px 24px rgba(20,40,30,.22)!important;
+    border:1px solid #b9d8c6!important;
+    border-radius:16px!important;
+    background:#fff!important;
+  }
+  .odoo-order-head{padding:9px 12px!important}
+  .odoo-order-body{padding:8px 12px 12px!important}
+  .odoo-order-lines{max-height:72px!important;min-height:0!important;overflow-y:auto!important}
+  .odoo-order-lines .empty{padding:7px!important}
+  .odoo-order-panel .totalrow{padding:5px 0!important}
+  .odoo-order-panel .grand{font-size:17px!important}
+  .odoo-checkout{min-height:46px!important;padding:11px!important;font-size:15px!important}
+  .odoo-order-panel .odoo-scan-hint{display:none!important}
+  #view:has(.odoo-order-panel){padding-bottom:45vh!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -604,45 +647,3 @@ document.getElementById('shiftAction').style.display='none';showLogin();try{page
 if(!document.getElementById('view').innerHTML.trim()){document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum tampil</h3><p class="muted">Aplikasi berhasil dibuka, tetapi isi dashboard belum dirender. Silakan kirim screenshot pesan ini.</p></div>';}
 </script>
 </body></html>
-/* Mobile navigation: expose all admin pages on phones and tablets */
-.mobile-menu-btn{display:none;background:#e8f5ef;color:#176b49;border:1px solid #cfe6d8;padding:8px 11px;border-radius:8px;font-size:13px;white-space:nowrap}
-@media(max-width:1100px){
- .mobile-menu-btn{display:inline-flex!important;align-items:center;gap:6px}
- .topbar{justify-content:flex-start!important;gap:10px!important}
- .topbar .crumb{flex:1;min-width:0}
- body.mobile-menu-open:before{content:'';position:fixed;inset:0;background:#10182080;z-index:99}
- body.mobile-menu-open .sidebar{display:block!important;position:fixed!important;inset:0 auto 0 0!important;width:min(280px,82vw)!important;height:100dvh!important;overflow-y:auto!important;z-index:100!important;padding:16px 12px!important;box-shadow:12px 0 32px #0003}
- body.mobile-menu-open .sidebar .brand span,body.mobile-menu-open .sidebar .navlabel,body.mobile-menu-open .sidebar .nav .navtxt,body.mobile-menu-open .sidebar .sidefoot{display:block!important}
- body.mobile-menu-open .sidebar .brand{padding:5px 8px 22px!important}
- body.mobile-menu-open .sidebar .brandmark{max-width:175px}
- body.mobile-menu-open .sidebar .nav{justify-content:flex-start!important;padding:11px 12px!important}
- body.mobile-menu-open .sidebar .nav .ico{width:18px!important}
-}
-
-
-/* SeaMart mobile POS: keep cart and payment controls visible */
-@media(max-width:900px){
-  .odoo-order-panel{
-    position:fixed!important;
-    left:10px!important;
-    right:10px!important;
-    bottom:10px!important;
-    width:auto!important;
-    max-height:42vh!important;
-    overflow-y:auto!important;
-    z-index:999!important;
-    box-shadow:0 -6px 24px rgba(20,40,30,.22)!important;
-    border:1px solid #b9d8c6!important;
-    border-radius:16px!important;
-    background:#fff!important;
-  }
-  .odoo-order-head{padding:9px 12px!important}
-  .odoo-order-body{padding:8px 12px 12px!important}
-  .odoo-order-lines{max-height:72px!important;min-height:0!important;overflow-y:auto!important}
-  .odoo-order-lines .empty{padding:7px!important}
-  .odoo-order-panel .totalrow{padding:5px 0!important}
-  .odoo-order-panel .grand{font-size:17px!important}
-  .odoo-checkout{min-height:46px!important;padding:11px!important;font-size:15px!important}
-  .odoo-order-panel .odoo-scan-hint{display:none!important}
-  #view:has(.odoo-order-panel){padding-bottom:45vh!important}
-}
