@@ -332,6 +332,14 @@
   #modalroot{position:relative;z-index:10000!important}
   .modalback .modal{max-height:82dvh!important;padding:18px!important}
 }
+
+/* When any dialog is open, hide the floating cart so receipts are fully readable */
+@media(max-width:900px){
+  body:has(#modalroot .modalback) .odoo-order-panel{display:none!important}
+  body:has(#modalroot .modalback) #view:has(.odoo-order-panel){padding-bottom:12px!important}
+  #modalroot .modalback{z-index:2147483000!important;align-items:center!important}
+  #modalroot .modalback .modal{max-height:calc(100dvh - 32px)!important;width:calc(100vw - 32px)!important;overflow-y:auto!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
