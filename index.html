@@ -323,6 +323,15 @@
   .odoo-order-panel .odoo-scan-hint{display:none!important}
   #view:has(.odoo-order-panel){padding-bottom:45vh!important}
 }
+
+/* Fix receipt modal stacking above the fixed mobile cart */
+.modalback{z-index:10000!important;align-items:center!important;padding:14px!important;overflow-y:auto!important}
+.modalback .modal{width:min(600px,100%)!important;max-height:84dvh!important;overflow-y:auto!important;overscroll-behavior:contain!important;margin:auto!important}
+@media(max-width:900px){
+  .odoo-order-panel{z-index:20!important}
+  #modalroot{position:relative;z-index:10000!important}
+  .modalback .modal{max-height:82dvh!important;padding:18px!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
