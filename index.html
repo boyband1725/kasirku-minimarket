@@ -431,7 +431,7 @@ async function saveNewPassword(){
 (function initPasswordRecovery(){
  try{
   if(!window.supabase)return;
-  const recoveryClient=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV',{auth:{flowType:'implicit',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+  const recoveryClient=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV',{auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
   window.seamartRecoveryClient=recoveryClient;
   recoveryClient.auth.onAuthStateChange((event,session)=>{
    if(event==='PASSWORD_RECOVERY'||(session&&location.hash.includes('type=recovery')))showPasswordRecoveryForm(recoveryClient);
