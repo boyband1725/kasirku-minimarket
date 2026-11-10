@@ -539,7 +539,9 @@ async function printReceipt(id){
    {type:'row',left:String(x.qty||0)+' x '+rupiah(x.harga),right:rupiah(x.subtotal)}
   ]),
   {type:'divider'},
-  {type:'row',left:'TOTAL',right:rupiah(s.total),bold:true},
+  {type:'text',text:'TOTAL PEMBAYARAN',align:'center',bold:true},
+  {type:'text',text:rupiah(s.total),align:'center',bold:true,size:'large'},
+  {type:'divider'},
   {type:'row',left:'Pembayaran',right:String(s.pay||'Tunai')},
   {type:'divider'},
   {type:'text',text:'Terima kasih telah berbelanja',align:'center'},
