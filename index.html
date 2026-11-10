@@ -536,11 +536,12 @@ async function printReceipt(id){
   {type:'divider'},
   ...(s.items||[]).flatMap(x=>[
    {type:'text',text:String(x.nama||'Barang'),bold:true},
-   {type:'row',left:String(x.qty||0)+' x '+rupiah(x.harga),right:rupiah(x.subtotal)}
+   {type:'text',text:String(x.qty||0)+' x '+rupiah(x.harga),align:'left'},
+   {type:'text',text:'Jumlah: '+rupiah(x.subtotal),align:'center',bold:true}
   ]),
   {type:'divider'},
   {type:'text',text:'TOTAL PEMBAYARAN',align:'center',bold:true},
-  {type:'text',text:rupiah(s.total),align:'center',bold:true,size:'large'},
+  {type:'text',text:rupiah(s.total),align:'center',bold:true,size:'normal'},
   {type:'divider'},
   {type:'row',left:'Pembayaran',right:String(s.pay||'Tunai')},
   {type:'divider'},
