@@ -262,7 +262,25 @@
 #loginroot .login-card input{min-height:42px!important;padding:9px 11px!important}
 #loginroot .login-card .btn-primary{min-height:44px!important;margin-top:14px!important;padding:10px 12px!important}
 #loginroot .login-card>p{font-size:12px!important}
-.pos-clock{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:5px 11px;border:1px solid #dcebe1;background:#f4faf6;border-radius:10px;min-width:150px}.pos-clock strong{font-size:19px;line-height:1.15;color:#075b36;font-variant-numeric:tabular-nums;letter-spacing:.5px}.pos-clock span{font-size:10px;color:#61746a;text-transform:capitalize}@media(max-width:600px){.pos-clock{align-items:flex-start;min-width:0;padding:5px 8px}.pos-clock strong{font-size:16px}.pos-clock span{font-size:9px}}</style>
+.pos-clock{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:5px 11px;border:1px solid #dcebe1;background:#f4faf6;border-radius:10px;min-width:150px}.pos-clock strong{font-size:19px;line-height:1.15;color:#075b36;font-variant-numeric:tabular-nums;letter-spacing:.5px}.pos-clock span{font-size:10px;color:#61746a;text-transform:capitalize}@media(max-width:600px){.pos-clock{align-items:flex-start;min-width:0;padding:5px 8px}.pos-clock strong{font-size:16px}.pos-clock span{font-size:9px}}
+/* SeaMart fix: keep cashier cart visible on Android phones */
+@media(max-width:900px){
+  #odooPosLayout .odoo-order-panel{
+    display:block!important;visibility:visible!important;opacity:1!important;
+    position:fixed!important;left:10px!important;right:10px!important;
+    bottom:calc(10px + env(safe-area-inset-bottom, 0px))!important;
+    top:auto!important;width:auto!important;max-height:42vh!important;
+    overflow-y:auto!important;z-index:2147483000!important;
+    background:#fff!important;border:2px solid #16845b!important;
+    border-radius:16px!important;box-shadow:0 -8px 28px rgba(0,0,0,.25)!important;
+  }
+  #odooPosLayout .odoo-order-head{display:flex!important;min-height:46px!important}
+  #odooPosLayout .odoo-order-body{display:block!important}
+  #odooPosLayout .odoo-order-lines{max-height:72px!important;min-height:24px!important}
+  #view:has(#odooPosLayout){padding-bottom:46vh!important}
+}
+
+</style>
 <script>
 window.__seamartRuntimeError = '';
 window.addEventListener('error', function(e) {
