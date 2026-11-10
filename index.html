@@ -662,28 +662,25 @@ function printReceipt(id){
 async function printReceiptNow(id){
  const s=db.sales.find(x=>x.id===id);
  if(!s)return alert('Transaksi tidak ditemukan.');
+ const fmt=n=>Number(n||0).toLocaleString('id-ID');
  const content=[
   {type:'text',text:'SeaMart',align:'center',bold:true,size:'large'},
   {type:'text',text:'MINIMARKET',align:'center'},
   {type:'divider'},
-  {type:'text',text:'No: '+s.id,align:'center'},
-  {type:'text',text:String(s.time||''),align:'center'},
+  {type:'row',left:'No. Transaksi',right:String(s.id)},
+  {type:'row',left:'Tanggal',right:String(s.time||'')},
   {type:'divider'},
   ...(s.items||[]).flatMap(x=>[
    {type:'text',text:String(x.nama||'Barang'),bold:true,align:'left'},
-   {type:'text',text:String(x.qty||0)+' x '+rupiah(x.harga),align:'left'},
-   {type:'text',text:rupiah(x.subtotal),align:'right',bold:true},
-   {type:'divider'}
+   {type:'row',left:String(x.qty||0)+'x @'+fmt(x.harga),right:fmt(x.subtotal)}
   ]),
-  {type:'text',text:'TOTAL PEMBAYARAN',align:'center',bold:true},
-  {type:'text',text:rupiah(s.total),align:'center',bold:true},
   {type:'divider'},
-  {type:'text',text:'METODE PEMBAYARAN',align:'center'},
-  {type:'text',text:String(s.pay||'-'),align:'center',bold:true},
-  {type:'text',text:'UANG DITERIMA',align:'center'},
-  {type:'text',text:rupiah(s.paid??s.total),align:'center',bold:true},
-  {type:'text',text:'KEMBALIAN',align:'center'},
-  {type:'text',text:rupiah(s.change??0),align:'center',bold:true},
+  {type:'row',left:'Subtotal',right:rupiah(s.total)},
+  {type:'row',left:'TOTAL',right:rupiah(s.total),bold:true},
+  {type:'divider'},
+  {type:'row',left:'Metode',right:String(s.pay||'-')},
+  {type:'row',left:'Uang diterima',right:rupiah(s.paid??s.total)},
+  {type:'row',left:'Kembalian',right:rupiah(s.change??0),bold:true},
   {type:'divider'},
   {type:'text',text:'Terima kasih telah berbelanja',align:'center'},
   {type:'feed',lines:3}
