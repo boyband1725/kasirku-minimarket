@@ -876,12 +876,12 @@ function printStockReport(){const rows=getStockRows(),start=document.getElementB
 .sm-payment-option span{font-size:25px}.sm-payment-option b{font-size:15px}.sm-payment-option small{font-size:11px;color:#718078}
 .sm-payment-option.active{border:2px solid #087b43;background:#eff9f2;color:#087b43}
 
-/* Keep the checkout action visible in the desktop POS cart */
-@media(min-width:901px){
- #odooPosLayout .odoo-order-panel{display:flex!important;flex-direction:column!important;max-height:calc(100vh - 96px)!important;overflow:hidden!important}
- #odooPosLayout .odoo-order-body{display:block!important;flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;padding-bottom:14px!important}
- #odooPosLayout .odoo-order-body .odoo-checkout{position:sticky!important;bottom:0!important;z-index:8!important;display:block!important;width:100%!important;min-height:54px!important;margin-top:12px!important;background:#087b43!important;color:#fff!important;box-shadow:0 -5px 14px rgba(255,255,255,.95),0 4px 12px rgba(8,123,67,.22)!important}
- #odooPosLayout .odoo-order-body .btn-danger{width:100%!important}
+/* Keep checkout visible on computer and tablet-sized POS layouts */
+@media(min-width:601px){
+ #odooPosLayout .odoo-order-panel{display:flex!important;flex-direction:column!important;max-height:calc(100vh - 110px)!important;overflow:hidden!important}
+ #odooPosLayout .odoo-order-body{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;padding-bottom:12px!important}
+ #odooPosLayout .odoo-order-body .odoo-checkout{position:sticky!important;bottom:0!important;z-index:20!important;display:block!important;flex:0 0 auto!important;width:100%!important;min-height:58px!important;margin-top:auto!important;padding:14px!important;background:#087b43!important;color:#fff!important;visibility:visible!important;opacity:1!important;box-shadow:0 -5px 14px rgba(255,255,255,.98),0 4px 12px rgba(8,123,67,.22)!important}
+ #odooPosLayout .odoo-order-body .btn-danger{width:100%!important;flex:0 0 auto!important}
 }
 </style></head><body><h2>SEAMART — POSISI DAN MUTASI STOK BARANG</h2><p>Periode: ${start} – ${end}</p><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kelompok</th><th>Awal Qty</th><th>Awal Nilai</th><th>Masuk Qty</th><th>Masuk Nilai</th><th>Keluar Qty</th><th>Keluar Nilai</th><th>Akhir Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${cells}</tbody></table><script>window.print()<\\/script></body></html>`);w.document.close()}
 function moveModal(){let opts=db.products.map(p=>`<option value="${p.id}">${esc(p.nama)}</option>`).join('');document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>Catat Mutasi Stok</h2><label>Produk<select id="m_prod" class="field" style="width:100%;margin:6px 0 12px">${opts}</select></label><label>Jenis<select id="m_type" class="field" style="width:100%;margin:6px 0 12px"><option>Masuk / Pembelian</option><option>Keluar / Mutasi Cabang</option><option>Penyesuaian Stok</option></select></label><label>Jumlah<input id="m_qty" type="number" min="1" class="field" style="width:100%;margin:6px 0 12px"></label><label>Keterangan<input id="m_note" class="field" style="width:100%;margin:6px 0"></label><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveMove()">Simpan Mutasi</button></div></div></div>`}
