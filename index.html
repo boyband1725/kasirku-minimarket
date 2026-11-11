@@ -656,7 +656,7 @@ db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
 db.cashflows=Array.isArray(db.cashflows)?db.cashflows:[];
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
-async function syncOneProduct(p,categoryCache){
+async function syncOneProduct(p,categoryCache=new Map()){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
