@@ -666,6 +666,17 @@ async function syncOneProduct(p,categoryCache){
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
+function updateSeaMartSyncProgress(percent,message){
+ const root=document.getElementById('loginroot');if(!root)return;
+ let panel=document.getElementById('seamartSyncProgress');
+ if(!panel){
+  panel=document.createElement('div');panel.id='seamartSyncProgress';
+  panel.style.cssText='margin-top:14px;padding:12px;border:1px solid #cfe6d8;border-radius:10px;background:#f5fbf7';
+  const card=root.querySelector('.login-card');if(card)card.appendChild(panel);
+ }
+ const pct=Math.max(0,Math.min(100,Math.round(percent)));
+ panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;color:#075b36;margin-bottom:8px"><span>'+String(message||'Sinkronisasi data')+'</span><span>'+pct+'%</span></div><div style="height:10px;background:#dfeee5;border-radius:20px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#16845b,#65bd83);border-radius:20px;transition:width .2s"></div></div>';
+}
 async function syncAllProducts(existingRows=[]){
  const norm=v=>String(v??'').trim();
  const seenIds=new Set(existingRows.map(r=>norm(r.id)).filter(Boolean));
@@ -676,7 +687,11 @@ async function syncAllProducts(existingRows=[]){
   if(id&&seenIds.has(id)){summary.skipped++;continue;}
   candidates.push({p,index:i});
  }
+ const total=candidates.length;
+ updateSeaMartSyncProgress(0,'Menyiapkan '+db.products.length+' produk');
+ if(!total){updateSeaMartSyncProgress(100,'Semua produk sudah ada');return summary;}
  const categoryCache=new Map();
+ let completed=0;
  for(let i=0;i<candidates.length;i+=20){
   const batch=candidates.slice(i,i+20);
   const results=await Promise.allSettled(batch.map(async item=>{
@@ -692,8 +707,10 @@ async function syncAllProducts(existingRows=[]){
    if(result.status==='fulfilled')summary.added++;
    else{summary.failed++;if(summary.errors.length<10)summary.errors.push((item.p.nama||item.p.kode||('Baris '+(item.index+1)))+': '+(result.reason?.message||String(result.reason)));}
   });
-  save();
+  completed+=batch.length;save();
+  updateSeaMartSyncProgress(completed/total*100,'Mengirim produk '+completed+' dari '+total);
  }
+ updateSeaMartSyncProgress(100,summary.failed?'Selesai dengan '+summary.failed+' produk gagal':'Sinkronisasi selesai');
  if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
  return summary;
 }
