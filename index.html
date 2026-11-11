@@ -487,12 +487,20 @@ function closeCashierShift(){
  <label style="display:grid;gap:7px;margin-top:14px;font-weight:700">Uang tunai fisik di laci (Rp)<input id="cashierClosingActual" type="number" min="0" step="1" inputmode="numeric" value="${expected}" oninput="updateCloseCashierDifference()" style="width:100%;padding:13px;border:1px solid #cbd8d0;border-radius:9px;font-size:18px"></label>
  <div class="totalrow" style="margin-top:12px;background:#f3f8f5;padding:12px;border-radius:8px"><b>Selisih kas</b><b id="closingDifferenceValue">Seimbang</b></div></div>
  <div style="margin-top:14px;padding:11px;background:#fff8e8;border-radius:9px;color:#72531b;font-size:12px">QRIS tidak dihitung sebagai uang tunai di laci. Pastikan jumlah uang fisik sudah dihitung sebelum menyelesaikan tutup kasir.</div>
- <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:14px"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button><button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button></div>
+ <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:14px"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-light" type="button" onclick="connectWindowsReceiptPrinter()">Pilih Printer PC</button><button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button><button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button></div>
  </div></div>`;
  updateCloseCashierDifference();
 }
 function updateCloseCashierDifference(){const sh=currentShift(),input=document.getElementById('cashierClosingActual'),out=document.getElementById('closingDifferenceValue');if(!sh||!input||!out)return;const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime())),cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0),expected=Number(sh.opening||0)+cash,actual=Number(input.value||0),diff=actual-expected;out.textContent=diff===0?'Seimbang':(diff>0?'Lebih '+rupiah(diff):'Kurang '+rupiah(Math.abs(diff)));out.style.color=diff===0?'#16845b':'#b45309';}
 function finalizeCashierClosing(shiftId){const sh=currentShift();if(!sh||sh.id!==shiftId)return alert('Sesi kasir tidak ditemukan.');const input=document.getElementById('cashierClosingActual');if(!input||input.value===''||!Number.isFinite(Number(input.value))||Number(input.value)<0)return alert('Masukkan jumlah uang tunai fisik yang valid.');const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime())),cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0),qris=sales.filter(x=>String(x.pay||'').toUpperCase()==='QRIS').reduce((a,x)=>a+Number(x.total||0),0),actual=Number(input.value),expected=Number(sh.opening||0)+cash;sh.closedAt=new Date().toISOString();sh.status='closed';sh.transactionCount=sales.length;sh.cashSales=cash;sh.qrisSales=qris;sh.totalSales=cash+qris;sh.expectedCash=expected;sh.actualCash=actual;sh.difference=actual-expected;save();updateShiftButton();document.getElementById('modalroot').innerHTML='<div class="modalback" style="position:fixed;inset:0;background:#17212b99;z-index:100001;display:grid;place-items:center;padding:16px"><div class="modal" style="width:min(100%,520px);background:#fff;border-radius:16px;padding:24px;text-align:center"><div style="font-size:42px;color:#16845b">✓</div><h2>Kasir berhasil ditutup</h2><p class="muted">Ringkasan sesi tersimpan di perangkat ini.</p><div class="totalrow"><span>Total penjualan</span><b>'+rupiah(sh.totalSales)+'</b></div><div class="totalrow"><span>Kas seharusnya</span><b>'+rupiah(sh.expectedCash)+'</b></div><div class="totalrow"><span>Kas fisik</span><b>'+rupiah(sh.actualCash)+'</b></div><div class="totalrow"><span>Selisih</span><b>'+(sh.difference===0?'Seimbang':(sh.difference>0?'Lebih ':'Kurang ')+rupiah(Math.abs(sh.difference)))+'</b></div><div class="actions" style="justify-content:center"><button class="btn-light" onclick="closeModal()">Selesai</button><button class="btn-primary" onclick="printCashierClosing(\''+sh.id+'\')">Cetak Ringkasan</button></div></div></div>';}
+async function seamartPrintClosingWindowsSerial(lines){
+ if(!seamartWindowsSerialPort||!seamartWindowsSerialPort.writable)throw new Error('Printer PC belum dipilih. Klik Pilih Printer PC terlebih dahulu.');
+ const enc=new TextEncoder(),parts=[],add=(...a)=>parts.push(new Uint8Array(a)),line=t=>{parts.push(enc.encode(String(t)));add(10);};
+ add(27,64,27,97,1);line('SEAMART POS');line('RINGKASAN TUTUP KASIR');add(27,97,0);line('--------------------------------');
+ lines.forEach(x=>line(x));line('--------------------------------');add(27,97,1);line('Terima kasih');add(27,97,0);add(10,10,10,29,86,66,0);
+ const bytes=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let off=0;for(const p of parts){bytes.set(p,off);off+=p.length;}
+ const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
+}
 async function printCashierClosing(shiftId){
  const sh=db.shifts.find(x=>x.id===shiftId);if(!sh)return alert('Data sesi kasir tidak ditemukan.');
  const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime()));
@@ -526,6 +534,12 @@ async function printCashierClosing(shiftId){
   {type:'feed',lines:3}
  ];
  try{
+  if(seamartWindowsSerialPort){await seamartPrintClosingWindowsSerial([
+   'Sesi: '+String(sh.id),'Kasir: '+String(sh.nama||sh.username||'-'),'Jumlah transaksi: '+sales.length,
+   'Penjualan tunai: '+fmt(cash),'Penjualan QRIS: '+fmt(qris),'TOTAL: '+fmt(total),
+   'Modal awal: '+fmt(sh.opening),'Kas seharusnya: '+fmt(expected),'Uang fisik: '+fmt(actual),
+   'Selisih: '+(diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff)))
+  ]);alert('Ringkasan tutup kasir berhasil dikirim ke printer PC.');return;}
   const health=await fetch('http://localhost:9100/health',{signal:AbortSignal.timeout(2500)});
   if(!health.ok)throw new Error('Aplikasi penghubung printer tidak merespons.');
   const status=await health.json();
