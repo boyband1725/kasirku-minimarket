@@ -644,64 +644,51 @@ db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
 db.cashflows=Array.isArray(db.cashflows)?db.cashflows:[];
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
-async function syncOneProduct(p){
+async function syncOneProduct(p,categoryCache){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
  let categoryId=null;
  if(p.kategori&&p.kategori!=='Umum'){
-  const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',p.kategori).limit(1).maybeSingle();
-  if(c.error)throw c.error;
-  if(c.data)categoryId=c.data.id;
- }
- const row={id:p.id,store_id:store,code:p.kode||null,barcode:p.barcode||null,name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
- const result=await sb.from('products').upsert(row,{onConflict:'id'});
- if(result.error)throw result.error;
-}
-async function syncOneProduct(p){
- const sb=window.seamartSupabase,store=window.seamartStoreId;
- if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
- if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
- let categoryId=null;
- if(p.kategori&&p.kategori!=='Umum'){
-  const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',p.kategori).limit(1).maybeSingle();
-  if(c.error)throw c.error;
-  if(c.data)categoryId=c.data.id;
+  const key=String(p.kategori);
+  if(!categoryCache.has(key))categoryCache.set(key,(async()=>{const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',key).limit(1).maybeSingle();if(c.error)throw c.error;return c.data?.id||null;})());
+  categoryId=await categoryCache.get(key);
  }
  const row={id:p.id,store_id:store,code:p.kode||null,barcode:p.barcode||null,name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
 async function syncAllProducts(existingRows=[]){
- const sb=window.seamartSupabase,store=window.seamartStoreId;
- if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
- const rows=[...existingRows];
  const norm=v=>String(v??'').trim();
- const seenIds=new Set(rows.map(r=>norm(r.id)).filter(Boolean));
- const seenCodes=new Set(rows.map(r=>norm(r.code)).filter(Boolean));
- const seenBarcodes=new Set(rows.map(r=>norm(r.barcode)).filter(Boolean));
+ const seenIds=new Set(existingRows.map(r=>norm(r.id)).filter(Boolean));
+ const seenCodes=new Set(existingRows.map(r=>norm(r.code)).filter(Boolean));
+ const seenBarcodes=new Set(existingRows.map(r=>norm(r.barcode)).filter(Boolean));
+ const candidates=[];
  const summary={added:0,skipped:0,failed:0,errors:[]};
  for(let i=0;i<db.products.length;i++){
   const p=db.products[i],id=norm(p.id),code=norm(p.kode),barcode=norm(p.barcode);
-  if((id&&seenIds.has(id))||(code&&seenCodes.has(code))||(barcode&&seenBarcodes.has(barcode))){
-   summary.skipped++;
-   continue;
-  }
-  let error=null;
-  for(let attempt=0;attempt<3;attempt++){
-   try{await syncOneProduct(p);error=null;break;}
-   catch(e){error=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));}
-  }
-  if(error){
-   summary.failed++;
-   if(summary.errors.length<10)summary.errors.push((p.nama||code||('Baris '+(i+1)))+': '+(error.message||String(error)));
-  }else{
-   summary.added++;
-   seenIds.add(norm(p.id));if(code)seenCodes.add(code);if(barcode)seenBarcodes.add(barcode);
-   rows.push({id:p.id,code:p.kode||null,barcode:p.barcode||null});
-  }
+  if((id&&seenIds.has(id))||(code&&seenCodes.has(code))||(barcode&&seenBarcodes.has(barcode))){summary.skipped++;continue;}
+  if(id)seenIds.add(id);if(code)seenCodes.add(code);if(barcode)seenBarcodes.add(barcode);
+  candidates.push({p,index:i});
  }
- save();
+ const categoryCache=new Map();
+ for(let i=0;i<candidates.length;i+=20){
+  const batch=candidates.slice(i,i+20);
+  const results=await Promise.allSettled(batch.map(async item=>{
+   let lastError;
+   for(let attempt=0;attempt<3;attempt++){
+    try{await syncOneProduct(item.p,categoryCache);return;}
+    catch(e){lastError=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,400*(attempt+1)));}
+   }
+   throw lastError;
+  }));
+  results.forEach((result,j)=>{
+   const item=batch[j];
+   if(result.status==='fulfilled')summary.added++;
+   else{summary.failed++;if(summary.errors.length<10)summary.errors.push((item.p.nama||item.p.kode||('Baris '+(item.index+1)))+': '+(result.reason?.message||String(result.reason)));}
+  });
+  save();
+ }
  if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
  return summary;
 }
