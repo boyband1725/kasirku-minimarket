@@ -1003,7 +1003,7 @@ function completeCheckout(pay,paid){
  db.cashflows.push(saleCash);save();
  if(window.seamartCashFlowSyncReady)syncCashFlowEntry(saleCash).catch(e=>alert('Transaksi tersimpan, tetapi arus kas belum tersinkron: '+(e.message||e)));
  cart=[];
- document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Metode: ${esc(pay)}</p><div class="totalrow"><span>Uang diterima</span><b>${rupiah(paid)}</b></div><div class="totalrow"><span>Kembalian</span><b>${rupiah(change)}</b></div><div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Struk</button></div></div></div>`;
+ document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Metode: ${esc(pay)}</p>${pay==='Tunai'?'<div class="totalrow"><span>Uang diterima</span><b>'+rupiah(paid)+'</b></div><div class="totalrow"><span>Kembalian</span><b>'+rupiah(change)+'</b></div>':''}<div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Struk</button></div></div></div>`;
  renderCart();
 }
 
