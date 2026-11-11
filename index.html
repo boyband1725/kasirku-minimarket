@@ -663,7 +663,7 @@ async function syncOneProduct(p,categoryCache){
   if(!categoryCache.has(key))categoryCache.set(key,(async()=>{const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',key).limit(1).maybeSingle();if(c.error)throw c.error;return c.data?.id||null;})());
   categoryId=await categoryCache.get(key);
  }
- const row={id:p.id,store_id:store,code:p.kode||null,barcode:String(p.barcode||'').trim(),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
+ const row={id:p.id,store_id:store,code:p.kode||null,barcode:(String(p.barcode||'').trim()||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
