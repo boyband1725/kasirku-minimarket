@@ -1170,6 +1170,37 @@ function printStockReport(){const rows=getStockRows(),start=document.getElementB
  #odooPosLayout .odoo-order-body #checkoutBtn{position:static!important;margin-top:6px!important;min-height:48px!important}
  #odooPosLayout .odoo-order-body>.btn-danger{margin-top:5px!important}
 }
+
+/* Checkout always visible on a PC/laptop even when browser zoom narrows CSS viewport */
+@media(min-width:601px){
+ #odooPosLayout aside.odoo-order-panel{
+  position:fixed!important;top:76px!important;right:12px!important;bottom:12px!important;
+  width:clamp(280px,32vw,365px)!important;height:auto!important;
+  max-height:none!important;min-height:0!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;z-index:100!important;
+  background:#fff!important
+ }
+ #odooPosLayout aside.odoo-order-panel .odoo-order-head{flex:0 0 auto!important}
+ #odooPosLayout aside.odoo-order-panel .odoo-order-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  min-height:0!important;height:auto!important;max-height:none!important;
+  overflow:hidden!important;padding:8px 11px!important
+ }
+ #odooPosLayout aside.odoo-order-panel .odoo-order-lines{
+  flex:1 1 70px!important;min-height:35px!important;height:auto!important;
+  max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain!important
+ }
+ #odooPosLayout aside.odoo-order-panel .totalrow,
+ #odooPosLayout aside.odoo-order-panel .odoo-pay-label,
+ #odooPosLayout aside.odoo-order-panel #paymethod,
+ #odooPosLayout aside.odoo-order-panel #cashPaymentFields,
+ #odooPosLayout aside.odoo-order-panel #checkoutBtn,
+ #odooPosLayout aside.odoo-order-panel .btn-danger{flex:0 0 auto!important}
+ #odooPosLayout aside.odoo-order-panel #cashPaymentFields{padding:6px 8px!important;margin:5px 0!important}
+ #odooPosLayout aside.odoo-order-panel #cashReceived{min-height:38px!important;margin:4px 0!important}
+ #odooPosLayout aside.odoo-order-panel #checkoutBtn{display:block!important;position:static!important;min-height:48px!important;margin:6px 0 0!important}
+ #odooPosLayout aside.odoo-order-panel .btn-danger{margin:5px 0 0!important}
+}
 </style></head><body><h2>SEAMART — POSISI DAN MUTASI STOK BARANG</h2><p>Periode: ${start} – ${end}</p><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kelompok</th><th>Awal Qty</th><th>Awal Nilai</th><th>Masuk Qty</th><th>Masuk Nilai</th><th>Keluar Qty</th><th>Keluar Nilai</th><th>Akhir Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${cells}</tbody></table><script>window.print()<\\/script></body></html>`);w.document.close()}
 function moveModal(){let opts=db.products.map(p=>`<option value="${p.id}">${esc(p.nama)}</option>`).join('');document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>Catat Mutasi Stok</h2><label>Produk<select id="m_prod" class="field" style="width:100%;margin:6px 0 12px">${opts}</select></label><label>Jenis<select id="m_type" class="field" style="width:100%;margin:6px 0 12px"><option>Masuk / Pembelian</option><option>Keluar / Mutasi Cabang</option><option>Penyesuaian Stok</option></select></label><label>Jumlah<input id="m_qty" type="number" min="1" class="field" style="width:100%;margin:6px 0 12px"></label><label>Keterangan<input id="m_note" class="field" style="width:100%;margin:6px 0"></label><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveMove()">Simpan Mutasi</button></div></div></div>`}
 function saveMove(){let p=db.products.find(x=>x.id===document.getElementById('m_prod').value),type=document.getElementById('m_type').value,q=Number(document.getElementById('m_qty').value);if(!p||q<=0)return alert('Pilih produk dan jumlah yang valid.');let delta=0;if(type==='Masuk / Pembelian'){p.stok+=q;delta=q}else if(type==='Keluar / Mutasi Cabang'){if(p.stok<q)return alert('Stok tidak cukup.');p.stok-=q;delta=-q}else{let before=Number(p.stok||0);p.stok=q;delta=q-before}db.moves.push({time:dateNow(),at:new Date().toISOString(),produk:p.nama,jenis:type,qty:q,delta,keterangan:document.getElementById('m_note').value});save();closeModal();stock()}
