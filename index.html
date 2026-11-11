@@ -396,7 +396,7 @@ window.addEventListener('error', function(e) {
  <div class="sidefoot">SeaMart POS · Web Preview</div>
 </aside>
 <main class="main">
- <header class="topbar"><button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div><div class="user"><span id="sessionUser">Belum login</span><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header>
+ <header class="topbar"><button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div><div class="user"><span id="sessionUser">Belum login</span><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header>
  <section class="content">
  <div class="notice">Mode pratinjau web: data tersimpan di browser perangkat ini. Login aman, database cloud multi-perangkat, dan sinkronisasi online perlu konfigurasi server sebelum dipakai untuk operasional.</div>
  <div id="view"></div>
@@ -1280,6 +1280,39 @@ function accounts(){
   ];save();
  }
  document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Daftar Akun (COA)</h1><div class="sub">Bagan akun dasar SeaMart sebagai fondasi jurnal dan laporan keuangan.</div></div></div><div class="notice">Tahap awal akuntansi. Akun ini menjadi tujuan debit/kredit saat jurnal otomatis dibangun. Saldo kas belum berubah hanya karena akun dibuat.</div><div class="panel"><div class="tablewrap"><table><thead><tr><th>Kode Akun</th><th>Nama Akun</th><th>Jenis</th><th>Kelompok</th></tr></thead><tbody>${db.accounts.map(a=>`<tr><td><b>${esc(a.kode)}</b></td><td>${esc(a.nama)}</td><td>${esc(a.jenis)}</td><td>${esc(a.kelompok)}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+async function accountSettings(){
+ if(!currentUser){showLogin();return;}
+ const sb=window.seamartSupabase;
+ if(!sb){alert('Sesi akun belum terhubung. Silakan login ulang.');return;}
+ let email='';
+ try{const {data,error}=await sb.auth.getUser();if(error)throw error;email=data.user?.email||'';}catch(e){alert(e.message||'Gagal membaca akun.');return;}
+ document.getElementById('crumb').textContent='Akun Saya';
+ document.querySelectorAll('.nav').forEach(b=>b.classList.remove('active'));
+ document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Akun Saya</h1><div class="sub">Ubah identitas login dan keamanan akun SeaMart.</div></div><button class="btn-light" onclick="page(currentUser.role==='kasir'?'kasir':'dashboard')">Kembali</button></div>
+ <div class="panel"><h3>Username / Email Login</h3><p class="muted">Email baru akan aktif setelah tautan konfirmasi dari Supabase disetujui.</p><form onsubmit="event.preventDefault();saveAccountIdentity()"><label class="muted">Nama pengguna</label><input id="accountName" class="field" style="width:100%;margin:6px 0 14px" maxlength="80" required value="${esc(currentUser.nama||'')}"><label class="muted">Username (email login)</label><input id="accountEmail" class="field" style="width:100%;margin:6px 0 14px" type="email" required value="${esc(email)}"><button id="saveIdentityBtn" class="btn-primary" type="submit">Simpan Identitas</button><p id="identityStatus" class="muted" style="margin-top:10px"></p></form></div>
+ <div class="panel"><h3>Ganti Password</h3><form onsubmit="event.preventDefault();saveAccountPassword()"><label class="muted">Password baru</label><input id="accountPassword" class="field" style="width:100%;margin:6px 0 12px" type="password" minlength="8" autocomplete="new-password" required placeholder="Minimal 8 karakter"><label class="muted">Ulangi password baru</label><input id="accountPasswordConfirm" class="field" style="width:100%;margin:6px 0 14px" type="password" minlength="8" autocomplete="new-password" required placeholder="Ketik ulang password baru"><button id="savePasswordBtn" class="btn-primary" type="submit">Ganti Password</button><p id="passwordStatus" class="muted" style="margin-top:10px"></p></form></div>`;
+}
+async function saveAccountIdentity(){
+ const sb=window.seamartSupabase, name=document.getElementById('accountName').value.trim(), email=document.getElementById('accountEmail').value.trim(), status=document.getElementById('identityStatus'), btn=document.getElementById('saveIdentityBtn');
+ if(!sb||!name||!email)return;
+ btn.disabled=true;btn.textContent='Menyimpan…';status.textContent='';
+ try{
+  const {data,error}=await sb.auth.updateUser({email,data:{name}});if(error)throw error;
+  currentUser.nama=name;document.getElementById('sessionUser').textContent=name+' · '+(currentUser.role==='admin'?'Admin':'Kasir');document.getElementById('sessionAvatar').textContent=name.slice(0,1).toUpperCase();
+  status.textContent=data.user?.new_email?'Nama diperbarui. Konfirmasi perubahan email melalui tautan yang dikirim ke email baru.':'Nama pengguna berhasil diperbarui.';
+ }catch(e){status.textContent=e.message||'Gagal memperbarui identitas.';}
+ finally{btn.disabled=false;btn.textContent='Simpan Identitas';}
+}
+async function saveAccountPassword(){
+ const sb=window.seamartSupabase, password=document.getElementById('accountPassword').value, confirmPassword=document.getElementById('accountPasswordConfirm').value, status=document.getElementById('passwordStatus'), btn=document.getElementById('savePasswordBtn');
+ if(!sb)return;
+ if(password.length<8){status.textContent='Password minimal 8 karakter.';return;}
+ if(password!==confirmPassword){status.textContent='Konfirmasi password tidak sama.';return;}
+ btn.disabled=true;btn.textContent='Memperbarui…';status.textContent='';
+ try{const {error}=await sb.auth.updateUser({password});if(error)throw error;document.getElementById('accountPassword').value='';document.getElementById('accountPasswordConfirm').value='';status.textContent='Password berhasil diganti. Gunakan password baru saat login berikutnya.';}
+ catch(e){status.textContent=e.message||'Gagal mengganti password.';}
+ finally{btn.disabled=false;btn.textContent='Ganti Password';}
 }
 function settings(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Pengaturan & Data</h1><div class="sub">Kelola data lokal dan siapkan migrasi ke database online.</div></div></div><div class="panel"><h3>Master Barang CSV</h3><p class="muted">Format kompatibel dengan master lama: <b>nama,barcode,harga,stok</b>. Kolom kode dan kategori juga didukung. Pencocokan barcode/kode akan memperbarui produk yang sama tanpa mengganti barcode yang sudah tersimpan.</p><button class="btn-primary" onclick="document.getElementById('csvfile').click()">Impor Master CSV</button> <button class="btn-light" onclick="exportCSV()">Ekspor Master CSV</button></div><div class="panel"><h3>Cadangan Data</h3><p class="muted">Unduh salinan data browser sebagai JSON untuk cadangan.</p><button class="btn-light" onclick="download('seamart-backup.json',JSON.stringify(db,null,2))">Unduh Backup JSON</button></div><div class="panel"><h3>Status Sistem</h3><div class="totalrow"><span>Antarmuka Odoo-inspired</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Penyimpanan browser</span><span class="pill">Aktif</span></div><div class="totalrow"><span>Database cloud bersama</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div><div class="totalrow"><span>Login aman admin/kasir</span><span class="pill" style="background:#fff3e8;color:#a65d1c">Belum dikonfigurasi</span></div></div><div class="panel"><h3>Zona Reset</h3><p class="muted">Menghapus seluruh data lokal pada browser ini.</p><button class="btn-danger" onclick="if(confirm('Hapus semua data SeaMart pada browser ini? Pastikan sudah membuat backup.')){db={products:[],moves:[],sales:[]};save();settings()}">Reset Data Lokal</button></div>`}
 document.getElementById('shiftAction').style.display='none';showLogin();try{page('dashboard')}catch(err){console.error('SeaMart render error:',err);document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum dapat dimuat</h3><p class="muted">Data lokal sedang diperiksa. Muat ulang halaman. Jika masih muncul, ekspor cadangan data dari menu Pengaturan & Data lalu kirimkan tangkapan layar ini.</p><button class="btn-primary" onclick="location.reload()">Muat Ulang</button></div>';}
