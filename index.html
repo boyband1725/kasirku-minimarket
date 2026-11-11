@@ -805,13 +805,14 @@ async function seamartPrintWindowsSerial(s){
  const px=ctx.getImageData(0,0,w,h).data,bpr=Math.ceil(w/8),raster=new Uint8Array(bpr*h);
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if((.299*px[i]+.587*px[i+1]+.114*px[i+2])<175)raster[y*bpr+(x>>3)]|=128>>(x&7);}
  const parts=[],enc=new TextEncoder(),add=a=>parts.push(a instanceof Uint8Array?a:new Uint8Array(a)),cmd=(...a)=>add(a),line=t=>{add(enc.encode(String(t)));cmd(10);},money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
- cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10,27,97,0);
- line('--------------------------------');line('No: '+s.id);line('Tanggal: '+(s.time||''));line('--------------------------------');
- (s.items||[]).forEach(it=>{line(String(it.nama||'Barang'));line(String(it.qty||0)+' x '+money(it.harga)+' = '+money(it.subtotal));});
+ cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10);
+ cmd(27,97,1);line('SEAMART');line('');cmd(27,97,0);
+ line('--------------------------------');line('Tanggal / Jam');line(String(s.time||''));line('No. Struk: '+String(s.id));line('--------------------------------');
+ (s.items||[]).forEach(it=>{line(String(it.nama||'Barang'));row(String(it.qty||0)+' x @'+money(it.harga),money(it.subtotal));});
  const rule='--------------------------------';
  const row=(label,value)=>{const left=String(label),right=String(value),width=32;const gap=Math.max(1,width-left.length-right.length);line(left.slice(0,width-1-right.length)+' '.repeat(gap)+right.slice(-Math.min(right.length,width-2)));};
  line(rule);row('Subtotal',money(s.total));cmd(29,33,16);row('TOTAL',money(s.total));cmd(29,33,0);
- cmd(27,97,0);line('');line(rule);line('RINCIAN PEMBAYARAN');row('Metode',String(s.pay||'-'));row('Uang diterima',money(s.paid??s.total));row('Kembalian',money(s.change??0));line(rule);
+ line(rule);row('Metode',String(s.pay||'-'));row('Uang diterima',money(s.paid??s.total));row('Kembalian',money(s.change??0));line(rule);
  cmd(27,97,1);line('Terima kasih telah berbelanja');cmd(27,97,0,10,10,10,29,86,66,0);
  const bytes=parts.reduce((a,b)=>{const n=new Uint8Array(a.length+b.length);n.set(a);n.set(b,a.length);return n;},new Uint8Array());
  const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
@@ -823,21 +824,20 @@ async function printReceiptNow(id){
  const logoBase64=await seamartReceiptLogoBase64();
  const content=[
   {type:'image',base64:logoBase64,align:'center',dither:false},
-  
+  {type:'text',text:'SEAMART',bold:true,align:'center'},
   {type:'divider'},
-  {type:'row',left:'No. Transaksi',right:String(s.id)},
-  {type:'row',left:'Tanggal',right:String(s.time||'')},
+  {type:'text',text:'Tanggal / Jam',align:'left'},
+  {type:'text',text:String(s.time||''),align:'left'},
+  {type:'row',left:'No. Struk',right:String(s.id)},
   {type:'divider'},
   ...(s.items||[]).flatMap(x=>[
    {type:'text',text:String(x.nama||'Barang'),bold:true,align:'left'},
-   {type:'row',left:String(x.qty||0)+'x @'+fmt(x.harga),right:fmt(x.subtotal)}
+   {type:'row',left:String(x.qty||0)+' x @'+fmt(x.harga),right:fmt(x.subtotal)}
   ]),
   {type:'divider'},
   {type:'row',left:'Subtotal',right:rupiah(s.total)},
   {type:'row',left:'TOTAL',right:rupiah(s.total),bold:true},
-  {type:'feed',lines:1},
   {type:'divider'},
-  {type:'text',text:'RINCIAN PEMBAYARAN',bold:true,align:'left'},
   {type:'row',left:'Metode',right:String(s.pay||'-')},
   {type:'row',left:'Uang diterima',right:rupiah(s.paid??s.total)},
   {type:'row',left:'Kembalian',right:rupiah(s.change??0),bold:true},
