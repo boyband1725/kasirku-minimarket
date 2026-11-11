@@ -1088,7 +1088,7 @@ async function printReceiptNow(id){
   console.error('Cleanter print error:',err);
   const msg=String(err&&err.message||err);
   if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('Load failed')){
-   alert('Tidak dapat terhubung ke Cleanter. Pastikan Cleanter Running, printer Connected, dan SeaMart dibuka di HP yang sama.');
+   alert('Tidak dapat terhubung ke Cleanter di komputer ini. Jalankan Cleanter di komputer yang sama dengan browser SeaMart, pastikan printer Connected, lalu coba Cetak Lagi.');
   }else{
    alert('Struk belum tercetak: '+msg);
   }
