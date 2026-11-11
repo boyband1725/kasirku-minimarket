@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SeaMart — Belanja Online</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#202a30;background:#f5f8f6;--g:#16845b;--line:#e4ebe7}
+*{box-sizing:border-box}body{margin:0}.top{background:#fff;border-bottom:1px solid var(--line);padding:15px max(18px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:2}.brand{font-size:22px;font-weight:900;color:var(--g)}.brand span{color:#a1d52a}.wrap{max-width:1120px;margin:auto;padding:24px 18px}.hero{background:#e9f6ee;border-radius:16px;padding:24px;margin-bottom:20px}.hero h1{margin:0 0 6px;font-size:25px}.hero p{margin:0;color:#557064}.tools{display:flex;gap:10px;margin:18px 0}.tools input{flex:1;min-width:0}.field{border:1px solid #dce5df;border-radius:9px;padding:12px;background:#fff;font:inherit;width:100%}.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.item,.cart{background:white;border:1px solid var(--line);border-radius:12px;padding:14px}.item h3{font-size:14px;margin:0 0 8px;min-height:38px}.price{color:var(--g);font-weight:800}.stock{font-size:11px;color:#77857d;margin:5px 0 12px}.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--g);color:#fff;font-weight:700;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.item .btn{width:100%}.cart h2{font-size:17px;margin:0 0 12px}.line{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.line button{border:0;background:#f1f4f2;border-radius:6px}.sum{display:flex;justify-content:space-between;font-weight:900;padding:15px 0}.cart label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px}.cart .btn{width:100%;margin-top:12px}.hint,.status{font-size:12px;color:#66756d;line-height:1.5}.error{color:#b42318}.empty{color:#7b8981;text-align:center;padding:25px}.hide{display:none}.overlay{position:fixed;inset:0;background:#17231e88;display:grid;place-items:center;padding:20px;z-index:4}.dialog{background:#fff;padding:22px;border-radius:14px;max-width:420px;width:100%}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.cart{order:-1}.products{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:16px 12px}.hero{padding:18px}.hero h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">Sea<span>$</span>Mart</div><strong>Belanja Online</strong></header>
+<main class="wrap">
+<section class="hero"><h1>Belanja kebutuhan harian lebih mudah</h1><p>Pilih produk, masukkan ke keranjang, lalu buat pesanan ke SeaMart.</p></section>
+<div id="notice" class="status">Memuat katalog...</div>
+<div class="tools"><input id="search" class="field" placeholder="Cari nama barang atau barcode..." oninput="renderProducts()"></div>
+<div class="layout">
+<section><div id="products" class="products"></div></section>
+<aside class="cart">
+<h2>Keranjang <span id="cartCount" class="hint"></span></h2><div id="cartLines" class="empty">Belum ada barang dipilih.</div>
+<div class="sum"><span>Total</span><span id="total">Rp0</span></div>
+<form id="checkout">
+<label>Nama penerima</label><input class="field" name="name" required minlength="2">
+<label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel">
+<label>Alamat (untuk COD)</label><textarea class="field" name="address" rows="2"></textarea>
+<label>Metode pembayaran</label><select class="field" name="payment"><option value="cod">COD — bayar saat diterima</option><option value="store">Bayar di toko</option><option disabled>Transfer bank — segera tersedia</option><option disabled>QRIS — segera tersedia</option></select>
+<label>Catatan (opsional)</label><input class="field" name="note">
+<button class="btn" id="submit" type="submit">Buat Pesanan</button>
+<p class="hint">Pembayaran QRIS dan transfer belum diaktifkan. Pesanan COD/bayar di toko akan menunggu konfirmasi admin.</p>
+</form></aside>
+</div>
+</main>
+<div id="result" class="overlay hide"><div class="dialog"><h2>Pesanan berhasil dibuat</h2><p id="resultText"></p><button class="btn" onclick="document.getElementById('result').classList.add('hide')">Selesai</button></div></div>
+<script>
+const SUPABASE_URL='https://kvavvulwrrxfqtihmfnu.supabase.co';
+const SUPABASE_KEY='sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV';
+const STORE_ID=new URLSearchParams(location.search).get('store');
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let catalog=[],cart=new Map();
+const money=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function init(){
+ if(!STORE_ID){document.getElementById('notice').innerHTML='<span class="error">Tautan toko belum lengkap. Admin perlu menambahkan ID toko pada tautan belanja.</span>';return}
+ const {data,error}=await sb.from('products').select('id,name,barcode,price,stock,active').eq('store_id',STORE_ID).eq('active',true).order('name');
+ if(error){document.getElementById('notice').innerHTML='<span class="error">Katalog belum dapat dimuat. Pastikan pengaturan database toko online sudah dijalankan di Supabase.</span>';return}
+ catalog=(data||[]).filter(p=>p.active!==false);document.getElementById('notice').textContent=catalog.length+' produk tersedia';renderProducts();
+}
+function renderProducts(){
+ const q=document.getElementById('search').value.toLowerCase();
+ const rows=catalog.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.barcode||'').includes(q));
+ document.getElementById('products').innerHTML=rows.map(p=>'<article class="item"><h3>'+esc(p.name)+'</h3><div class="price">'+money(p.price)+'</div><div class="stock">Stok tersedia: '+Number(p.stock||0)+'</div><button class="btn" '+(Number(p.stock||0)<1?'disabled':'')+' onclick="addItem(\''+p.id+'\')">Tambah</button></article>').join('')||'<div class="empty">Produk tidak ditemukan.</div>';
+}
+function addItem(id){const p=catalog.find(x=>x.id===id);if(!p)return;const old=cart.get(id)?.qty||0;if(old>=Number(p.stock||0))return alert('Jumlah melebihi stok yang tersedia.');cart.set(id,{product:p,qty:old+1});renderCart()}
+function changeQty(id,d){const x=cart.get(id);if(!x)return;const n=x.qty+d;if(n<=0)cart.delete(id);else if(n<=Number(x.product.stock||0))x.qty=n;renderCart()}
+function renderCart(){
+ let total=0,count=0;const lines=[...cart.entries()];document.getElementById('cartLines').innerHTML=lines.length?lines.map(([id,x])=>{total+=Number(x.product.price||0)*x.qty;count+=x.qty;return '<div class="line"><div><b>'+esc(x.product.name)+'</b><br>'+money(x.product.price)+' × '+x.qty+'</div><div><button type="button" onclick="changeQty(\''+id+'\',-1)">−</button> <button type="button" onclick="changeQty(\''+id+'\',1)">+</button></div></div>'}).join(''):'<div class="empty">Belum ada barang dipilih.</div>';
+ document.getElementById('total').textContent=money(total);document.getElementById('cartCount').textContent=count?'('+count+' barang)':'';
+}
+document.getElementById('checkout').addEventListener('submit',async e=>{
+ e.preventDefault();if(!cart.size)return alert('Keranjang masih kosong.');
+ const form=new FormData(e.target),btn=document.getElementById('submit');btn.disabled=true;btn.textContent='Mengirim...';
+ const payload={p_store_id:STORE_ID,p_customer_name:form.get('name'),p_customer_phone:form.get('phone'),p_customer_address:form.get('address'),p_customer_note:form.get('note'),p_payment_method:form.get('payment'),p_items:[...cart.values()].map(x=>({product_id:x.product.id,quantity:x.qty}))};
+ const {data,error}=await sb.rpc('seamart_create_online_order',payload);btn.disabled=false;btn.textContent='Buat Pesanan';
+ if(error){alert('Pesanan belum berhasil: '+error.message);return}
+ const order=data?.order_code||'Pesanan dibuat';document.getElementById('resultText').textContent='Nomor pesanan: '+order+'. Simpan nomor ini untuk ditunjukkan ke admin SeaMart.';document.getElementById('result').classList.remove('hide');cart.clear();renderCart();e.target.reset();
+});
+init();
+</script>
+</body></html>
