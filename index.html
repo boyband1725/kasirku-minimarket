@@ -747,7 +747,7 @@ function checkout(){
 }
 function selectPaymentMethod(method){
  window.smSelectedPayment=method;
- document.getElementById('paymethod').value=method;
+ const paySelect=document.getElementById('paymethod');if(paySelect)paySelect.value=method;
  document.getElementById('chooseCash').classList.toggle('active',method==='Tunai');
  document.getElementById('chooseQris').classList.toggle('active',method==='QRIS');
  const cashInput=document.getElementById('smCashReceived');if(cashInput)cashInput.disabled=method!=='Tunai';
