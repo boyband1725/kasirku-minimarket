@@ -751,8 +751,10 @@ function selectPaymentMethod(method){
  document.getElementById('chooseCash').classList.toggle('active',method==='Tunai');
  document.getElementById('chooseQris').classList.toggle('active',method==='QRIS');
  const cashInput=document.getElementById('smCashReceived');if(cashInput)cashInput.disabled=method!=='Tunai';
- document.getElementById('smCashFields').style.display=method==='Tunai'?'block':'none';
- document.getElementById('smQrisInfo').style.display=method==='QRIS'?'block':'none';
+ const cashFields=document.getElementById('smCashFields');
+ if(cashFields){cashFields.hidden=method!=='Tunai';cashFields.style.setProperty('display',method==='Tunai'?'block':'none','important');}
+ const qrisInfo=document.getElementById('smQrisInfo');if(qrisInfo){qrisInfo.hidden=method!=='QRIS';qrisInfo.style.setProperty('display',method==='QRIS'?'block':'none','important');}
+ if(cashInput){cashInput.disabled=method!=='Tunai';cashInput.readOnly=method!=='Tunai';cashInput.value=method==='QRIS'?'':cashInput.value;}
 }
 function updatePaymentModalChange(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
@@ -1209,6 +1211,10 @@ function printStockReport(){const rows=getStockRows(),start=document.getElementB
  #odooPosLayout aside.odoo-order-panel .odoo-order-lines{flex:1 1 auto!important;min-height:60px!important;overflow-y:auto!important}
  #odooPosLayout aside.odoo-order-panel #checkoutBtn{display:block!important;flex:0 0 auto!important;position:static!important;min-height:54px!important;margin-top:10px!important}
 }
+
+/* Hard-hide cash amount and change controls for QRIS */
+#smCashFields[hidden]{display:none!important}
+#smCashReceived:disabled{pointer-events:none!important;opacity:.55!important}
 </style></head><body><h2>SEAMART — POSISI DAN MUTASI STOK BARANG</h2><p>Periode: ${start} – ${end}</p><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kelompok</th><th>Awal Qty</th><th>Awal Nilai</th><th>Masuk Qty</th><th>Masuk Nilai</th><th>Keluar Qty</th><th>Keluar Nilai</th><th>Akhir Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${cells}</tbody></table><script>window.print()<\\/script></body></html>`);w.document.close()}
 function moveModal(){let opts=db.products.map(p=>`<option value="${p.id}">${esc(p.nama)}</option>`).join('');document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>Catat Mutasi Stok</h2><label>Produk<select id="m_prod" class="field" style="width:100%;margin:6px 0 12px">${opts}</select></label><label>Jenis<select id="m_type" class="field" style="width:100%;margin:6px 0 12px"><option>Masuk / Pembelian</option><option>Keluar / Mutasi Cabang</option><option>Penyesuaian Stok</option></select></label><label>Jumlah<input id="m_qty" type="number" min="1" class="field" style="width:100%;margin:6px 0 12px"></label><label>Keterangan<input id="m_note" class="field" style="width:100%;margin:6px 0"></label><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveMove()">Simpan Mutasi</button></div></div></div>`}
 function saveMove(){let p=db.products.find(x=>x.id===document.getElementById('m_prod').value),type=document.getElementById('m_type').value,q=Number(document.getElementById('m_qty').value);if(!p||q<=0)return alert('Pilih produk dan jumlah yang valid.');let delta=0;if(type==='Masuk / Pembelian'){p.stok+=q;delta=q}else if(type==='Keluar / Mutasi Cabang'){if(p.stok<q)return alert('Stok tidak cukup.');p.stok-=q;delta=-q}else{let before=Number(p.stok||0);p.stok=q;delta=q-before}db.moves.push({time:dateNow(),at:new Date().toISOString(),produk:p.nama,jenis:type,qty:q,delta,keterangan:document.getElementById('m_note').value});save();closeModal();stock()}
