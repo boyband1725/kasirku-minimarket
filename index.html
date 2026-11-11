@@ -667,8 +667,22 @@ async function syncOneProduct(p,categoryCache=new Map()){
   categoryId=await categoryCache.get(key);
  }
  const row={id:p.id,store_id:store,code:p.kode||null,barcode:(String(p.barcode||'').trim()||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false};
- const result=await sb.from('products').upsert(row,{onConflict:'id'});
- if(result.error)throw result.error;
+ // A product may already exist in cloud under the unique (store_id, code) key
+ // but have a different UUID from this browser's local copy. Reuse that cloud ID.
+ let existing=null;
+ if(row.code){
+  const lookup=await sb.from('products').select('id,name').eq('store_id',store).eq('code',row.code).limit(1).maybeSingle();
+  if(lookup.error)throw lookup.error;
+  existing=lookup.data;
+ }
+ if(existing){
+  const result=await sb.from('products').update({code:row.code,barcode:row.barcode,name:row.name,category_id:row.category_id,price:row.price,stock:row.stock,active:row.active}).eq('id',existing.id).eq('store_id',store);
+  if(result.error)throw result.error;
+  p.id=existing.id;
+ }else{
+  const result=await sb.from('products').upsert(row,{onConflict:'id'});
+  if(result.error)throw result.error;
+ }
 }
 function updateSeaMartSyncProgress(percent,message,stats={}){
  const root=document.getElementById('loginroot');if(!root)return;
