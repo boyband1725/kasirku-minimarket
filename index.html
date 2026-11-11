@@ -567,7 +567,7 @@ function closeCashierShift(){
  <label style="display:grid;gap:7px;margin-top:14px;font-weight:700">Uang tunai fisik di laci (Rp)<input id="cashierClosingActual" type="number" min="0" step="1" inputmode="numeric" value="${expected}" oninput="updateCloseCashierDifference()" style="width:100%;padding:13px;border:1px solid #cbd8d0;border-radius:9px;font-size:18px"></label>
  <div class="totalrow" style="margin-top:12px;background:#f3f8f5;padding:12px;border-radius:8px"><b>Selisih kas</b><b id="closingDifferenceValue">Seimbang</b></div></div>
  <div style="margin-top:14px;padding:11px;background:#fff8e8;border-radius:9px;color:#72531b;font-size:12px">QRIS tidak dihitung sebagai uang tunai di laci. Pastikan jumlah uang fisik sudah dihitung sebelum menyelesaikan tutup kasir.</div>
- <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:14px"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-light" type="button" onclick="connectWindowsReceiptPrinter()">Pilih Printer PC</button><button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button><button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button></div>
+ <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:14px"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-light" type="button" onclick="connectWindowsReceiptPrinter()">Hubungkan Bluetooth</button><button class="btn-light" type="button" onclick="printCashierClosing('${sh.id}')">Cetak Ringkasan</button><button class="btn-primary" type="button" onclick="finalizeCashierClosing('${sh.id}')">Simpan & Tutup Kasir</button></div>
  </div></div>`;
  updateCloseCashierDifference();
 }
@@ -1019,6 +1019,16 @@ function printReceipt(id){
 async function seamartReceiptLogoBase64(){return 'iVBORw0KGgoAAAANSUhEUgAAAYAAAACQAQAAAAApHYE9AAAFc0lEQVR42u2ZP4gkRRTGf1XTO9uHA9seh0wgbIeCyYQXHG57qGjkBgoigpMLcoGBoLAlBh4ohsYTiiZGHohoKXehuLkGfdmC4PWtc1zv2NPPoP9Vz8wyU2B4He3W1uvvffW991VXrRL8Hs2TgCcBlwTMfQNK3wAxfhGSHYrPo+TiIPdLKSg8OeilZ4AyiR9pSQ98SGuIvKRTku/tlV4cFgM/6SQ7sYd+HOwk8yvv0/DcL2A+FL+A0k86yThJPVgjOYfZvld5h/uPPKTTDD2lEzGIh3QaEpI480HIOMgHHqskBYOS5vcZPCUiCwBOZH4iIiLlpyIir0txKIgISsxRNb+s5kkKwFFDLkdEioFkB6IBIyapZlSuNoP6V2wMQI6BOZyCRpgym5xVEwqAM7B1gKkis14DmTHZqEqaHGABrS4VQoqFDCxoVBQw70nXFm8qbW4ppGBA89gMWGJmDraR9vUVgnVTCjWW5FY1NeqLVLYIWReQ/8OENJw747MuJMYhVyMUdsTZ8BLDTLsfbYPAsWahjMM6W0coIGkQmCsjJplteL1uEUqHAyVTbCOdm3BctgjicEDMmNNaOiWSAxyKiNgVDlIjEHfSCQzdrBoEDAmqRuC5AUuMBVCgKDreaX+NaoQPsCTT0+5ljYK6Q3A5cIUJ6TjvkVtRuqq/GkH/lIw4GxZ1SiRll1LcadPpgBxrFqpsEXRXVOl6SjlD+VAZqXpArfw9XtVGExIHPzAlOXJSX18lV4dXC2vGpBgnpYdKKWXaVQooHB1G0cksIIvXUrLtKnUfPZXSZAO3eco1DkW73poQHTHH5lgnJaeRAfZ6/aBgSUzYpGSd18et+sbRwfJ0QrFxM0hXGq7i0BUPApigI9NwSHq1BA+aBlWw3NDTQUzq9IPhahMgai/YpHRE5vTDjL+7KQUV6CW1FJBDyosvbPSYVukiJLfuKlmTBd23YtSZQMMhaHhrcphytYfdJJ441drIHxDClILkAPcD4jAFWLbv0a7SWCZL1++S9VpSiKO00XbuGrdpolulg1bVioOQEaeNFoOWd3mJL/EMM+wv3VJv0CFx+2EWilHdvjZmzTWKFioghORowXDZHlamrLlG0Fc6+Og+43k1+Nro1GxyjchF2CNlmo0B1PfunuL0Q+hyeIUEM+vZ6MoqFX1vvbVkIJV7y+Y9LiBwdbBzRosBrs1km85vnQ4ZUd7rm8rIErivlNKr3gozpqdj1lPSXVcpl4MYZZIpa86Xlo74xkFYMFyqDR+W8UbnCeGMcK5h0yp1Y4mDkDLJRrBpf+jGYno9PZtsOwtHBNLUkhlI84mkVzbFeiysoaJah6CWbeXpnRJCV4dxK1tPPtOORXWZxjVCI1vP9NoFCGvGESQVB2XUSc1s0j+nNpVrQTNFmQpIt7INK/NRbzL/4/3f4BvO7vz5Nu8B6ts3+Ko+0hxkA4/jQEgn204nlJzLZNv4BFW1ih/CZtkuCwjhLMAPIR17ItgpHqRz+KT0RBjiySHED0EmngjK+iFc8bxqyf0uc5RchOKJoDxTCrVnwMUXW6bcLd75S8zP3P73u3MDcnG07QR9a2CfPRodkQ3soWgutlxqCJT2PI2k2pg0+1suEMpr6Ju5UE4M9yI0i20snzfFnlEUIYVOCdhmGCXwYyAkwSPCnS43T+ElstgizHcJ0HOOixDQ5ngJbLW6UmX75mB047pk+/ZItiOoE0MSkSQG4nQXDglfg8HCW+Nsl4DrHP9KDqjZcNcr4JczSBDUyha1uTQCKMxDcyM4/9LuglBeI7ibJwR3Rd/bKaWM8gZwE/TH0U4cbusAsMpg4h2Ek8+Wd35/8FhOPl++m4qoJ/9DeRLwPwX8B6zA9TPpkIMPAAAAAElFTkSuQmCC';}
 /* Direct Windows Bluetooth thermal printing through virtual COM port */
 let seamartWindowsSerialPort=null;
+async function ensureWindowsReceiptPrinter(){
+ if(seamartWindowsSerialPort&&seamartWindowsSerialPort.writable)return true;
+ if(!('serial' in navigator))return false;
+ const ports=await navigator.serial.getPorts();
+ if(!ports.length)return false;
+ const port=ports[0];
+ if(!port.readable&&!port.writable)await port.open({baudRate:9600});
+ seamartWindowsSerialPort=port;
+ return !!port.writable;
+}
 async function connectWindowsReceiptPrinter(){
  if(!('serial' in navigator)){alert('Cetak langsung memerlukan Google Chrome atau Microsoft Edge terbaru di Windows.');return;}
  try{const port=await navigator.serial.requestPort();await port.open({baudRate:9600});seamartWindowsSerialPort=port;alert('Printer PC tersambung. Silakan tekan Cetak Struk.');}
@@ -1075,6 +1085,8 @@ async function printReceiptNow(id){
   {type:'feed',lines:3}
  ];
  try{
+  const serialReady=await ensureWindowsReceiptPrinter();
+  if(!serialReady){alert('Hubungkan printer Bluetooth satu kali melalui tombol Hubungkan Bluetooth. Pilih port COM printer yang sudah dipasangkan di Windows. Setelah diizinkan, SeaMart akan mencoba menyambungkan kembali otomatis.');return;}
   if(seamartWindowsSerialPort){await seamartPrintWindowsSerial(s);const b=document.getElementById('smPrintAgainBtn');if(b)b.textContent='Cetak Lagi';alert('Struk berhasil dikirim ke printer Bluetooth Windows.');return;}
   const res=await fetch('http://localhost:9100/print',{
    method:'POST',
