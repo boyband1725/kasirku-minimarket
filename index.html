@@ -1399,6 +1399,11 @@ function printStockReport(){const rows=getStockRows(),start=document.getElementB
 #smCashFields[hidden]{display:none!important}
 #smCashReceived:disabled{pointer-events:none!important;opacity:.55!important}
 
+
+/* Subtle SeaMart logo highlight - preserve original artwork and colors */
+#loginroot .login-brand{position:relative;isolation:isolate}
+#loginroot .login-brand svg{filter:drop-shadow(0 0 5px rgba(190,255,120,.52)) drop-shadow(0 3px 5px rgba(4,91,54,.28))!important}
+#loginroot .login-brand:after{content:'';position:absolute;inset:3px 2%;pointer-events:none;border-radius:12px;background:linear-gradient(112deg,transparent 28%,rgba(255,255,255,.0) 39%,rgba(255,255,255,.55) 47%,rgba(255,255,255,.08) 53%,transparent 64%);opacity:.42;mix-blend-mode:screen}
 /* SeaMart premium login refresh */
 #loginroot .login-screen{background:radial-gradient(ellipse at 15% 12%,#20a568 0%,transparent 34%),radial-gradient(ellipse at 90% 85%,#b7ed58 0%,transparent 25%),linear-gradient(145deg,#042f23 0%,#075b3b 52%,#087c4b 100%)!important;overflow:auto}
 #loginroot .login-card{position:relative;overflow:hidden;width:min(440px,100%);padding:30px 30px 25px;border:1px solid #ffffffb8;border-radius:26px;box-shadow:0 28px 80px #001b1290,0 2px 8px #ffffff30;}
