@@ -675,6 +675,7 @@ function updateSeaMartSyncProgress(percent,message){
   panel.style.cssText='margin-top:16px;padding:18px 17px 16px;border:1px solid #245f45;border-radius:18px;background:radial-gradient(circle at 90% 0%,#1d9b62 0%,transparent 38%),linear-gradient(145deg,#073b2b 0%,#075b3b 55%,#06452f 100%);color:#fff;box-shadow:0 14px 32px rgba(4,65,42,.24);overflow:hidden;position:relative';
   const card=root.querySelector('.login-card');if(card)card.appendChild(panel);
  }
+ panel.style.cssText='display:block!important;box-sizing:border-box!important;width:100%!important;margin:18px 0 0!important;padding:20px 19px 18px!important;border:1px solid #245f45!important;border-radius:18px!important;background:radial-gradient(circle at 90% 0%,#1d9b62 0%,transparent 38%),linear-gradient(145deg,#073b2b 0%,#075b3b 55%,#06452f 100%)!important;color:#fff!important;box-shadow:0 14px 32px rgba(4,65,42,.24)!important;overflow:hidden!important;position:relative!important;opacity:1!important;';
  const pct=Math.max(0,Math.min(100,Math.round(percent)));
  const safeMessage=String(message||'Sinkronisasi data').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  const done=pct>=100;
