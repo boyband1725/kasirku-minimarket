@@ -446,7 +446,45 @@ function cancelLogin(){if(history.length>1){history.back();return;}const root=do
 function toggleLoginPasswordVisibility(){const input=document.getElementById("loginPass"),button=document.getElementById("toggleLoginPassword");if(!input||!button)return;const show=input.type==="password";input.type=show?"text":"password";button.textContent=show?"◎":"◉";button.setAttribute("aria-label",show?"Hide password":"Show password");button.title=show?"Hide password":"Show password";}
 function normalizeLoginEmail(value){const v=String(value||'').trim();if(v.includes('@'))return v;if(v.toLowerCase()==='boyband1725')return 'boyband1725@gmail.com';return v;}
 async function requestPasswordReset(){const email=normalizeLoginEmail(document.getElementById('loginUser')?.value||''),status=document.getElementById('cloudLoginError'),button=document.getElementById('forgotPasswordButton');if(!email){status.textContent='Masukkan email akun SeaMart terlebih dahulu.';document.getElementById('loginUser')?.focus();return;}button.disabled=true;button.textContent='Mengirim link…';status.textContent='';try{if(!window.supabase)throw new Error('Library Supabase belum termuat. Muat ulang halaman.');const sb=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV');const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;status.textContent='Jika email terdaftar, link reset akan dikirim. Periksa Inbox dan Spam.';button.textContent='Link reset diminta';}catch(e){status.textContent=e.message||'Gagal mengirim link reset password.';button.disabled=false;button.textContent='Lupa Password?';}}function getSeaMartAuthClient(){if(!window.supabase)throw new Error('Library Supabase belum termuat. Muat ulang halaman.');if(!window.seamartAuthClient)window.seamartAuthClient=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return window.seamartAuthClient;}
-async function finishSeaMartLogin(user){const sb=getSeaMartAuthClient();const member=await sb.from('store_members').select('store_id,role').eq('user_id',user.id).limit(1).maybeSingle();if(member.error)throw member.error;if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;const cloudFlows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',member.data.store_id).order('transaction_date',{ascending:false});if(!cloudFlows.error){db.cashflows=(cloudFlows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;save();}else{console.warn('Arus kas cloud belum tersedia:',cloudFlows.error.message);}const cats=await sb.from('categories').select('id,name').eq('store_id',member.data.store_id);if(cats.error)throw cats.error;const catNames=new Map((cats.data||[]).map(x=>[x.id,x.name]));let remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);if(remote.error)throw remote.error;if((remote.data||[]).length===0&&db.products.length>0&&window.confirm('Database online SeaMart masih kosong. Sinkronkan '+db.products.length+' produk dari perangkat ini ke cloud sekarang? Data barang di perangkat tidak akan dihapus.')){await syncAllProducts();remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);if(remote.error)throw remote.error;alert('Sinkronisasi produk selesai: '+(remote.data||[]).length+' produk sudah ada di cloud.');}if(remote.data?.length){db.products=remote.data.map(p=>({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false}));save();}currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};const app=document.querySelector('.app');if(app)app.style.display='';document.getElementById('loginroot').innerHTML='';document.getElementById('loginroot').style.display='none';document.getElementById('sessionUser').textContent=currentUser.nama+' · '+(currentUser.role==='admin'?'Admin':'Kasir');document.getElementById('sessionAvatar').textContent=currentUser.nama.slice(0,1).toUpperCase();document.querySelectorAll('.nav').forEach(b=>{b.style.display=currentUser.role==='kasir'&&!['kasir'].includes(b.dataset.page)?'none':''});document.getElementById('shiftAction').style.display='';updateShiftButton();page(currentUser.role==='kasir'?'kasir':'dashboard');}
+async function finishSeaMartLogin(user){
+ const sb=getSeaMartAuthClient();
+ const member=await sb.from('store_members').select('store_id,role').eq('user_id',user.id).limit(1).maybeSingle();
+ if(member.error)throw member.error;
+ if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');
+ window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;
+ const cloudFlows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',member.data.store_id).order('transaction_date',{ascending:false});
+ if(!cloudFlows.error){db.cashflows=(cloudFlows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;save();}
+ else{console.warn('Arus kas cloud belum tersedia:',cloudFlows.error.message);}
+ const cats=await sb.from('categories').select('id,name').eq('store_id',member.data.store_id);
+ if(cats.error)throw cats.error;
+ const catNames=new Map((cats.data||[]).map(x=>[x.id,x.name]));
+ let remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);
+ if(remote.error)throw remote.error;
+ let syncSummary=null;
+ if(db.products.length>0){
+  syncSummary=await syncAllProducts(remote.data||[]);
+  remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);
+  if(remote.error)throw remote.error;
+  if(syncSummary.added>0||syncSummary.failed>0){
+   alert('Sinkronisasi produk: '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada, '+syncSummary.failed+' gagal. Data lokal tetap dipertahankan.');
+  }
+ }
+ const local=[...db.products];
+ const hasMatch=(a,b)=>String(a.id||'')===String(b.id||'')||(a.barcode&&b.barcode&&String(a.barcode)===String(b.barcode))||(a.kode&&b.code&&String(a.kode)===String(b.code));
+ for(const p of (remote.data||[])){
+  if(!local.some(x=>hasMatch(x,p))){
+   local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false});
+  }
+ }
+ db.products=local;save();
+ currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
+ const app=document.querySelector('.app');if(app)app.style.display='';
+ document.getElementById('loginroot').innerHTML='';document.getElementById('loginroot').style.display='none';
+ document.getElementById('sessionUser').textContent=currentUser.nama+' · '+(currentUser.role==='admin'?'Admin':'Kasir');
+ document.getElementById('sessionAvatar').textContent=currentUser.nama.slice(0,1).toUpperCase();
+ document.querySelectorAll('.nav').forEach(b=>{b.style.display=currentUser.role==='kasir'&&!['kasir'].includes(b.dataset.page)?'none':''});
+ document.getElementById('shiftAction').style.display='';updateShiftButton();page(currentUser.role==='kasir'?'kasir':'dashboard');
+}
 async function doLogin(){const email=normalizeLoginEmail(document.getElementById('loginUser').value),password=document.getElementById('loginPass').value,err=document.getElementById('cloudLoginError'),btn=document.getElementById('cloudLoginBtn');btn.disabled=true;btn.textContent='Menghubungkan…';err.textContent='';try{const sb=getSeaMartAuthClient();const auth=await sb.auth.signInWithPassword({email,password});if(auth.error)throw auth.error;await finishSeaMartLogin(auth.data.user);}catch(e){err.textContent=e.message||'Login Supabase gagal';}finally{btn.disabled=false;btn.textContent='Masuk';}}
 async function restoreSeaMartSession(){try{const sb=getSeaMartAuthClient();const {data,error}=await sb.auth.getSession();if(error)throw error;if(data.session?.user)await finishSeaMartLogin(data.session.user);}catch(e){console.warn('Pemulihan sesi SeaMart:',e);}}
 function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
@@ -606,6 +644,42 @@ db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
 db.cashflows=Array.isArray(db.cashflows)?db.cashflows:[];
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+async function syncOneProduct(p){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
+ let categoryId=null;
+ if(p.kategori&&p.kategori!=='Umum'){
+  const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',p.kategori).limit(1).maybeSingle();
+  if(c.error)throw c.error;
+  if(c.data)categoryId=c.data.id;
+ }
+ const row={id:p.id,store_id:store,code:p.kode||null,barcode:p.barcode||null,name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
+ const result=await sb.from('products').upsert(row,{onConflict:'id'});
+ if(result.error)throw result.error;
+}
+async function syncAllProducts(existingRows=[]){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
+ const rows=[...existingRows];
+ const norm=v=>String(v||'').trim();
+ const summary={added:0,skipped:0,failed:0,errors:[]};
+ for(let i=0;i<db.products.length;i++){
+  const p=db.products[i];
+  const match=rows.find(r=>(p.id&&norm(r.id)===norm(p.id))||(p.barcode&&norm(r.barcode)===norm(p.barcode))||(p.kode&&norm(r.code)===norm(p.kode)));
+  if(match){if(!p.id||!(/^[0-9a-f-]{36}$/i.test(String(p.id))))p.id=match.id;summary.skipped++;continue;}
+  let error=null;
+  for(let attempt=0;attempt<3;attempt++){
+   try{await syncOneProduct(p);error=null;break;}
+   catch(e){error=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));}
+  }
+  if(error){summary.failed++;if(summary.errors.length<8)summary.errors.push((p.nama||p.kode||('Baris '+(i+1)))+': '+(error.message||String(error)));}
+  else{summary.added++;rows.push({id:p.id,code:p.kode||null,barcode:p.barcode||null});}
+ }
+ save();
+ if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
+ return summary;
+}
 async function syncOneProduct(p){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return;
