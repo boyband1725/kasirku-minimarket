@@ -658,31 +658,9 @@ async function syncOneProduct(p){
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
-async function syncAllProducts(existingRows=[]){
- const sb=window.seamartSupabase,store=window.seamartStoreId;
- if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
- const rows=[...existingRows];
- const norm=v=>String(v||'').trim();
- const summary={added:0,skipped:0,failed:0,errors:[]};
- for(let i=0;i<db.products.length;i++){
-  const p=db.products[i];
-  const match=rows.find(r=>(p.id&&norm(r.id)===norm(p.id))||(p.barcode&&norm(r.barcode)===norm(p.barcode))||(p.kode&&norm(r.code)===norm(p.kode)));
-  if(match){if(!p.id||!(/^[0-9a-f-]{36}$/i.test(String(p.id))))p.id=match.id;summary.skipped++;continue;}
-  let error=null;
-  for(let attempt=0;attempt<3;attempt++){
-   try{await syncOneProduct(p);error=null;break;}
-   catch(e){error=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));}
-  }
-  if(error){summary.failed++;if(summary.errors.length<8)summary.errors.push((p.nama||p.kode||('Baris '+(i+1)))+': '+(error.message||String(error)));}
-  else{summary.added++;rows.push({id:p.id,code:p.kode||null,barcode:p.barcode||null});}
- }
- save();
- if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
- return summary;
-}
 async function syncOneProduct(p){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
- if(!sb||!store)return;
+ if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
  let categoryId=null;
  if(p.kategori&&p.kategori!=='Umum'){
@@ -694,11 +672,38 @@ async function syncOneProduct(p){
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
-async function syncAllProducts(){
- const items=[...db.products];
- for(let i=0;i<items.length;i+=15){
-  await Promise.all(items.slice(i,i+15).map(p=>syncOneProduct(p)));
+async function syncAllProducts(existingRows=[]){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
+ const rows=[...existingRows];
+ const norm=v=>String(v??'').trim();
+ const seenIds=new Set(rows.map(r=>norm(r.id)).filter(Boolean));
+ const seenCodes=new Set(rows.map(r=>norm(r.code)).filter(Boolean));
+ const seenBarcodes=new Set(rows.map(r=>norm(r.barcode)).filter(Boolean));
+ const summary={added:0,skipped:0,failed:0,errors:[]};
+ for(let i=0;i<db.products.length;i++){
+  const p=db.products[i],id=norm(p.id),code=norm(p.kode),barcode=norm(p.barcode);
+  if((id&&seenIds.has(id))||(code&&seenCodes.has(code))||(barcode&&seenBarcodes.has(barcode))){
+   summary.skipped++;
+   continue;
+  }
+  let error=null;
+  for(let attempt=0;attempt<3;attempt++){
+   try{await syncOneProduct(p);error=null;break;}
+   catch(e){error=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));}
+  }
+  if(error){
+   summary.failed++;
+   if(summary.errors.length<10)summary.errors.push((p.nama||code||('Baris '+(i+1)))+': '+(error.message||String(error)));
+  }else{
+   summary.added++;
+   seenIds.add(norm(p.id));if(code)seenCodes.add(code);if(barcode)seenBarcodes.add(barcode);
+   rows.push({id:p.id,code:p.kode||null,barcode:p.barcode||null});
+  }
  }
+ save();
+ if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
+ return summary;
 }
 const rupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
