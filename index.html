@@ -474,8 +474,8 @@ async function finishSeaMartLogin(user){
  if(db.products.length>0){
   syncSummary=await syncAllProducts(remote.data||[]);
   remote=await fetchAllStoreProducts(sb,member.data.store_id);
-  if(syncSummary.added>0||syncSummary.failed>0){
-   alert('Sinkronisasi produk: '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada, '+syncSummary.failed+' gagal. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\nContoh error: '+syncSummary.errors.slice(0,3).join(' | '):''));
+  if(syncSummary.failed>0){
+   alert('Sinkronisasi belum berhasil: '+syncSummary.failed+' produk gagal dikirim. '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\nContoh penyebab: '+syncSummary.errors.slice(0,3).join(' | '):''));
   }
  }
  const local=[...db.products];
