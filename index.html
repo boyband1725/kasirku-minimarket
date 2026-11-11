@@ -643,10 +643,43 @@ function showKeyboardHelp(){
  document.getElementById('modalroot').innerHTML='<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>⌨ Tombol Pintas SeaMart</h2><p class="muted">Gunakan tombol keyboard untuk mempercepat pekerjaan kasir.</p>'+rows.map(r=>'<div class="totalrow"><b style="min-width:64px"><kbd style="display:inline-block;padding:4px 9px;border:1px solid #cbd5cf;border-radius:6px;background:#f5f8f6">'+r[0]+'</kbd></b><span>'+r[1]+'</span></div>').join('')+'<div class="actions"><button class="btn-primary" onclick="closeModal()">Mengerti</button></div></div></div>';
 }
 function dashboard(){
- const total=db.products.length,qty=db.products.reduce((a,p)=>a+Number(p.stok||0),0),today=new Date().toDateString(),sold=db.sales.filter(s=>new Date(s.time).toDateString()===today),revenue=sold.reduce((a,s)=>a+s.total,0);
- document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ringkasan</h1><div class="sub">Selamat datang di operasional SeaMart.</div></div><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div>
- <div class="cards"><div class="stat"><div class="stat-top">Total Produk <span>▤</span></div><strong>${total.toLocaleString('id-ID')}</strong><small>Master barang</small></div><div class="stat"><div class="stat-top">Total Stok <span>▦</span></div><strong>${qty.toLocaleString('id-ID')}</strong><small>Unit tersedia</small></div><div class="stat"><div class="stat-top">Penjualan Hari Ini <span>↗</span></div><strong>${rupiah(revenue)}</strong><small>${sold.length} transaksi</small></div><div class="stat"><div class="stat-top">Nilai Persediaan <span>◈</span></div><strong>${rupiah(db.products.reduce((a,p)=>a+p.harga*p.stok,0))}</strong><small>Estimasi harga jual × stok</small></div></div>
- <div class="grid2"><div class="panel"><h3>Transaksi Terbaru</h3>${salesTable(db.sales.slice(-6).reverse())}</div><div class="panel"><h3>Stok Menipis</h3>${lowStock()}</div></div>`;
+ const now=new Date(),todayKey=now.toLocaleDateString('en-CA');
+ const saleDate=s=>{const d=s.at?new Date(s.at):new Date(s.time);return Number.isNaN(d.getTime())?'':d.toLocaleDateString('en-CA')};
+ const today=db.sales.filter(s=>saleDate(s)===todayKey);
+ const revenue=today.reduce((a,s)=>a+Number(s.total||0),0);
+ const cash=today.filter(s=>String(s.pay||'').toUpperCase()==='TUNAI').reduce((a,s)=>a+Number(s.total||0),0);
+ const qris=today.filter(s=>String(s.pay||'').toUpperCase()==='QRIS').reduce((a,s)=>a+Number(s.total||0),0);
+ const stockQty=db.products.reduce((a,p)=>a+Number(p.stok||0),0);
+ const low=db.products.filter(p=>Number(p.stok||0)<=5).sort((a,b)=>Number(a.stok||0)-Number(b.stok||0)).slice(0,6);
+ const days=Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-6+i);const key=d.toLocaleDateString('en-CA');const rows=db.sales.filter(s=>saleDate(s)===key);return {label:d.toLocaleDateString('id-ID',{weekday:'short'}),total:rows.reduce((a,s)=>a+Number(s.total||0),0),count:rows.length};});
+ const maxDay=Math.max(1,...days.map(d=>d.total));
+ const best={};db.sales.forEach(s=>(s.items||[]).forEach(it=>{const k=it.nama||'Barang';best[k]=(best[k]||0)+Number(it.qty||0)}));
+ const top=Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ const inventoryValue=db.products.reduce((a,p)=>a+Number(p.harga_jual_1??p.harga??0)*Number(p.stok||0),0);
+ const syncLabel=window.seamartSupabase&&window.seamartStoreId?'Terhubung ke database toko':'Data perangkat · cloud belum lengkap';
+ document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Dashboard SeaMart</h1><div class="sub">Ringkasan performa toko · ${now.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div></div><div class="toolbar"><span class="pill">${esc(syncLabel)}</span><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div></div>
+ <div class="cards">
+ <div class="stat"><div class="stat-top">Penjualan Bersih Hari Ini <span>💰</span></div><strong>${rupiah(revenue)}</strong><small>${today.length} transaksi</small></div>
+ <div class="stat"><div class="stat-top">Total Pajak <span>🧾</span></div><strong>—</strong><small>Belum dikonfigurasi</small></div>
+ <div class="stat"><div class="stat-top">Total Produk <span>📦</span></div><strong>${db.products.length.toLocaleString('id-ID')}</strong><small>${stockQty.toLocaleString('id-ID')} unit stok</small></div>
+ <div class="stat"><div class="stat-top">Nilai Persediaan <span>🏷️</span></div><strong>${rupiah(inventoryValue)}</strong><small>Estimasi harga jual × stok</small></div>
+ </div>
+ <div class="cards" style="margin-top:12px">
+ <div class="stat"><div class="stat-top">Penjualan Tunai</div><strong>${rupiah(cash)}</strong><small>Hari ini</small></div>
+ <div class="stat"><div class="stat-top">Penjualan QRIS</div><strong>${rupiah(qris)}</strong><small>Hari ini</small></div>
+ <div class="stat"><div class="stat-top">Stok Menipis</div><strong>${low.length}</strong><small>Produk dengan stok ≤ 5</small></div>
+ <div class="stat"><div class="stat-top">Total Transaksi Hari Ini</div><strong>${today.length}</strong><small>Semua metode pembayaran</small></div>
+ </div>
+ <div class="grid2" style="margin-top:14px">
+ <div class="panel"><div class="pagehead" style="margin-bottom:12px"><div><h3>Tren Penjualan 7 Hari</h3><div class="sub">Nilai transaksi per hari</div></div></div>
+ <div style="height:190px;display:flex;align-items:end;gap:clamp(5px,2vw,14px);padding:12px 4px 0;border-bottom:1px solid var(--line)">${days.map(d=>`<div style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:7px"><small style="font-size:10px;color:var(--muted);white-space:nowrap">${d.total?rupiah(d.total):'—'}</small><div title="${esc(d.label)} · ${rupiah(d.total)}" style="width:min(100%,34px);height:${Math.max(3,d.total/maxDay*112)}px;background:linear-gradient(180deg,#39c879,#087b43);border-radius:7px 7px 2px 2px"></div><small style="font-size:11px;color:var(--muted)">${esc(d.label)}</small></div>`).join('')}</div></div>
+ <div class="panel"><h3>Komposisi Pembayaran</h3><div class="totalrow"><span>💵 Tunai</span><b>${rupiah(cash)}</b></div><div class="totalrow"><span>📱 QRIS</span><b>${rupiah(qris)}</b></div><div class="totalrow grand"><span>Total hari ini</span><span>${rupiah(revenue)}</span></div><div class="muted" style="font-size:12px;margin-top:8px">Komposisi dihitung dari transaksi yang tersimpan di perangkat ini.</div></div>
+ </div>
+ <div class="grid2" style="margin-top:14px">
+ <div class="panel"><h3>🏆 Produk Terlaris</h3>${top.length?'<div class="tablewrap"><table><thead><tr><th>Produk</th><th>Terjual</th></tr></thead><tbody>'+top.map(([n,q],i)=>'<tr><td><b>'+(i+1)+'.</b> '+esc(n)+'</td><td>'+q+' unit</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Belum ada data penjualan produk.</div>'}</div>
+ <div class="panel"><h3>⚠️ Stok Menipis</h3>${low.length?low.map(p=>'<div class="cartline"><div><b>'+esc(p.nama)+'</b><div class="muted">'+esc(p.barcode||p.kode||'-')+'</div></div><span class="pill" style="background:#fff0e8;color:#b65b20">'+Number(p.stok||0)+' unit</span></div>').join(''):'<div class="empty">Tidak ada stok menipis.</div>'}</div>
+ </div>
+ <div class="panel" style="margin-top:14px"><div class="pagehead" style="margin-bottom:12px"><h3>Transaksi Terbaru</h3><button class="btn-light" onclick="page('penjualan')">Lihat Semua</button></div>${salesTable(db.sales.slice(-5).reverse())}</div>`;
 }
 function salesTable(rows){if(!rows.length)return '<div class="empty">Belum ada transaksi.</div>';return '<div class="tablewrap"><table><thead><tr><th>No. Transaksi</th><th>Waktu</th><th>Total</th><th>Bayar</th><th>Aksi</th></tr></thead><tbody>'+rows.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.time)}</td><td>${rupiah(s.total)}</td><td><span class="pill">${esc(s.pay)}</span></td><td><button class="btn-light" onclick="editSale('${esc(s.id)}')">Ubah</button> <button class="btn-danger" onclick="showDeleteSaleConfirm('${esc(s.id)}')">Hapus</button></td></tr>`).join('')+'</tbody></table></div>'}
 function showDeleteSaleConfirm(id){const s=db.sales.find(x=>x.id===id);if(!s)return alert('Transaksi tidak ditemukan.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Hapus Transaksi?</h2><p>Hapus transaksi <b>${esc(s.id)}</b> senilai <b>${rupiah(s.total)}</b>?</p><p class="muted">Stok barang pada transaksi ini akan dikembalikan.</p><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-danger" onclick="deleteSaleHistory('${esc(s.id)}')">Ya, Hapus</button></div></div></div>`}
