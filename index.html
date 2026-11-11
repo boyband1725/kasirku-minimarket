@@ -1035,12 +1035,13 @@ async function seamartPrintWindowsSerial(s){
  const parts=[],enc=new TextEncoder(),add=a=>parts.push(a instanceof Uint8Array?a:new Uint8Array(a)),cmd=(...a)=>add(a),line=t=>{add(enc.encode(String(t)));cmd(10);},money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
  cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10);cmd(27,97,0);
 
+ const isCash=String(s.pay||'').toLowerCase().includes('tunai')||String(s.pay||'').toLowerCase().includes('cash');
  const rule='--------------------------------';
  const row=(label,value)=>{const left=String(label),right=String(value),width=32;const gap=Math.max(1,width-left.length-right.length);line(left.slice(0,width-1-right.length)+' '.repeat(gap)+right.slice(-Math.min(right.length,width-2)));};
  line(rule);line('Tanggal / Jam');line(String(s.time||''));line('No. Struk: '+String(s.id));line(rule);
  (s.items||[]).forEach(it=>{line(String(it.nama||'Barang'));row(String(it.qty||0)+' x @'+money(it.harga),money(it.subtotal));});
  line(rule);row('Subtotal',money(s.total));cmd(29,33,16);row('TOTAL',money(s.total));cmd(29,33,0);
- line(rule);row('Metode',String(s.pay||'-'));row('Uang diterima',money(s.paid??s.total));row('Kembalian',money(s.change??0));line(rule);
+ line(rule);row('Metode',String(s.pay||'-'));if(isCash){row('Uang diterima',money(s.paid??s.total));row('Kembalian',money(s.change??Math.max(0,Number(s.paid||s.total)-Number(s.total||0))));}line(rule);
  cmd(27,97,1);line('Terima kasih telah berbelanja');cmd(27,97,0,10,10,10,29,86,66,0);
  const bytes=parts.reduce((a,b)=>{const n=new Uint8Array(a.length+b.length);n.set(a);n.set(b,a.length);return n;},new Uint8Array());
  const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
@@ -1049,6 +1050,7 @@ async function printReceiptNow(id){
  const s=db.sales.find(x=>x.id===id);
  if(!s)return alert('Transaksi tidak ditemukan.');
  const fmt=n=>Number(n||0).toLocaleString('id-ID');
+ const isCash=String(s.pay||'').toLowerCase().includes('tunai')||String(s.pay||'').toLowerCase().includes('cash');
  const logoBase64=await seamartReceiptLogoBase64();
  const content=[
   {type:'image',base64:logoBase64,align:'center',dither:false},
@@ -1067,8 +1069,7 @@ async function printReceiptNow(id){
   {type:'row',left:'TOTAL',right:receiptRupiah(s.total),bold:true},
   {type:'divider'},
   {type:'row',left:'Metode',right:String(s.pay||'-')},
-  {type:'row',left:'Uang diterima',right:receiptRupiah(s.paid??s.total)},
-  {type:'row',left:'Kembalian',right:receiptRupiah(s.change??0),bold:true},
+  ...(isCash?[{type:'row',left:'Uang diterima',right:receiptRupiah(s.paid??s.total)},{type:'row',left:'Kembalian',right:receiptRupiah(s.change??Math.max(0,Number(s.paid||s.total)-Number(s.total||0))),bold:true}]:[]),
   {type:'divider'},
   {type:'text',text:'Terima kasih telah berbelanja',align:'center'},
   {type:'feed',lines:3}
