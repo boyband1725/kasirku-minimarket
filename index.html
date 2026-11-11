@@ -446,6 +446,16 @@ function cancelLogin(){if(history.length>1){history.back();return;}const root=do
 function toggleLoginPasswordVisibility(){const input=document.getElementById("loginPass"),button=document.getElementById("toggleLoginPassword");if(!input||!button)return;const show=input.type==="password";input.type=show?"text":"password";button.textContent=show?"◎":"◉";button.setAttribute("aria-label",show?"Hide password":"Show password");button.title=show?"Hide password":"Show password";}
 function normalizeLoginEmail(value){const v=String(value||'').trim();if(v.includes('@'))return v;if(v.toLowerCase()==='boyband1725')return 'boyband1725@gmail.com';return v;}
 async function requestPasswordReset(){const email=normalizeLoginEmail(document.getElementById('loginUser')?.value||''),status=document.getElementById('cloudLoginError'),button=document.getElementById('forgotPasswordButton');if(!email){status.textContent='Masukkan email akun SeaMart terlebih dahulu.';document.getElementById('loginUser')?.focus();return;}button.disabled=true;button.textContent='Mengirim link…';status.textContent='';try{if(!window.supabase)throw new Error('Library Supabase belum termuat. Muat ulang halaman.');const sb=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV');const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;status.textContent='Jika email terdaftar, link reset akan dikirim. Periksa Inbox dan Spam.';button.textContent='Link reset diminta';}catch(e){status.textContent=e.message||'Gagal mengirim link reset password.';button.disabled=false;button.textContent='Lupa Password?';}}function getSeaMartAuthClient(){if(!window.supabase)throw new Error('Library Supabase belum termuat. Muat ulang halaman.');if(!window.seamartAuthClient)window.seamartAuthClient=window.supabase.createClient('https://kvavvulwrrxfqtihmfnu.supabase.co','sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return window.seamartAuthClient;}
+async function fetchAllStoreProducts(sb,store){
+ const all=[],pageSize=500;
+ for(let from=0;from<10000;from+=pageSize){
+  const result=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',store).range(from,from+pageSize-1);
+  if(result.error)throw result.error;
+  const pageRows=result.data||[];all.push(...pageRows);
+  if(pageRows.length<pageSize)break;
+ }
+ return {data:all,error:null};
+}
 async function finishSeaMartLogin(user){
  const sb=getSeaMartAuthClient();
  const member=await sb.from('store_members').select('store_id,role').eq('user_id',user.id).limit(1).maybeSingle();
@@ -458,13 +468,11 @@ async function finishSeaMartLogin(user){
  const cats=await sb.from('categories').select('id,name').eq('store_id',member.data.store_id);
  if(cats.error)throw cats.error;
  const catNames=new Map((cats.data||[]).map(x=>[x.id,x.name]));
- let remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);
- if(remote.error)throw remote.error;
+ let remote=await fetchAllStoreProducts(sb,member.data.store_id);
  let syncSummary=null;
  if(db.products.length>0){
   syncSummary=await syncAllProducts(remote.data||[]);
-  remote=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',member.data.store_id);
-  if(remote.error)throw remote.error;
+  remote=await fetchAllStoreProducts(sb,member.data.store_id);
   if(syncSummary.added>0||syncSummary.failed>0){
    alert('Sinkronisasi produk: '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada, '+syncSummary.failed+' gagal. Data lokal tetap dipertahankan.');
   }
