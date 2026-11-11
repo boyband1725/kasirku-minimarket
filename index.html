@@ -667,19 +667,21 @@ async function syncOneProduct(p,categoryCache){
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
-function updateSeaMartSyncProgress(percent,message){
+function updateSeaMartSyncProgress(percent,message,stats={}){
  const root=document.getElementById('loginroot');if(!root)return;
  let panel=document.getElementById('seamartSyncProgress');
  if(!panel){
   panel=document.createElement('div');panel.id='seamartSyncProgress';
-  panel.style.cssText='margin-top:16px;padding:18px 17px 16px;border:1px solid #245f45;border-radius:18px;background:radial-gradient(circle at 90% 0%,#1d9b62 0%,transparent 38%),linear-gradient(145deg,#073b2b 0%,#075b3b 55%,#06452f 100%);color:#fff;box-shadow:0 14px 32px rgba(4,65,42,.24);overflow:hidden;position:relative';
   const card=root.querySelector('.login-card');if(card)card.appendChild(panel);
  }
  panel.setAttribute('style','display:block!important;box-sizing:border-box!important;width:100%!important;margin:18px 0 0!important;padding:20px 19px 18px!important;border:1px solid #245f45!important;border-radius:18px!important;background:#075638!important;background-image:radial-gradient(circle at 90% 0%,#168b59 0%,transparent 38%),linear-gradient(145deg,#063b2b 0%,#075638 55%,#06452f 100%)!important;color:#ffffff!important;box-shadow:0 14px 32px rgba(4,65,42,.24)!important;overflow:hidden!important;position:relative!important;opacity:1!important;');
  const pct=Math.max(0,Math.min(100,Math.round(percent)));
  const safeMessage=String(message||'Sinkronisasi data').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- const done=pct>=100;
- panel.innerHTML='<div style="display:flex;align-items:center;gap:11px;margin-bottom:14px"><div style="width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#ffffff20;border:1px solid #ffffff50;display:grid;place-items:center;font-size:21px">☁</div><div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:.5px;color:#ffffff!important">SEAMART CLOUD SYNC</div><div style="font-size:11px;color:#e5fff0!important;margin-top:3px">Sinkronisasi database toko</div></div><div style="font-size:11px;font-weight:900;padding:7px 10px;border-radius:20px;background:'+(done?'#d9fbe7':'#ffffff')+';color:#075b36!important">'+(done?'SELESAI':'LIVE')+'</div></div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px"><div style="font-size:12px;font-weight:800;color:#ffffff!important">PROGRES PENGIRIMAN</div><div style="font-size:44px!important;line-height:1!important;font-weight:1000!important;letter-spacing:-2px;color:#ffffff!important;text-shadow:0 2px 8px #002d1c;font-variant-numeric:tabular-nums;white-space:nowrap">'+pct+'<span style="font-size:25px!important;color:#d8ffb0!important">%</span></div></div><div style="font-size:12px;font-weight:700;color:#f1fff6!important;margin-bottom:10px">'+safeMessage+'</div><div style="height:16px;padding:2px;background:#ffffff40;border:1px solid #ffffff80;border-radius:20px;overflow:hidden;box-shadow:inset 0 2px 4px #00351f55"><div style="height:100%;width:'+pct+'%;border-radius:20px;background:linear-gradient(90deg,#baff68,#e4ffad,#ffffff);box-shadow:0 0 13px #c9ff8a;transition:width .35s ease"></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:#e5fff0!important"><span>● Data lokal tetap tersimpan</span><span>'+(done?'100% tercapai':'Mohon tunggu...')+'</span></div>';
+ const finished=!!stats.finished,failed=Number(stats.failed||0),added=Number(stats.added||0),skipped=Number(stats.skipped||0),total=Number(stats.total||0);
+ const status=finished?(failed?'BELUM BERHASIL':'BERHASIL'):'SEDANG DIPROSES';
+ const statusBg=finished?(failed?'#ffe3e0':'#d9fbe7'):'#ffffff';
+ const statusColor=finished?(failed?'#a32118':'#075b36'):'#075b36';
+ panel.innerHTML='<div style="display:flex;align-items:center;gap:11px;margin-bottom:14px"><div style="width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#ffffff20;border:1px solid #ffffff50;display:grid;place-items:center;font-size:21px">☁</div><div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:900;letter-spacing:.5px;color:#ffffff!important">SEAMART CLOUD SYNC</div><div style="font-size:11px;color:#e5fff0!important;margin-top:3px">Sinkronisasi database toko</div></div><div style="font-size:10px;font-weight:900;padding:7px 9px;border-radius:20px;background:'+statusBg+';color:'+statusColor+'!important;text-align:center">'+status+'</div></div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px"><div style="font-size:12px;font-weight:800;color:#ffffff!important">PROGRES PEMERIKSAAN</div><div style="font-size:44px!important;line-height:1!important;font-weight:1000!important;letter-spacing:-2px;color:#ffffff!important;text-shadow:0 2px 8px #002d1c;font-variant-numeric:tabular-nums;white-space:nowrap">'+pct+'<span style="font-size:25px!important;color:#d8ffb0!important">%</span></div></div><div style="font-size:12px;font-weight:700;color:#f1fff6!important;margin-bottom:10px">'+safeMessage+'</div><div style="height:16px;padding:2px;background:#ffffff40;border:1px solid #ffffff80;border-radius:20px;overflow:hidden;box-shadow:inset 0 2px 4px #00351f55"><div style="height:100%;width:'+pct+'%;border-radius:20px;background:linear-gradient(90deg,#baff68,#e4ffad,#ffffff);box-shadow:0 0 13px #c9ff8a;transition:width .35s ease"></div></div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:14px;text-align:center"><div><div style="font-size:10px;color:#e5fff0">Baru terkirim</div><div style="font-size:20px;font-weight:900;color:#fff">'+added+'</div></div><div><div style="font-size:10px;color:#e5fff0">Sudah ada</div><div style="font-size:20px;font-weight:900;color:#fff">'+skipped+'</div></div><div><div style="font-size:10px;color:#ffd7d2">Gagal</div><div style="font-size:20px;font-weight:900;color:'+(failed?'#ffb4aa':'#fff')+'">'+failed+'</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:13px;font-size:11px;color:#e5fff0!important"><span>● Data lokal tetap tersimpan</span><span>'+(finished?(failed?'Perlu perbaikan':'Semua berhasil'):'Mohon tunggu...')+'</span></div>';
 }
 async function syncAllProducts(existingRows=[]){
  const norm=v=>String(v??'').trim();
@@ -692,8 +694,8 @@ async function syncAllProducts(existingRows=[]){
   candidates.push({p,index:i});
  }
  const total=candidates.length;
- updateSeaMartSyncProgress(0,'Menyiapkan '+db.products.length+' produk');
- if(!total){updateSeaMartSyncProgress(100,'Semua produk sudah ada');return summary;}
+ updateSeaMartSyncProgress(0,'Menyiapkan '+db.products.length+' produk',{total,added:0,skipped:summary.skipped,failed:0});
+ if(!total){updateSeaMartSyncProgress(100,'Semua produk sudah ada di cloud',{total:0,added:0,skipped:summary.skipped,failed:0,finished:true});return summary;}
  const categoryCache=new Map();
  let completed=0;
  for(let i=0;i<candidates.length;i+=20){
@@ -712,9 +714,9 @@ async function syncAllProducts(existingRows=[]){
    else{summary.failed++;if(summary.errors.length<10)summary.errors.push((item.p.nama||item.p.kode||('Baris '+(item.index+1)))+': '+(result.reason?.message||String(result.reason)));}
   });
   completed+=batch.length;save();
-  updateSeaMartSyncProgress(completed/total*100,'Mengirim produk '+completed+' dari '+total);
+  updateSeaMartSyncProgress(completed/total*100,'Memeriksa '+completed+' dari '+total+' produk antrean',{total,added:summary.added,skipped:summary.skipped,failed:summary.failed});
  }
- updateSeaMartSyncProgress(100,summary.failed?'Selesai dengan '+summary.failed+' produk gagal':'Sinkronisasi selesai');
+ updateSeaMartSyncProgress(100,'Pemeriksaan antrean selesai: '+completed+' dari '+total,{total,added:summary.added,skipped:summary.skipped,failed:summary.failed,finished:true});
  if(summary.failed)console.warn('Produk gagal disinkronkan:',summary.errors);
  return summary;
 }
