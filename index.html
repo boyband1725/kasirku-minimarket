@@ -495,9 +495,19 @@ function updateCloseCashierDifference(){const sh=currentShift(),input=document.g
 function finalizeCashierClosing(shiftId){const sh=currentShift();if(!sh||sh.id!==shiftId)return alert('Sesi kasir tidak ditemukan.');const input=document.getElementById('cashierClosingActual');if(!input||input.value===''||!Number.isFinite(Number(input.value))||Number(input.value)<0)return alert('Masukkan jumlah uang tunai fisik yang valid.');const sales=db.sales.filter(x=>x.shiftId===sh.id||(!x.shiftId&&new Date(x.at||x.time).getTime()>=new Date(sh.openedAt).getTime())),cash=sales.filter(x=>String(x.pay||'Tunai').toUpperCase()==='TUNAI').reduce((a,x)=>a+Number(x.total||0),0),qris=sales.filter(x=>String(x.pay||'').toUpperCase()==='QRIS').reduce((a,x)=>a+Number(x.total||0),0),actual=Number(input.value),expected=Number(sh.opening||0)+cash;sh.closedAt=new Date().toISOString();sh.status='closed';sh.transactionCount=sales.length;sh.cashSales=cash;sh.qrisSales=qris;sh.totalSales=cash+qris;sh.expectedCash=expected;sh.actualCash=actual;sh.difference=actual-expected;save();updateShiftButton();document.getElementById('modalroot').innerHTML='<div class="modalback" style="position:fixed;inset:0;background:#17212b99;z-index:100001;display:grid;place-items:center;padding:16px"><div class="modal" style="width:min(100%,520px);background:#fff;border-radius:16px;padding:24px;text-align:center"><div style="font-size:42px;color:#16845b">✓</div><h2>Kasir berhasil ditutup</h2><p class="muted">Ringkasan sesi tersimpan di perangkat ini.</p><div class="totalrow"><span>Total penjualan</span><b>'+rupiah(sh.totalSales)+'</b></div><div class="totalrow"><span>Kas seharusnya</span><b>'+rupiah(sh.expectedCash)+'</b></div><div class="totalrow"><span>Kas fisik</span><b>'+rupiah(sh.actualCash)+'</b></div><div class="totalrow"><span>Selisih</span><b>'+(sh.difference===0?'Seimbang':(sh.difference>0?'Lebih ':'Kurang ')+rupiah(Math.abs(sh.difference)))+'</b></div><div class="actions" style="justify-content:center"><button class="btn-light" onclick="closeModal()">Selesai</button><button class="btn-primary" onclick="printCashierClosing(\''+sh.id+'\')">Cetak Ringkasan</button></div></div></div>';}
 async function seamartPrintClosingWindowsSerial(lines){
  if(!seamartWindowsSerialPort||!seamartWindowsSerialPort.writable)throw new Error('Printer PC belum dipilih. Klik Pilih Printer PC terlebih dahulu.');
- const enc=new TextEncoder(),parts=[],add=(...a)=>parts.push(new Uint8Array(a)),line=t=>{parts.push(enc.encode(String(t)));add(10);};
- add(27,64,27,97,1);line('SEAMART POS');line('RINGKASAN TUTUP KASIR');add(27,97,0);line('--------------------------------');
- lines.forEach(x=>line(x));line('--------------------------------');add(27,97,1);line('Terima kasih');add(27,97,0);add(10,10,10,29,86,66,0);
+ const logo=await seamartReceiptLogoBase64(),img=new Image(),url='data:image/png;base64,'+logo;
+ await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});
+ const w=384,h=Math.max(1,Math.round(img.height*w/img.width)),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+ const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+ const px=ctx.getImageData(0,0,w,h).data,bpr=Math.ceil(w/8),raster=new Uint8Array(bpr*h);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if((.299*px[i]+.587*px[i+1]+.114*px[i+2])<175)raster[y*bpr+(x>>3)]|=128>>(x&7);}
+ const enc=new TextEncoder(),parts=[],add=a=>parts.push(a instanceof Uint8Array?a:new Uint8Array(a)),cmd=(...a)=>add(a),line=t=>{add(enc.encode(String(t)));cmd(10);};
+ const rule='--------------------------------',width=32;
+ const row=(label,value)=>{label=String(label);value=String(value);const maxLeft=Math.max(1,width-value.length-1);line(label.slice(0,maxLeft)+' '.repeat(Math.max(1,width-Math.min(label.length,maxLeft)-value.length))+value.slice(-width+1));};
+ cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10);
+ line(rule);line('RINGKASAN TUTUP KASIR');line('Tanggal / Jam');line(new Date().toLocaleString('id-ID'));line(rule);
+ lines.forEach(x=>{const p=String(x).split(': ');if(p.length>1)row(p.shift(),p.join(': '));else line(x);});
+ line(rule);cmd(27,97,1);line('Terima kasih');cmd(27,97,0);cmd(10,10,10,29,86,66,0);
  const bytes=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let off=0;for(const p of parts){bytes.set(p,off);off+=p.length;}
  const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
 }
@@ -512,7 +522,7 @@ async function printCashierClosing(shiftId){
  const diff=actual-expected,fmt=n=>rupiah(Number(n)||0);
  const line=(label,value)=>({type:'text',text:label+': '+value,align:'center'});
  const content=[
-  {type:'text',text:'SEAMART POS',align:'center',bold:true},
+  {type:'image',base64:await seamartReceiptLogoBase64(),align:'center',dither:false},
   {type:'text',text:'RINGKASAN TUTUP KASIR',align:'center',bold:true},
   {type:'text',text:'Sesi '+String(sh.id),align:'center'},
   {type:'text',text:new Date().toLocaleString('id-ID'),align:'center'},
