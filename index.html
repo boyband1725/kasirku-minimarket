@@ -685,12 +685,22 @@ function updateSeaMartSyncProgress(percent,message,stats={}){
 }
 async function syncAllProducts(existingRows=[]){
  const norm=v=>String(v??'').trim();
+ const key=v=>norm(v).toLocaleLowerCase('id-ID');
  const seenIds=new Set(existingRows.map(r=>norm(r.id)).filter(Boolean));
+ const remoteByCode=new Map();
+ for(const r of existingRows){const code=norm(r.code);if(code&&!remoteByCode.has(code))remoteByCode.set(code,r);}
  const candidates=[];
  const summary={added:0,skipped:0,failed:0,errors:[]};
  for(let i=0;i<db.products.length;i++){
-  const p=db.products[i],id=norm(p.id);
+  const p=db.products[i],id=norm(p.id),code=norm(p.kode);
   if(id&&seenIds.has(id)){summary.skipped++;continue;}
+  const sameCode=code?remoteByCode.get(code):null;
+  if(sameCode){
+   if(key(sameCode.name)===key(p.nama)){summary.skipped++;continue;}
+   summary.failed++;
+   if(summary.errors.length<10)summary.errors.push((p.nama||code||('Baris '+(i+1)))+': kode barang '+code+' sudah dipakai oleh '+(sameCode.name||'barang lain')+' di cloud; perlu pemeriksaan manual.');
+   continue;
+  }
   candidates.push({p,index:i});
  }
  const total=candidates.length;
