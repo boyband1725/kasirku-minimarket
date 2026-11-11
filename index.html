@@ -474,7 +474,7 @@ async function finishSeaMartLogin(user){
   syncSummary=await syncAllProducts(remote.data||[]);
   remote=await fetchAllStoreProducts(sb,member.data.store_id);
   if(syncSummary.added>0||syncSummary.failed>0){
-   alert('Sinkronisasi produk: '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada, '+syncSummary.failed+' gagal. Data lokal tetap dipertahankan.');
+   alert('Sinkronisasi produk: '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada, '+syncSummary.failed+' gagal. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\nContoh error: '+syncSummary.errors.slice(0,3).join(' | '):''));
   }
  }
  const local=[...db.products];
@@ -669,14 +669,11 @@ async function syncOneProduct(p,categoryCache){
 async function syncAllProducts(existingRows=[]){
  const norm=v=>String(v??'').trim();
  const seenIds=new Set(existingRows.map(r=>norm(r.id)).filter(Boolean));
- const seenCodes=new Set(existingRows.map(r=>norm(r.code)).filter(Boolean));
- const seenBarcodes=new Set(existingRows.map(r=>norm(r.barcode)).filter(Boolean));
  const candidates=[];
  const summary={added:0,skipped:0,failed:0,errors:[]};
  for(let i=0;i<db.products.length;i++){
-  const p=db.products[i],id=norm(p.id),code=norm(p.kode),barcode=norm(p.barcode);
-  if((id&&seenIds.has(id))||(code&&seenCodes.has(code))||(barcode&&seenBarcodes.has(barcode))){summary.skipped++;continue;}
-  if(id)seenIds.add(id);if(code)seenCodes.add(code);if(barcode)seenBarcodes.add(barcode);
+  const p=db.products[i],id=norm(p.id);
+  if(id&&seenIds.has(id)){summary.skipped++;continue;}
   candidates.push({p,index:i});
  }
  const categoryCache=new Map();
