@@ -806,7 +806,7 @@ async function seamartPrintWindowsSerial(s){
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if((.299*px[i]+.587*px[i+1]+.114*px[i+2])<175)raster[y*bpr+(x>>3)]|=128>>(x&7);}
  const parts=[],enc=new TextEncoder(),add=a=>parts.push(a instanceof Uint8Array?a:new Uint8Array(a)),cmd=(...a)=>add(a),line=t=>{add(enc.encode(String(t)));cmd(10);},money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
  cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10);
- cmd(27,97,1);line('SEAMART');line('');cmd(27,97,0);
+
  const rule='--------------------------------';
  const row=(label,value)=>{const left=String(label),right=String(value),width=32;const gap=Math.max(1,width-left.length-right.length);line(left.slice(0,width-1-right.length)+' '.repeat(gap)+right.slice(-Math.min(right.length,width-2)));};
  line(rule);line('Tanggal / Jam');line(String(s.time||''));line('No. Struk: '+String(s.id));line(rule);
@@ -824,7 +824,7 @@ async function printReceiptNow(id){
  const logoBase64=await seamartReceiptLogoBase64();
  const content=[
   {type:'image',base64:logoBase64,align:'center',dither:false},
-  {type:'text',text:'SEAMART',bold:true,align:'center'},
+
   {type:'divider'},
   {type:'text',text:'Tanggal / Jam',align:'left'},
   {type:'text',text:String(s.time||''),align:'left'},
