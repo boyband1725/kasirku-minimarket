@@ -462,6 +462,7 @@ async function finishSeaMartLogin(user){
  if(member.error)throw member.error;
  if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');
  window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;
+ const loginRoot=document.getElementById('loginroot');if(loginRoot){loginRoot.style.display='block';loginRoot.innerHTML='<div class="login-screen"><div class="login-card" style="max-width:440px"><div class="login-brand"><h2>SeaMart</h2></div><h2 style="margin:8px 0 4px">Login berhasil!</h2><p style="color:#64748b;font-size:13px;margin:0">Menyiapkan data toko sebelum masuk kasir</p><div id="seamartSyncProgress"></div></div></div>';}
  const cloudFlows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',member.data.store_id).order('transaction_date',{ascending:false});
  if(!cloudFlows.error){db.cashflows=(cloudFlows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;save();}
  else{console.warn('Arus kas cloud belum tersedia:',cloudFlows.error.message);}
@@ -662,7 +663,7 @@ async function syncOneProduct(p,categoryCache){
   if(!categoryCache.has(key))categoryCache.set(key,(async()=>{const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',key).limit(1).maybeSingle();if(c.error)throw c.error;return c.data?.id||null;})());
   categoryId=await categoryCache.get(key);
  }
- const row={id:p.id,store_id:store,code:p.kode||null,barcode:p.barcode||null,name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
+ const row={id:p.id,store_id:store,code:p.kode||null,barcode:String(p.barcode||'').trim(),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
