@@ -1507,8 +1507,9 @@ async function onlineOrdersPage(){
  const view=document.getElementById('view');
  if(currentUser.role!=='admin'){view.innerHTML='<div class="notice">Menu khusus pemilik/admin.</div>';return}
  if(!window.seamartSupabase||!window.seamartStoreId){view.innerHTML='<div class="notice">Login admin melalui Supabase diperlukan.</div>';return}
- view.innerHTML='<div class="pagehead"><div><h1>Pesanan Online</h1><div class="sub">Kelola pesanan toko online SeaMart.</div></div><button class="btn-light" id="reloadOnlineOrders">Muat ulang</button></div><div id="onlineOrdersList" class="panel">Memuat...</div>';
+ view.innerHTML='<div class="pagehead"><div><h1>Pesanan Online</h1><div class="sub">Kelola pesanan toko online SeaMart.</div></div><div class="actions"><button class="btn-light" id="connectOnlinePrinter">Hubungkan Printer Bluetooth</button><button class="btn-light" id="reloadOnlineOrders">Muat ulang</button></div></div><div id="onlineOrdersList" class="panel">Memuat...</div>';
  document.getElementById('reloadOnlineOrders').onclick=onlineOrdersPage;
+ document.getElementById('connectOnlinePrinter').onclick=connectWindowsReceiptPrinter;
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  // Realtime notification for new customer orders while admin is signed in.
  if(window.seamartOrderChannel){try{await sb.removeChannel(window.seamartOrderChannel)}catch(e){}}
@@ -1538,19 +1539,20 @@ async function onlineOrdersPage(){
 async function saveOnlineOrderStatus(id){const status=document.getElementById('os-'+id)?.value;if(!status)return;const r=await window.seamartSupabase.from('online_orders').update({order_status:status,updated_at:new Date().toISOString()}).eq('id',id).eq('store_id',window.seamartStoreId);if(r.error){alert('Gagal menyimpan: '+r.error.message);return}alert('Status pesanan tersimpan.');onlineOrdersPage()}
 async function showOnlineOrderItems(id){const r=await window.seamartSupabase.from('online_order_items').select('product_name,quantity,unit_price,line_total').eq('order_id',id);if(r.error){alert(r.error.message);return}const o=(window.seamartOnlineOrders||[]).find(x=>x.id===id);const lines=(r.data||[]).map(x=>x.product_name+' x '+x.quantity+' = Rp'+Number(x.line_total).toLocaleString('id-ID')).join('\\n');alert((o?.order_code||'Pesanan')+'\\nPelanggan: '+(o?.customer_name||'')+'\\nTelepon: '+(o?.customer_phone||'')+'\\nAlamat: '+(o?.customer_address||'-')+'\\nCatatan: '+(o?.customer_note||'-')+'\\n\\n'+lines)}
 async function printOnlineOrder(id){
- const win=window.open('','_blank','width=420,height=700');
- if(!win){alert('Izinkan pop-up untuk mencetak struk pesanan.');return}
  try{
   const o=(window.seamartOnlineOrders||[]).find(x=>x.id===id);
   if(!o)throw new Error('Pesanan tidak ditemukan.');
   const r=await window.seamartSupabase.from('online_order_items').select('product_name,quantity,unit_price,line_total').eq('order_id',id);
   if(r.error)throw r.error;
-  const safe=v=>String(v??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-  const money=v=>'Rp'+Number(v||0).toLocaleString('id-ID');
-  const items=(r.data||[]).map(x=>'<tr><td>'+safe(x.product_name)+'<br><small>'+Number(x.quantity)+' x '+money(x.unit_price)+'</small></td><td style="text-align:right">'+money(x.line_total)+'</td></tr>').join('');
-  win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Struk '+safe(o.order_code)+'</title><style>body{font:12px Arial,sans-serif;width:280px;margin:12px auto;color:#111}h2,p{text-align:center;margin:4px 0}hr{border:0;border-top:1px dashed #333;margin:9px 0}table{width:100%;border-collapse:collapse}td{padding:5px 0;vertical-align:top}small{font-size:10px}.total{font-weight:bold;font-size:15px;text-align:right}.note{white-space:pre-wrap;overflow-wrap:anywhere}@media print{body{margin:0 auto}}</style></head><body><h2>SEAMART</h2><p>STRUK PESANAN ONLINE</p><hr><b>'+safe(o.order_code)+'</b><br>'+new Date(o.created_at).toLocaleString('id-ID')+'<hr>Pelanggan: '+safe(o.customer_name)+'<br>Telepon: '+safe(o.customer_phone)+'<br>Alamat: '+safe(o.customer_address||'-')+'<br>Catatan: <span class="note">'+safe(o.customer_note||'-')+'</span><hr><table>'+items+'</table><hr><div class="total">TOTAL '+money(o.subtotal)+'</div><hr>Pembayaran: '+safe(o.payment_method)+' / '+safe(o.payment_status)+'<p>Terima kasih</p><script>window.onload=()=>{window.focus();window.print()}<\\/script></body></html>');
-  win.document.close();
- }catch(e){win.close();alert('Gagal membuat struk: '+(e.message||e))}
+  const ready=await ensureWindowsReceiptPrinter();
+  if(!ready){
+   alert('Printer belum terhubung. Klik Hubungkan Printer Bluetooth di bagian atas halaman, pilih port COM printer satu kali, lalu tekan Cetak Struk lagi.');
+   return;
+  }
+  const sale={id:o.order_code,time:new Date(o.created_at).toLocaleString('id-ID'),items:(r.data||[]).map(x=>({nama:x.product_name,qty:x.quantity,harga:x.unit_price,subtotal:x.line_total})),total:Number(o.subtotal||0),pay:o.payment_method==='cod'?'COD':o.payment_method==='qris'?'QRIS':o.payment_method==='bank_transfer'?'Transfer Bank':'Ambil di Toko'};
+  await seamartPrintWindowsSerial(sale);
+  alert('Struk pesanan '+o.order_code+' berhasil dikirim ke printer Bluetooth.');
+ }catch(e){console.error(e);alert('Gagal mencetak struk: '+(e.message||e))}
 }
 
 function cashFlowPage(){
