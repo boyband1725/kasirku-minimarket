@@ -808,8 +808,10 @@ async function seamartPrintWindowsSerial(s){
  cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10,27,97,0);
  line('--------------------------------');line('No: '+s.id);line('Tanggal: '+(s.time||''));line('--------------------------------');
  (s.items||[]).forEach(it=>{line(String(it.nama||'Barang'));line(String(it.qty||0)+' x '+money(it.harga)+' = '+money(it.subtotal));});
- line('--------------------------------');line('Subtotal: '+money(s.total));cmd(29,33,16);line('TOTAL: '+money(s.total));cmd(29,33,0);
- line('Metode: '+(s.pay||'-'));line('Uang diterima: '+money(s.paid??s.total));line('Kembalian: '+money(s.change??0));
+ const rule='--------------------------------';
+ const row=(label,value)=>{const left=String(label),right=String(value),width=32;const gap=Math.max(1,width-left.length-right.length);line(left.slice(0,width-1-right.length)+' '.repeat(gap)+right.slice(-Math.min(right.length,width-2)));};
+ line(rule);row('Subtotal',money(s.total));cmd(29,33,16);row('TOTAL',money(s.total));cmd(29,33,0);
+ cmd(27,97,0);line('');line(rule);line('RINCIAN PEMBAYARAN');row('Metode',String(s.pay||'-'));row('Uang diterima',money(s.paid??s.total));row('Kembalian',money(s.change??0));line(rule);
  cmd(27,97,1);line('Terima kasih telah berbelanja');cmd(27,97,0,10,10,10,29,86,66,0);
  const bytes=parts.reduce((a,b)=>{const n=new Uint8Array(a.length+b.length);n.set(a);n.set(b,a.length);return n;},new Uint8Array());
  const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
