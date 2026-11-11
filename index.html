@@ -739,7 +739,7 @@ function checkout(){
  <button type="button" id="chooseCash" class="sm-payment-option ${current==='Tunai'?'active':''}" onclick="selectPaymentMethod('Tunai')"><span>💵</span><b>Tunai</b><small>Uang cash</small></button>
  <button type="button" id="chooseQris" class="sm-payment-option ${current==='QRIS'?'active':''}" onclick="selectPaymentMethod('QRIS')"><span>▦</span><b>QRIS</b><small>Pembayaran QR</small></button>
  </div>
- <div id="smCashFields" style="display:${current==='Tunai'?'block':'none'};margin-top:14px"><label style="font-size:12px;font-weight:800">UANG DITERIMA (Rp)</label><input id="smCashReceived" class="field" type="number" min="${total}" inputmode="numeric" placeholder="Masukkan uang pelanggan" style="width:100%;min-height:46px;margin-top:6px" oninput="updatePaymentModalChange()"><div class="totalrow"><span>Kembalian</span><b id="smCashChange">Rp 0</b></div></div>
+ <div id="smCashFields" style="display:${current==='Tunai'?'block':'none'};margin-top:14px"><label style="font-size:12px;font-weight:800">UANG DITERIMA (Rp)</label><input id="smCashReceived" class="field" type="number" min="${total}" inputmode="numeric" ${current==='QRIS'?'disabled':''} placeholder="Masukkan uang pelanggan" style="width:100%;min-height:46px;margin-top:6px" oninput="updatePaymentModalChange()"><div class="totalrow"><span>Kembalian</span><b id="smCashChange">Rp 0</b></div></div>
  <div id="smQrisInfo" class="notice" style="display:${current==='QRIS'?'block':'none'};margin-top:14px">Pastikan pembayaran QRIS pelanggan sudah berhasil sebelum menekan tombol Konfirmasi.</div>
  <div class="actions"><button class="btn-primary" style="width:100%;min-height:48px" onclick="confirmPayment()">Konfirmasi Pembayaran · ${rupiah(total)}</button></div>
  </div></div>`;
@@ -750,6 +750,7 @@ function selectPaymentMethod(method){
  document.getElementById('paymethod').value=method;
  document.getElementById('chooseCash').classList.toggle('active',method==='Tunai');
  document.getElementById('chooseQris').classList.toggle('active',method==='QRIS');
+ const cashInput=document.getElementById('smCashReceived');if(cashInput)cashInput.disabled=method!=='Tunai';
  document.getElementById('smCashFields').style.display=method==='Tunai'?'block':'none';
  document.getElementById('smQrisInfo').style.display=method==='QRIS'?'block':'none';
 }
