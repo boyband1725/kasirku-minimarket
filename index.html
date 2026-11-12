@@ -598,6 +598,42 @@
  width:100%!important;
 }
 
+
+/* Final reference-based SeaMart login proportions */
+#loginroot .login-card{
+ box-sizing:border-box!important;
+ width:84vw!important;
+ height:87dvh!important;
+ min-height:0!important;
+ max-height:87dvh!important;
+ padding:4.5dvh 5vw 5dvh!important;
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:flex-start!important;
+ overflow-y:auto!important;
+}
+#loginroot .login-brand{width:60%!important;max-width:360px!important;margin:0 auto 2.2dvh!important}
+#loginroot .login-card h2{text-align:center!important;font-size:clamp(22px,2.5vw,30px)!important;margin:0 0 3dvh!important}
+#loginroot .login-card label{margin:1.5dvh 0 .7dvh!important}
+#loginroot .login-card input{height:7dvh!important;min-height:48px!important}
+#loginroot .login-password-wrap{margin-top:.8dvh!important}
+#loginroot .login-forgot{margin:1.8dvh 0 0 auto!important}
+#loginroot .login-actions{margin:3.8dvh 0 0!important;gap:1.2vw!important}
+#loginroot .login-actions button{min-height:8dvh!important}
+@media(max-width:600px){
+ #loginroot .login-card{
+  width:84vw!important;height:87dvh!important;min-height:0!important;max-height:87dvh!important;
+  padding:4dvh 5.2vw 5dvh!important;
+ }
+ #loginroot .login-brand{width:62%!important;max-width:none!important;margin:0 auto 2.2dvh!important}
+ #loginroot .login-card h2{font-size:clamp(20px,5vw,25px)!important;margin:0 0 2.8dvh!important}
+ #loginroot .login-card label{margin:1.3dvh 0 .7dvh!important}
+ #loginroot .login-card input{height:6.8dvh!important;min-height:48px!important}
+ #loginroot .login-forgot{margin-top:1.8dvh!important;font-size:clamp(14px,3.8vw,17px)!important}
+ #loginroot .login-actions{margin-top:3.8dvh!important;gap:2vw!important;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr)!important}
+ #loginroot .login-actions button{min-height:7.5dvh!important;font-size:clamp(14px,4vw,18px)!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
