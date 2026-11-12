@@ -586,7 +586,7 @@ async function seamartPrintClosingWindowsSerial(lines){
  const row=(label,value)=>{label=String(label);value=String(value);const maxLeft=Math.max(1,width-value.length-1);line(label.slice(0,maxLeft)+' '.repeat(Math.max(1,width-Math.min(label.length,maxLeft)-value.length))+value.slice(-width+1));};
  cmd(27,64,27,97,1);cmd(29,118,48,0,bpr&255,(bpr>>8)&255,h&255,(h>>8)&255);add(raster);cmd(10,10);
  line(rule);line('RINGKASAN TUTUP KASIR');line('Tanggal / Jam');line(new Date().toLocaleString('id-ID'));line(rule);
- lines.forEach(x=>{const p=String(x).split(': ');if(p.length>1)row(p.shift(),p.join(': '));else line(x);});
+ lines.forEach(x=>{const p=String(x).split(': ');if(p.length>1){const label=p.shift(),value=p.join(': '),emphasis=label==='Total Penjualan';if(emphasis)cmd(27,69,1);row(label,value);if(emphasis)cmd(27,69,0);}else line(x);});
  line(rule);cmd(27,97,1);line('Terima kasih');cmd(27,97,0);cmd(10,10,10,29,86,66,0);
  const bytes=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let off=0;for(const p of parts){bytes.set(p,off);off+=p.length;}
  const writer=seamartWindowsSerialPort.writable.getWriter();try{await writer.write(bytes);}finally{writer.releaseLock();}
@@ -612,7 +612,8 @@ async function printCashierClosing(shiftId){
   {type:'text',text:'--------------------------------',align:'center'},
   line('Bayar Tunai',fmt(cash)),
   line('Bayar QRIS',fmt(qris)),
-  line('TOTAL PENJUALAN',fmt(total)),
+  {type:'text',text:'--------------------------------',align:'center'},
+  {type:'row',left:'Total Penjualan',right:fmt(total),bold:true},
   {type:'text',text:'--------------------------------',align:'center'},
   line('Modal awal kas',fmt(sh.opening)),
   line('Kas seharusnya',fmt(expected)),
@@ -626,7 +627,7 @@ async function printCashierClosing(shiftId){
  try{
   if(seamartWindowsSerialPort){await seamartPrintClosingWindowsSerial([
    'Sesi: '+String(sh.id),'Kasir: '+String(sh.nama||sh.username||'-'),'Jumlah transaksi: '+sales.length,
-   'Bayar Tunai: '+fmt(cash),'Bayar QRIS: '+fmt(qris),'TOTAL: '+fmt(total),
+   'Bayar Tunai: '+fmt(cash),'Bayar QRIS: '+fmt(qris),'--------------------------------','Total Penjualan: '+fmt(total),'--------------------------------',
    'Modal awal: '+fmt(sh.opening),'Kas seharusnya: '+fmt(expected),'Uang fisik: '+fmt(actual),
    'Selisih: '+(diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff)))
   ]);alert('Ringkasan tutup kasir berhasil dikirim ke printer PC.');return;}
