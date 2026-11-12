@@ -649,8 +649,32 @@ function saveCategoryGroupState(name,hidden){const clean=String(name||'').trim()
 function setAllCategoryGroupsHidden(hidden){const action=hidden?'menyembunyikan':'menampilkan kembali';if(!confirm('Yakin '+action+' semua kelompok barang?'))return;getCategoryGroups().forEach(g=>saveCategoryGroupState(g.name,hidden));window.posCategory='Semua';alert(hidden?'Semua kelompok disembunyikan dari filter kasir.':'Semua kelompok ditampilkan kembali.');if(document.getElementById('groupTable'))categoryGroupsPage();if(document.getElementById('poscategories'))renderPosProducts()}
 function toggleCategoryGroup(name,hidden){saveCategoryGroupState(name,hidden);if(window.posCategory===name&&hidden)window.posCategory='Semua';categoryGroupsPage()}
 function addCategoryGroup(){const name=prompt('Nama kelompok barang baru:');if(!name||!name.trim())return;const clean=name.trim();if(getCategoryGroups().some(g=>categoryGroupKey(g.name)===categoryGroupKey(clean)))return alert('Kelompok barang sudah ada.');db.categoryGroups.push({name:clean,hidden:false});save();saveCategoryGroupCloud(clean,false).catch(e=>{console.error('Sinkronisasi kelompok barang gagal:',e);alert('Kelompok dibuat di perangkat, tetapi gagal disimpan ke cloud: '+(e.message||e));});categoryGroupsPage()}
-function openCategoryProducts(name){
+async function openCategoryProducts(name){
  window.openCategoryName=name;
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ // Ambil langsung berdasarkan category_id dari Supabase agar seluruh barang cloud tampil,
+ // bukan hanya barang yang kebetulan sudah ada di cache browser.
+ if(sb&&store){
+  try{
+   const category=await sb.from('categories').select('id').eq('store_id',store).ilike('name',String(name).trim()).limit(1).maybeSingle();
+   if(category.error)throw category.error;
+   if(category.data){
+    const cloudRows=[];
+    for(let from=0;from<10000;from+=500){
+     const result=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active').eq('store_id',store).eq('category_id',category.data.id).range(from,from+499);
+     if(result.error)throw result.error;
+     const rows=result.data||[];cloudRows.push(...rows);
+     if(rows.length<500)break;
+    }
+    for(const row of cloudRows){
+     const mapped={id:row.id,nama:row.name||'',kode:row.code||'',barcode:row.barcode||'',kategori:name,harga:Number(row.price||0),harga_jual_1:Number(row.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(row.stock||0),active:row.active!==false};
+     const existing=db.products.find(p=>String(p.id||'')===String(row.id)||((row.code||p.kode)&&String(p.kode||'')===String(row.code||''))||((row.barcode||p.barcode)&&String(p.barcode||'')===String(row.barcode||'')));
+     if(existing)Object.assign(existing,mapped);else db.products.push(mapped);
+    }
+    save();
+   }
+  }catch(e){console.error('Gagal memuat barang kelompok dari cloud:',e);alert('Daftar cloud belum berhasil dimuat: '+(e.message||e));}
+ }
  const assigned=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===categoryGroupKey(name));
  const available=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')!==categoryGroupKey(name));
  document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Barang: ${esc(name)}</h1><div class="sub" id="categoryProductCount">${assigned.length} barang dalam kelompok ini.</div></div><button class="btn-light" onclick="page('kelompok')">← Kembali ke Kelompok</button></div><div class="panel"><h3>Masukkan barang ke kelompok ${esc(name)}</h3><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><select id="assignCategoryProduct" class="field" style="min-width:260px;flex:1"><option value="">Pilih barang dari master barang...</option>${available.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.nama)+' — '+esc(p.kode||p.barcode||'')+' ('+esc(p.kategori||'Umum')+')</option>').join('')}</select><button class="btn-primary" onclick="assignProductToGroup()">＋ Masukkan Barang</button></div><div class="emptyhint" style="margin-top:8px">Barang yang dipilih akan dipindahkan kategorinya ke kelompok ini dan disimpan ke cloud.</div></div><div class="panel"><h3>Daftar Barang Kelompok Ini</h3><input id="categoryProductSearch" class="field" style="width:100%;max-width:420px;margin-bottom:12px" placeholder="Cari barang dalam kelompok ini..." oninput="filterCategoryProducts(window.openCategoryName)"><div id="categoryProductTable"></div></div>`;
