@@ -1145,9 +1145,9 @@ async function validateProductPhoto(url,targetName,sourceName){
  if(!wanted.length||!shared.length)throw new Error('Nama produk tidak cocok dengan data foto. Foto ditolak.');
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat. Foto ditolak.'));img.src=url});
- if(img.naturalWidth<250||img.naturalHeight<250)throw new Error('Resolusi foto terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Foto ditolak.');
+ if(img.naturalWidth<120||img.naturalHeight<160)throw new Error('Resolusi foto terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Minimal 120×160 piksel. Foto ditolak.');
  const ratio=img.naturalWidth/img.naturalHeight;
- if(ratio<0.45||ratio>2.2)throw new Error('Proporsi gambar tidak layak untuk foto produk. Foto ditolak.');
+ if(ratio<0.3||ratio>2.5)throw new Error('Proporsi gambar tidak layak untuk foto produk. Foto ditolak.');
  return {width:img.naturalWidth,height:img.naturalHeight,matched:shared.join(', ')};
 }
 function setInlinePhotoProgress(percent,message,show=true){
