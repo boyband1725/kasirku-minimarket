@@ -1040,6 +1040,23 @@ db.sales=Array.isArray(db.sales)?db.sales.filter(t=>t&&typeof t==='object'):[];
 db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+async function uploadSeaMartProductPhoto(p,sb,store){
+ const photo=String(p.foto||'').trim();
+ if(!photo)return null;
+ if(/^https?:\\/\\//i.test(photo))return photo;
+ const match=photo.match(/^data:(image\\/[a-z0-9.+-]+);base64,(.+)$/i);
+ if(!match)throw new Error('Format foto produk tidak didukung.');
+ const mime=match[1].toLowerCase(),ext=mime.includes('png')?'png':mime.includes('webp')?'webp':'jpg';
+ const binary=atob(match[2]),bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ const blob=new Blob([bytes],{type:mime}),path=String(store)+'/'+String(p.id)+'.'+ext;
+ const bucket=sb.storage.from('product-images');
+ const uploaded=await bucket.upload(path,blob,{upsert:true,contentType:mime,cacheControl:'3600'});
+ if(uploaded.error)throw new Error('Foto belum terunggah ke Storage: '+uploaded.error.message);
+ const url=bucket.getPublicUrl(path)?.data?.publicUrl;
+ if(!url)throw new Error('URL foto cloud tidak berhasil dibuat.');
+ return url;
+}
 async function syncOneProduct(p,categoryCache=new Map()){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
@@ -1063,7 +1080,7 @@ async function syncOneProduct(p,categoryCache=new Map()){
   }
   categoryId=await categoryCache.get(categoryGroupKey(categoryName));
  }
- const row={id:p.id,store_id:store,code:p.kode||null,barcode:(String(p.barcode||'').trim()||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false,image_url:(/^https?:\/\//i.test(String(p.foto||''))?p.foto:null)};
+ const photoUrl=await uploadSeaMartProductPhoto(p,sb,store);\n const row={id:p.id,store_id:store,code:p.kode||null,barcode:(String(p.barcode||'').trim()||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false,image_url:photoUrl};
  let result=await sb.from('products').upsert(row,{onConflict:'id'});
  // Kompatibilitas sementara jika kolom image_url belum dibuat melalui migrasi Supabase.
  if(result.error&&/image_url|column/i.test(result.error.message||'')){
