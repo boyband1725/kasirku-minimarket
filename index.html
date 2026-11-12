@@ -535,6 +535,40 @@
  #loginroot .login-actions button{min-height:50px!important;font-size:16px!important}
 }
 
+
+/* Reference dimensions: card occupies about 84% viewport width and 87% viewport height */
+#loginroot .login-card{
+ width:min(84vw,980px)!important;
+ height:87dvh!important;
+ min-height:0!important;
+ max-height:87dvh!important;
+ box-sizing:border-box!important;
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:flex-start!important;
+}
+#loginroot .login-brand{flex:0 0 auto!important}
+#loginroot .login-card h2,
+#loginroot .login-card label,
+#loginroot .login-forgot,
+#loginroot .login-actions{flex:0 0 auto!important}
+@media(max-width:600px){
+ #loginroot .login-card{
+  width:84vw!important;
+  height:87dvh!important;
+  min-height:0!important;
+  max-height:87dvh!important;
+  padding:28px 24px 30px!important;
+ }
+ #loginroot .login-brand{width: min(62vw,220px)!important;margin:0 auto 18px!important}
+ #loginroot .login-card h2{font-size:22px!important;margin:0 0 18px!important}
+ #loginroot .login-card label{margin:13px 0 7px!important}
+ #loginroot .login-card input{height:52px!important}
+ #loginroot .login-forgot{margin-top:13px!important}
+ #loginroot .login-actions{margin-top:20px!important;gap:10px!important}
+ #loginroot .login-actions button{min-height:52px!important;font-size:16px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
