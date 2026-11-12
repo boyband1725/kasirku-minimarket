@@ -680,7 +680,7 @@
 /* FINAL FIX: SeaMart login design styles belong in the main document stylesheet */
 #loginroot .seamart-login-screen{position:fixed!important;inset:0!important;z-index:100000!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:28px!important;display:grid!important;place-items:center!important;box-sizing:border-box!important;overflow:auto!important;background:radial-gradient(ellipse at 10% 8%,#36dfc1 0%,transparent 40%),radial-gradient(ellipse at 92% 92%,#079fe8 0%,transparent 42%),linear-gradient(135deg,#08bca9 0%,#087e9e 52%,#04c85b 100%)!important}
 #loginroot .seamart-login-screen:before{content:""!important;position:fixed!important;inset:0!important;pointer-events:none!important;background:linear-gradient(145deg,transparent 0 70%,#00ef8520 70.1% 100%)!important}
-#loginroot .seamart-login-shell{position:relative!important;z-index:1!important;display:grid!important;grid-template-columns:48% 52%!important;width:min(1280px,calc(100vw - 80px))!important;height:min(675px,calc(100dvh - 80px))!important;min-height:500px!important;max-height:675px!important;margin:auto!important;overflow:hidden!important;border-radius:28px!important;background:#fff!important;box-shadow:0 28px 85px #003b5b55!important}
+#loginroot .seamart-login-shell{position:relative!important;z-index:1!important;display:grid!important;grid-template-columns:48% 52%!important;width:min(1080px,calc(100vw - 140px))!important;height:min(560px,calc(100dvh - 100px))!important;min-height:440px!important;max-height:560px!important;margin:auto!important;overflow:hidden!important;border-radius:24px!important;background:#fff!important;box-shadow:0 22px 65px #003b5b45!important}
 #loginroot .seamart-login-shell>.login-showcase{position:relative!important;isolation:isolate!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:0!important;width:auto!important;height:100%!important;max-width:none!important;padding:50px clamp(28px,4vw,58px) 72px!important;border-radius:0!important;text-align:center!important;color:#fff!important;background:linear-gradient(145deg,#07516f 0%,#006e86 48%,#00b987 100%)!important}
 #loginroot .seamart-login-shell>.login-showcase:before{content:""!important;position:absolute!important;z-index:-1!important;width:480px!important;height:480px!important;left:-250px!important;top:-320px!important;border-radius:50%!important;border:65px solid #00d8ce33!important}
 #loginroot .login-showcase-brand{display:block!important;width:min(390px,94%)!important;max-width:390px!important;margin:0 auto 20px!important}
@@ -732,10 +732,22 @@
  #loginroot .seamart-login-form .login-or{margin-top:17px!important}
 }
 @media(max-height:620px) and (min-width:761px){
- #loginroot .seamart-login-shell{height:calc(100dvh - 40px)!important;min-height:0!important}
- #loginroot .seamart-login-shell>.login-showcase{padding-top:18px!important;padding-bottom:38px!important}
- #loginroot .seamart-login-shell>.login-showcase h1{margin-bottom:18px!important}
- #loginroot .seamart-login-shell>.seamart-login-form{padding-top:22px!important;padding-bottom:22px!important}
+ #loginroot .seamart-login-shell{width:min(1000px,calc(100vw - 140px))!important;height:calc(100dvh - 100px)!important;min-height:0!important;max-height:none!important}
+ #loginroot .seamart-login-shell>.login-showcase{padding:18px 28px 34px!important}
+ #loginroot .login-showcase-brand{width:min(300px,88%)!important;margin-bottom:12px!important}
+ #loginroot .seamart-login-shell>.login-showcase h1{font-size:18px!important;margin-bottom:18px!important}
+ #loginroot .login-feature-icon{width:50px!important;height:50px!important}
+ #loginroot .login-feature-icon svg{width:28px!important;height:28px!important}
+ #loginroot .login-feature{font-size:13px!important;gap:7px!important}
+ #loginroot .seamart-login-shell>.seamart-login-form{padding:20px 38px!important}
+ #loginroot .seamart-login-form h2{font-size:27px!important}
+ #loginroot .seamart-login-form .login-subtitle{font-size:13px!important;margin-bottom:17px!important}
+ #loginroot .seamart-login-form label{font-size:13px!important;margin:9px 0 5px!important}
+ #loginroot .seamart-login-form input{height:44px!important;font-size:14px!important;margin-top:5px!important}
+ #loginroot .seamart-login-form .login-field-icon{top:34px!important;width:19px!important;height:19px!important}
+ #loginroot .seamart-login-form .login-forgot{font-size:13px!important;margin:10px 0 14px auto!important}
+ #loginroot .seamart-login-form .login-actions button{min-height:42px!important;font-size:13px!important}
+ #loginroot .seamart-login-form .login-or{font-size:12px!important;margin-top:13px!important}
 }
 </style>
 <script>
