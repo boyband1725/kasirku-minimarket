@@ -650,14 +650,36 @@ function setAllCategoryGroupsHidden(hidden){const action=hidden?'menyembunyikan'
 function toggleCategoryGroup(name,hidden){saveCategoryGroupState(name,hidden);if(window.posCategory===name&&hidden)window.posCategory='Semua';categoryGroupsPage()}
 function addCategoryGroup(){const name=prompt('Nama kelompok barang baru:');if(!name||!name.trim())return;const clean=name.trim();if(getCategoryGroups().some(g=>categoryGroupKey(g.name)===categoryGroupKey(clean)))return alert('Kelompok barang sudah ada.');db.categoryGroups.push({name:clean,hidden:false});save();saveCategoryGroupCloud(clean,false).catch(e=>{console.error('Sinkronisasi kelompok barang gagal:',e);alert('Kelompok dibuat di perangkat, tetapi gagal disimpan ke cloud: '+(e.message||e));});categoryGroupsPage()}
 function openCategoryProducts(name){
- const key=categoryGroupKey(name),items=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===key);
- document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Barang: ${esc(name)}</h1><div class="sub">${items.length} barang dalam kelompok ini.</div></div><button class="btn-light" onclick="page('kelompok')">← Kembali ke Kelompok</button></div><div class="panel"><input id="categoryProductSearch" class="field" style="width:100%;max-width:420px;margin-bottom:12px" placeholder="Cari barang dalam kelompok ini..." oninput="filterCategoryProducts(window.openCategoryName)"><div id="categoryProductTable"></div></div>`;
- window.openCategoryName=name;filterCategoryProducts(name);
+ window.openCategoryName=name;
+ const assigned=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===categoryGroupKey(name));
+ const available=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')!==categoryGroupKey(name));
+ document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Barang: ${esc(name)}</h1><div class="sub" id="categoryProductCount">${assigned.length} barang dalam kelompok ini.</div></div><button class="btn-light" onclick="page('kelompok')">← Kembali ke Kelompok</button></div><div class="panel"><h3>Masukkan barang ke kelompok ${esc(name)}</h3><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><select id="assignCategoryProduct" class="field" style="min-width:260px;flex:1"><option value="">Pilih barang dari master barang...</option>${available.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.nama)+' — '+esc(p.kode||p.barcode||'')+' ('+esc(p.kategori||'Umum')+')</option>').join('')}</select><button class="btn-primary" onclick="assignProductToGroup()">＋ Masukkan Barang</button></div><div class="emptyhint" style="margin-top:8px">Barang yang dipilih akan dipindahkan kategorinya ke kelompok ini dan disimpan ke cloud.</div></div><div class="panel"><h3>Daftar Barang Kelompok Ini</h3><input id="categoryProductSearch" class="field" style="width:100%;max-width:420px;margin-bottom:12px" placeholder="Cari barang dalam kelompok ini..." oninput="filterCategoryProducts(window.openCategoryName)"><div id="categoryProductTable"></div></div>`;
+ filterCategoryProducts(name);
+}
+async function assignProductToGroup(){
+ const id=document.getElementById('assignCategoryProduct')?.value,name=window.openCategoryName;
+ if(!id)return alert('Pilih barang terlebih dahulu.');
+ const p=db.products.find(x=>String(x.id)===String(id));if(!p)return alert('Barang tidak ditemukan.');
+ const previous=p.kategori||'Umum';p.kategori=name;save();
+ try{
+  const sb=window.seamartSupabase,store=window.seamartStoreId;
+  if(sb&&store){
+   let category=await sb.from('categories').select('id').eq('store_id',store).eq('name',name).limit(1).maybeSingle();
+   if(category.error)throw category.error;
+   if(!category.data){
+    const created=await sb.from('categories').insert({store_id:store,name}).select('id').single();
+    if(created.error)throw created.error;
+   }
+   await syncOneProduct(p);
+  }
+  openCategoryProducts(name);
+ }catch(e){p.kategori=previous;save();alert('Kategori belum berhasil disimpan ke cloud: '+(e.message||e));}
 }
 function filterCategoryProducts(name){
  const key=categoryGroupKey(name),q=(document.getElementById('categoryProductSearch')?.value||'').toLowerCase(),items=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===key&&[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)),el=document.getElementById('categoryProductTable');
+ const count=document.getElementById('categoryProductCount');if(count)count.textContent=items.length+' barang ditampilkan dalam kelompok ini.';
  if(!el)return;
- el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th></tr></thead><tbody>'+items.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang yang terhubung ke kelompok '+esc(name)+'. Periksa kategori barang pada menu Ubah Data Barang.</div>';
+ el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th></tr></thead><tbody>'+items.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
 }
 function categoryGroupsPage(){document.getElementById('view').innerHTML='<div class="sm-groups"><div class="pagehead"><div><h1>Kelompok Barang</h1><div class="sub">Atur kelompok yang tampil pada filter barang dan kasir.</div></div><button class="group-btn primary" onclick="addCategoryGroup()">＋ Tambah</button></div><div class="panel"><div class="group-actions" style="justify-content:space-between;margin-bottom:13px"><div class="group-filter"><button class="group-chip active" data-gfilter="semua" onclick="filterCategoryGroups(\'semua\',this)">Semua</button><button class="group-chip" data-gfilter="aktif" onclick="filterCategoryGroups(\'aktif\',this)">Aktif</button><button class="group-chip" data-gfilter="hidden" onclick="filterCategoryGroups(\'hidden\',this)">Hidden</button></div><div class="group-actions"><button class="group-btn primary" onclick="setAllCategoryGroupsHidden(true)">◉ Hide Semua</button><button class="group-btn outline" onclick="setAllCategoryGroupsHidden(false)">◎ Unhide Semua</button></div></div><input id="groupSearch" class="field" style="width:100%;max-width:360px;margin-bottom:12px" placeholder="Cari kelompok barang..." oninput="filterCategoryGroups()"><div id="groupTable"></div></div></div>';window.groupFilter='semua';renderCategoryGroupTable()}
 function filterCategoryGroups(mode){if(mode)window.groupFilter=mode;document.querySelectorAll('[data-gfilter]').forEach(b=>b.classList.toggle('active',b.dataset.gfilter===window.groupFilter));renderCategoryGroupTable()}
