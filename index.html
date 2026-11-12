@@ -658,6 +658,15 @@
  #loginroot .login-actions button{min-height:50px!important}
 }
 
+
+/* SeaMart category manager green theme */
+.sm-groups .group-btn.primary{background:#087b43!important;color:#fff!important}
+.sm-groups .group-btn.outline{background:#fff!important;border:1px solid #087b43!important;color:#087b43!important}
+.sm-groups .group-chip.active{background:#087b43!important;border-color:#087b43!important;color:#fff!important}
+.sm-groups .group-status{background:#e0f5e7!important;color:#087b43!important}
+.sm-groups .group-dot{background:#e0f5e7!important;color:#087b43!important}
+.sm-groups .group-row-name{color:#174b35!important}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -864,7 +873,8 @@ async function saveCategoryGroupCloud(name,hidden){
   :await sb.from('category_visibility').insert({store_id:store,name:clean,hidden:!!hidden});
  if(result.error)throw result.error;
 }
-const rupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const rupiah=n=>Number(n||0).toLocaleString('id-ID');
+const receiptRupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateNow=()=>new Date().toLocaleString('id-ID');
 function toggleMobileMenu(){document.body.classList.toggle('mobile-menu-open')}
@@ -1128,13 +1138,13 @@ function checkout(){if(!requireOpenShift())return;if(!cart.length)return alert('
 function printReceipt(id){
  const s=db.sales.find(x=>x.id===id);
  if(!s)return alert('Transaksi tidak ditemukan.');
- const rows=(s.items||[]).map(x=>'<section class="sm-receipt-item"><div class="sm-receipt-name">'+esc(x.nama)+'</div><div class="sm-receipt-detail"><span>'+Number(x.qty||0)+' × '+rupiah(x.harga)+'</span><b>'+rupiah(x.subtotal)+'</b></div></section>').join('');
- document.getElementById('modalroot').innerHTML='<div class="modalback sm-receipt-backdrop" onclick="if(event.target===this)closeModal()"><section class="sm-receipt-viewer" role="dialog" aria-modal="true" aria-label="Preview struk"><header class="sm-receipt-toolbar"><div><b>Preview Struk</b><small>'+esc(s.id)+' · '+esc(s.time||'')+'</small></div><button class="btn-light" onclick="closeModal()" aria-label="Tutup preview">✕</button></header><div class="sm-receipt-scroll"><article class="sm-receipt-paper" id="smReceiptPaper"><h2>SEAMART</h2><p class="sm-receipt-store">MINIMARKET</p><hr><p><b>'+esc(s.id)+'</b></p><p class="sm-receipt-muted">'+esc(s.time||'')+'</p><hr>'+rows+'<hr><div class="sm-receipt-total"><b>TOTAL</b><b>'+rupiah(s.total)+'</b></div><p class="sm-receipt-muted">Metode: '+esc(s.pay||'-')+'</p><p class="sm-receipt-muted">Uang diterima: '+rupiah(s.paid??s.total)+'</p><p class="sm-receipt-muted">Kembalian: '+rupiah(s.change??0)+'</p><hr><p class="sm-receipt-thanks">Terima kasih telah berbelanja</p></article></div><footer class="sm-receipt-actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceiptNow(\''+esc(s.id)+'\')">Cetak Struk</button></footer></section></div>';
+ const rows=(s.items||[]).map(x=>'<section class="sm-receipt-item"><div class="sm-receipt-name">'+esc(x.nama)+'</div><div class="sm-receipt-detail"><span>'+Number(x.qty||0)+' × '+receiptRupiah(x.harga)+'</span><b>'+receiptRupiah(x.subtotal)+'</b></div></section>').join('');
+ document.getElementById('modalroot').innerHTML='<div class="modalback sm-receipt-backdrop" onclick="if(event.target===this)closeModal()"><section class="sm-receipt-viewer" role="dialog" aria-modal="true" aria-label="Preview struk"><header class="sm-receipt-toolbar"><div><b>Preview Struk</b><small>'+esc(s.id)+' · '+esc(s.time||'')+'</small></div><button class="btn-light" onclick="closeModal()" aria-label="Tutup preview">✕</button></header><div class="sm-receipt-scroll"><article class="sm-receipt-paper" id="smReceiptPaper"><h2>SEAMART</h2><p class="sm-receipt-store">MINIMARKET</p><hr><p><b>'+esc(s.id)+'</b></p><p class="sm-receipt-muted">'+esc(s.time||'')+'</p><hr>'+rows+'<hr><div class="sm-receipt-total"><b>TOTAL</b><b>'+receiptRupiah(s.total)+'</b></div><p class="sm-receipt-muted">Metode: '+esc(s.pay||'-')+'</p><p class="sm-receipt-muted">Uang diterima: '+receiptRupiah(s.paid??s.total)+'</p><p class="sm-receipt-muted">Kembalian: '+receiptRupiah(s.change??0)+'</p><hr><p class="sm-receipt-thanks">Terima kasih telah berbelanja</p></article></div><footer class="sm-receipt-actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceiptNow(\''+esc(s.id)+'\')">Cetak Struk</button></footer></section></div>';
 }
 async function printReceiptNow(id){
  const s=db.sales.find(x=>x.id===id);
  if(!s)return alert('Transaksi tidak ditemukan.');
- const fmt=n=>Number(n||0).toLocaleString('id-ID');
+ const fmt=n=>receiptRupiah(n);
  const content=[
   {type:'text',text:'SeaMart',align:'center',bold:true,size:'large'},
   {type:'text',text:'MINIMARKET',align:'center'},
@@ -1147,12 +1157,12 @@ async function printReceiptNow(id){
    {type:'row',left:String(x.qty||0)+'x @'+fmt(x.harga),right:fmt(x.subtotal)}
   ]),
   {type:'divider'},
-  {type:'row',left:'Subtotal',right:rupiah(s.total)},
-  {type:'row',left:'TOTAL',right:rupiah(s.total),bold:true},
+  {type:'row',left:'Subtotal',right:receiptRupiah(s.total)},
+  {type:'row',left:'TOTAL',right:receiptRupiah(s.total),bold:true},
   {type:'divider'},
   {type:'row',left:'Metode',right:String(s.pay||'-')},
-  {type:'row',left:'Uang diterima',right:rupiah(s.paid??s.total)},
-  {type:'row',left:'Kembalian',right:rupiah(s.change??0),bold:true},
+  {type:'row',left:'Uang diterima',right:receiptRupiah(s.paid??s.total)},
+  {type:'row',left:'Kembalian',right:receiptRupiah(s.change??0),bold:true},
   {type:'divider'},
   {type:'text',text:'Terima kasih telah berbelanja',align:'center'},
   {type:'feed',lines:3}
