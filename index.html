@@ -660,7 +660,7 @@ async function hydrateFeaturedProductPhotos(items){
 }
 
 function categoryGroupKey(name){return String(name||'Umum').trim().toLocaleLowerCase('id-ID')}
-function getCategoryGroups(){const defaults=['Minuman','Makanan','Mie Instan','Es Krim','Frozen Food','Snack','Sembako','Perlengkapan Rumah','Rokok','Umum'];const names=[...defaults,...db.products.map(p=>String(p.kategori||'Umum').trim()||'Umum'),...db.categoryGroups.map(g=>g.name)];const unique=[...new Map(names.filter(Boolean).map(n=>[categoryGroupKey(n),n])).values()];return unique.map(name=>{const saved=db.categoryGroups.find(g=>categoryGroupKey(g.name)===categoryGroupKey(name));return {name,hidden:!!saved?.hidden}}).sort((a,b)=>a.name.localeCompare(b.name,'id'))}
+function getCategoryGroups(){const defaults=['Minuman','Makanan','Mie Instan','Es Krim','Frozen Food','Snack','Sembako','Perlengkapan Rumah','Pakaian','Rokok','Umum'];const names=[...defaults,...db.products.map(p=>String(p.kategori||'Umum').trim()||'Umum'),...db.categoryGroups.map(g=>g.name)];const unique=[...new Map(names.filter(Boolean).map(n=>[categoryGroupKey(n),n])).values()];return unique.map(name=>{const saved=db.categoryGroups.find(g=>categoryGroupKey(g.name)===categoryGroupKey(name));return {name,hidden:!!saved?.hidden}}).sort((a,b)=>a.name.localeCompare(b.name,'id'))}
 function getVisibleCategoryGroups(){return getCategoryGroups().filter(g=>!g.hidden)}
 function saveCategoryGroupState(name,hidden){const clean=String(name||'').trim(),key=categoryGroupKey(clean),existing=db.categoryGroups.find(g=>categoryGroupKey(g.name)===key);if(existing)existing.hidden=!!hidden;else db.categoryGroups.push({name:clean,hidden:!!hidden});save();saveCategoryGroupCloud(clean,hidden).catch(e=>{console.error('Sinkronisasi kelompok barang gagal:',e);alert('Status tersimpan di perangkat, tetapi gagal disinkronkan ke cloud: '+(e.message||e));});}
 function setAllCategoryGroupsHidden(hidden){const action=hidden?'menyembunyikan':'menampilkan kembali';if(!confirm('Yakin '+action+' semua kelompok barang?'))return;getCategoryGroups().forEach(g=>saveCategoryGroupState(g.name,hidden));window.posCategory='Semua';alert(hidden?'Semua kelompok disembunyikan dari filter kasir.':'Semua kelompok ditampilkan kembali.');if(document.getElementById('groupTable'))categoryGroupsPage();if(document.getElementById('poscategories'))renderPosProducts()}
@@ -725,6 +725,7 @@ function filterCategoryProducts(name){
 function guessProductGroup(name){
  const n=String(name||'').toLocaleLowerCase('id-ID');
  const rules=[
+  ['Pakaian',/\\b(pakaian|baju|kaos|t-shirt|kemeja|celana|jeans|rok|dress|gaun|daster|gamis|jaket|hoodie|sweater|seragam|piyama|pakaian dalam|singlet|kaus kaki|jilbab|hijab|kerudung|mukena|sarung|peci|topi|rompi|legging|shorts|underwear|bra|boxer)\\b/i],
   ['Es Krim',/\b(es krim|ice cream|icecream|magnum|cornetto|aice|walls|wall's|campina|paddle pop|joyday|glico wings|viennetta)\b/i],
   ['Rokok',/\b(rokok|cigarette|djarum|sampoerna|marlboro|gudang garam|surya|la bold|esse|camel|dunhill|lucky strike|winston|clas mild|jarum|filter kretek)\b/i],
   ['Mie Instan',/\b(mie|mi instan|noodle|indomie|sarimi|supermi|pop mie|popmi|mie sedaap|gaga|lemonilo)\b/i],
