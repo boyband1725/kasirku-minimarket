@@ -749,6 +749,53 @@
  #loginroot .seamart-login-form .login-actions button{min-height:42px!important;font-size:13px!important}
  #loginroot .seamart-login-form .login-or{font-size:12px!important;margin-top:13px!important}
 }
+
+/* SeaMart modern workspace theme — visual-only, preserves existing app behavior */
+:root{--ink:#173847;--muted:#71818a;--line:#e2edf0;--bg:#f2f8f8;--green:#00a879;--green2:#e5f8f1;--nav:#073d55;--white:#fff;--shadow:0 10px 28px #06445b0d}
+body{background:linear-gradient(135deg,#f3fbfa 0%,#f5f9fc 55%,#f1fbf6 100%);color:var(--ink)}
+.sidebar{background:linear-gradient(165deg,#063e59 0%,#075c70 52%,#008d78 100%);padding:22px 14px;color:#e7fbfa;box-shadow:8px 0 30px #073d5514}
+.brand{padding:8px 9px 28px}
+.brandmark{max-width:180px;filter:drop-shadow(0 3px 8px #001d2c40)}
+.navlabel{color:#9dc6c9;font-weight:800;letter-spacing:1.5px;padding-top:17px}
+.nav{color:#d6eeee;border:1px solid transparent;border-radius:11px;padding:12px 13px;margin:3px 0;transition:background .18s,border-color .18s,transform .18s}
+.nav:hover{background:#ffffff16;color:#fff;border-color:#ffffff16;transform:translateX(2px)}
+.nav.active{background:linear-gradient(100deg,#00a6a6,#00b96c);color:#fff;box-shadow:0 7px 18px #002b3535;border-color:#ffffff20}
+.nav .ico{font-size:17px}
+.sidefoot{border-top:1px solid #ffffff22;color:#b6d7d8}
+.main{background:transparent}
+.topbar{height:68px;background:#ffffffed;backdrop-filter:blur(12px);border-bottom:1px solid #dcebed;padding:0 30px;box-shadow:0 3px 18px #073d5508}
+.crumb{color:#17475a;font-size:16px;font-weight:800}
+.user{color:#59727c}
+.avatar{background:linear-gradient(135deg,#00a8b5,#00bd69);color:#fff;box-shadow:0 4px 12px #009b8b30}
+.content{padding:28px 32px;max-width:1600px}
+.pagehead{margin-bottom:24px}
+.pagehead h1{font-size:27px;letter-spacing:-.5px;color:#153e50}
+.sub{font-size:13px;color:#7b9098}
+.btn-primary{background:linear-gradient(100deg,#008fae,#00b96b);color:#fff;border:0;box-shadow:0 5px 14px #009c8b26}
+.btn-primary:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.btn-light{background:#fff;border:1px solid #dce8eb;color:#355461}
+.btn-danger{background:#fff1ef;color:#b63d36;border:1px solid #f6d8d4}
+.cards{gap:16px;margin-bottom:24px}
+.stat,.panel{background:#fff;border:1px solid #e3edef;border-radius:16px;box-shadow:0 8px 26px #0b4b5b0a}
+.stat{padding:20px 21px;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s}
+.stat:hover{transform:translateY(-2px);box-shadow:0 13px 30px #0b4b5b12}
+.stat:after{content:"";position:absolute;right:-28px;top:-34px;width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#00b8b022,#00ce7820)}
+.stat-top{position:relative;z-index:1;color:#6f8790;font-weight:700;font-size:12px}
+.stat-top span{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:#e7f8f4;color:#009e83;font-size:17px}
+.stat strong{position:relative;z-index:1;color:#173e50;font-size:27px;letter-spacing:-.5px;margin-top:15px}
+.stat small{position:relative;z-index:1;color:#00a47c;font-size:11px;font-weight:600}
+.grid2{gap:18px}
+.panel{padding:21px;margin-bottom:18px}
+.panel h3{font-size:16px;color:#19465a;font-weight:800;margin-bottom:17px}
+.tablewrap{border-radius:10px;overflow:auto}
+th{background:#f2f9f9;color:#6d858d;font-weight:800;font-size:10px;letter-spacing:.6px;padding:13px 11px}
+td{padding:14px 11px;color:#36525d;font-size:12px;border-bottom:1px solid #edf3f4}
+tr:hover td{background:#f8fcfb}
+.pill{background:#e3f8ef;color:#008d68;border-radius:20px;padding:5px 9px}
+.field{border:1px solid #dce8eb;border-radius:10px}
+.field:focus{border-color:#00a88a;box-shadow:0 0 0 3px #00a88a16}
+@media(max-width:900px){.sidebar{background:linear-gradient(165deg,#063e59 0%,#075c70 52%,#008d78 100%)}.content{padding:20px 16px}.topbar{padding:0 16px}}
+@media(max-width:520px){.stat{border-radius:13px}.stat strong{font-size:20px}.panel{padding:15px;border-radius:13px}.pagehead h1{font-size:23px}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
