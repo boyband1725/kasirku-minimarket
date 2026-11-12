@@ -1053,7 +1053,7 @@ async function uploadSeaMartProductPhoto(p,sb,store){
  const binary=atob(photo.slice(comma+1)),bytes=new Uint8Array(binary.length);
  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
  const blob=new Blob([bytes],{type:mime}),path=String(store)+'/'+String(p.id)+'.'+ext;
- const bucket=sb.storage.from('product-images');
+ const bucket=sb.storage.from('seamart-product-photos');
  const uploaded=await bucket.upload(path,blob,{upsert:true,contentType:mime,cacheControl:'3600'});
  if(uploaded.error)throw new Error('Foto belum terunggah ke Storage: '+uploaded.error.message);
  const url=bucket.getPublicUrl(path)?.data?.publicUrl;
