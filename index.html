@@ -1435,7 +1435,7 @@ async function lookupProductPhoto(){
     const data=await response.json(),product=data.product;
     if(data.status===1&&product&&String(product.code||'').replace(/\D/g,'')===barcode.replace(/\D/g,'')){
      const url=imageUrl(product.selected_images?.front);
-     if(url)candidates.push({url,product_name:product.product_name||'',code:product.code||barcode});
+     if(url){candidates.push({url,product_name:product.product_name||'',code:product.code||barcode});barcodeVerified=true;}
     }
    }
   }
