@@ -1399,10 +1399,10 @@ async function autoFillMissingProductPhotos(){
  if(!sb||!store)return alert('Koneksi cloud belum siap. Muat ulang halaman lalu coba lagi.');
  const missing=db.products.filter(p=>!String(p.foto||'').trim());
  if(!missing.length)return alert('Semua barang sudah memiliki foto. Tidak ada yang perlu dicari.');
- if(!confirm('Cari foto otomatis untuk '+missing.length+' barang yang belum memiliki foto? Foto lama tidak akan diubah.'))return;
+ if(!confirm('Cari foto otomatis untuk '+missing.length+' barang yang belum memiliki foto? Proses akan memeriksa 6 barang sekaligus. Foto lama tidak akan diubah.'))return;
  const panel=document.getElementById('auto_photo_progress'),bar=document.getElementById('auto_photo_bar'),percent=document.getElementById('auto_photo_percent'),count=document.getElementById('auto_photo_count'),detail=document.getElementById('auto_photo_detail'),foundEl=document.getElementById('auto_photo_found'),onlineEl=document.getElementById('auto_photo_online'),skipEl=document.getElementById('auto_photo_skipped'),button=document.getElementById('auto_photo_button'),eta=document.getElementById('auto_photo_eta');
- let found=0,uploaded=0,skipped=0,errors=[],done=0;
- const started=Date.now(),categoryCache=new Map();
+ let found=0,uploaded=0,skipped=0,errors=[],done=0,next=0;
+ const started=Date.now(),categoryCache=new Map(),workers=6;
  if(panel)panel.style.display='block';
  if(button)button.disabled=true;
  const paint=(current='Menyiapkan pencarian…')=>{
@@ -1413,25 +1413,30 @@ async function autoFillMissingProductPhotos(){
   if(foundEl)foundEl.textContent=found.toLocaleString('id-ID');
   if(onlineEl)onlineEl.textContent=uploaded.toLocaleString('id-ID');
   if(skipEl)skipEl.textContent=skipped.toLocaleString('id-ID');
-  if(detail)detail.textContent=current;
+  if(detail)detail.textContent=current+' · '+workers+' proses bersamaan';
   if(eta)eta.textContent=done===missing.length?'Selesai':(done?'Perkiraan sisa ± '+Math.floor(remaining/60)+' menit '+(remaining%60)+' detik':'Menghitung estimasi…');
  };
- paint('Menyiapkan pencarian foto produk…');
- for(let i=0;i<missing.length;i++){
-  const p=missing[i];
-  paint('Memeriksa '+p.nama);
-  try{
-   const result=await findAutomaticProductPhoto(p);
-   if(!result)skipped++;
-   else{
-    p.foto=result.url;save();found++;
-    paint('Mengunggah foto '+p.nama+' ke toko online…');
-    await syncOneProduct(p,categoryCache);uploaded++;
-   }
-  }catch(e){errors.push(p.nama+': '+(e.message||e));}
-  done=i+1;paint('Memeriksa '+p.nama);
-  if(i<missing.length-1)await new Promise(resolve=>setTimeout(resolve,900));
+ paint('Memulai pencarian foto…');
+ async function worker(){
+  while(true){
+   const index=next++;
+   if(index>=missing.length)return;
+   const p=missing[index];
+   try{
+    const result=await findAutomaticProductPhoto(p);
+    if(!result){skipped++;}
+    else{
+     p.foto=result.url;
+     save();found++;
+     paint('Mengunggah foto '+p.nama+'…');
+     await syncOneProduct(p,categoryCache);uploaded++;
+    }
+   }catch(e){errors.push(p.nama+': '+(e.message||e));}
+   done++;
+   paint('Selesai memeriksa '+p.nama);
+  }
  }
+ await Promise.all(Array.from({length:Math.min(workers,missing.length)},()=>worker()));
  paint('Pencarian selesai.');
  if(button)button.disabled=false;
  alert('Pencarian foto otomatis selesai.\nFoto ditemukan: '+found+'\nBerhasil masuk toko online: '+uploaded+'\nDilewati/tidak cocok: '+skipped+(errors.length?'\nGagal sinkron: '+errors.length+'\n'+errors.slice(0,5).join('\n'):''));
