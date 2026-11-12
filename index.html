@@ -1390,7 +1390,7 @@ async function validateProductPhoto(url,targetName,sourceName,barcodeVerified=fa
  if(!barcodeVerified&&wantedNumbers.length&&foundNumbers.length&&wantedNumbers.some(n=>!foundNumbers.includes(n)))throw new Error('Ukuran/isi produk tidak cocok. Foto ditolak.');
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat. Foto ditolak.'));img.src=url});
- if(img.naturalWidth<500||img.naturalHeight<500)throw new Error('Resolusi foto kurang dari 500×500 ('+img.naturalWidth+'×'+img.naturalHeight+'). Foto ditolak.');
+ if(img.naturalWidth<250||img.naturalHeight<300)throw new Error('Resolusi foto terlalu kecil (minimum 250×300; ditemukan '+img.naturalWidth+'×'+img.naturalHeight+'). Foto ditolak.');
  const ratio=img.naturalWidth/img.naturalHeight;
  if(ratio<0.5||ratio>1.8)throw new Error('Bentuk gambar tidak sesuai foto produk. Foto ditolak.');
  return {width:img.naturalWidth,height:img.naturalHeight,matched:wanted[0]};
