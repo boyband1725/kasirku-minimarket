@@ -796,6 +796,39 @@ tr:hover td{background:#f8fcfb}
 .field:focus{border-color:#00a88a;box-shadow:0 0 0 3px #00a88a16}
 @media(max-width:900px){.sidebar{background:linear-gradient(165deg,#063e59 0%,#075c70 52%,#008d78 100%)}.content{padding:20px 16px}.topbar{padding:0 16px}}
 @media(max-width:520px){.stat{border-radius:13px}.stat strong{font-size:20px}.panel{padding:15px;border-radius:13px}.pagehead h1{font-size:23px}}
+
+/* Dashboard composition closely following approved SeaMart reference mockup */
+.topbar{background:linear-gradient(105deg,#087b91 0%,#00a995 58%,#35df68 100%)!important;color:#fff!important;border-bottom:0!important;box-shadow:0 5px 20px #006b6630!important}
+.topbar .crumb,.topbar .user{color:#fff!important}
+.topbar .btn-light{background:#fff!important;border:0!important;color:#078c59!important;border-radius:12px!important;font-weight:800!important;padding:11px 18px!important;box-shadow:0 4px 14px #004d4430!important}
+.topbar .avatar{background:#fff!important;color:#008f70!important}
+.dashboard-view .pagehead{align-items:center;margin-bottom:25px}
+.dashboard-view .pagehead h1{font-size:29px!important;letter-spacing:-.7px;color:#152f3d!important}
+.dashboard-view .pagehead .sub{font-size:14px;color:#657a83!important}
+.dashboard-view .pagehead>.btn-primary{background:linear-gradient(100deg,#078f56,#00a95c)!important;border:0!important;border-radius:12px!important;padding:14px 22px!important;font-size:15px!important;font-weight:800!important;box-shadow:0 6px 18px #008d5730!important}
+.dashboard-view .cards{gap:17px!important;margin-bottom:25px!important}
+.dashboard-view .stat{min-height:148px!important;padding:20px!important;border-radius:20px!important;border:1px solid #e7eff1!important;box-shadow:0 8px 24px #16495c12!important}
+.dashboard-view .stat-top{display:flex!important;align-items:center!important;gap:8px!important;color:#526a74!important;font-size:14px!important;font-weight:700!important}
+.dashboard-view .stat-top span{width:52px!important;height:52px!important;flex:0 0 52px!important;display:grid!important;place-items:center!important;border-radius:50%!important;background:#dcf8e9!important;color:#00965d!important;font-size:25px!important}
+.dashboard-view .stat:nth-child(2) .stat-top span{background:#e3f2ff!important;color:#1682c7!important}
+.dashboard-view .stat:nth-child(3) .stat-top span{background:#f1e8ff!important;color:#8746d6!important}
+.dashboard-view .stat:nth-child(4) .stat-top span{background:#ddf8e8!important;color:#00965d!important}
+.dashboard-view .stat strong{font-size:30px!important;letter-spacing:-.7px;color:#132f3d!important;margin-top:9px!important}
+.dashboard-view .stat small{font-size:12px!important;color:#637983!important;margin-top:5px!important}
+.dashboard-view .grid2{grid-template-columns:minmax(0,1.45fr) minmax(310px,1fr)!important;gap:19px!important}
+.dashboard-view .panel{padding:22px!important;border-radius:20px!important;border:1px solid #e5edef!important;box-shadow:0 8px 25px #16495c12!important}
+.dashboard-view .panel h3{display:flex!important;align-items:center!important;gap:12px!important;font-size:18px!important;color:#152f3d!important;margin-bottom:20px!important}
+.dashboard-view .dash-panel-icon{display:inline-grid!important;place-items:center!important;width:34px!important;height:34px!important;border-radius:10px!important;background:#e3f8ed!important;color:#008d5c!important;font-size:20px!important}
+.dashboard-view th{background:#f0f4f7!important;color:#3e5662!important;font-size:12px!important;letter-spacing:0!important;padding:14px 12px!important}
+.dashboard-view td{font-size:13px!important;padding:14px 12px!important;border-bottom:1px solid #edf2f4!important}
+.dashboard-view td .btn-light,.dashboard-view td .btn-danger{border-radius:9px!important;padding:7px 12px!important;font-weight:700!important}
+.dashboard-view .pill{background:#d9f8eb!important;color:#008e65!important;padding:7px 12px!important;font-size:12px!important}
+.dashboard-view .cartline{padding:15px 0!important;border-bottom:1px solid #edf1f3!important;align-items:center!important}
+.dashboard-view .cartline b{font-size:13px!important;color:#203d49!important}
+.dashboard-view .cartline .muted{font-size:12px!important;margin-top:5px!important}
+.dashboard-view .cartline .pill{background:#ffe6e5!important;color:#d43c38!important;white-space:nowrap!important}
+@media(max-width:1050px){.dashboard-view .cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dashboard-view .grid2{grid-template-columns:1fr!important}}
+@media(max-width:600px){.dashboard-view .pagehead h1{font-size:23px!important}.dashboard-view .stat{min-height:120px!important;padding:14px!important}.dashboard-view .stat-top{font-size:12px!important}.dashboard-view .stat-top span{width:38px!important;height:38px!important;flex-basis:38px!important;font-size:19px!important}.dashboard-view .stat strong{font-size:22px!important}.dashboard-view .panel{padding:15px!important}.dashboard-view .panel h3{font-size:16px!important}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -1070,9 +1103,9 @@ function showKeyboardHelp(){
 }
 function dashboard(){
  const total=db.products.length,qty=db.products.reduce((a,p)=>a+Number(p.stok||0),0),today=new Date().toDateString(),sold=db.sales.filter(s=>new Date(s.time).toDateString()===today),revenue=sold.reduce((a,s)=>a+s.total,0);
- document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ringkasan</h1><div class="sub">Selamat datang di operasional SeaMart.</div></div><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div>
+ document.getElementById('view').innerHTML=`<div class="dashboard-view"><div class="pagehead"><div><h1>Ringkasan</h1><div class="sub">Selamat datang di operasional SeaMart.</div></div><button class="btn-primary" onclick="page('kasir')">＋ Transaksi Baru</button></div>
  <div class="cards"><div class="stat"><div class="stat-top">Total Produk <span>▤</span></div><strong>${total.toLocaleString('id-ID')}</strong><small>Master barang</small></div><div class="stat"><div class="stat-top">Total Stok <span>▦</span></div><strong>${qty.toLocaleString('id-ID')}</strong><small>Unit tersedia</small></div><div class="stat"><div class="stat-top">Penjualan Hari Ini <span>↗</span></div><strong>${rupiah(revenue)}</strong><small>${sold.length} transaksi</small></div><div class="stat"><div class="stat-top">Nilai Persediaan <span>◈</span></div><strong>${rupiah(db.products.reduce((a,p)=>a+p.harga*p.stok,0))}</strong><small>Estimasi harga jual × stok</small></div></div>
- <div class="grid2"><div class="panel"><h3>Transaksi Terbaru</h3>${salesTable(db.sales.slice(-6).reverse())}</div><div class="panel"><h3>Stok Menipis</h3>${lowStock()}</div></div>`;
+ <div class="grid2"><div class="panel"><h3><span class="dash-panel-icon">▤</span>Transaksi Terbaru</h3>${salesTable(db.sales.slice(-6).reverse())}</div><div class="panel"><h3><span class="dash-panel-icon">▦</span>Stok Menipis</h3>${lowStock()}</div></div></div>`;
 }
 function salesTable(rows){if(!rows.length)return '<div class="empty">Belum ada transaksi.</div>';return '<div class="tablewrap"><table><thead><tr><th>No. Transaksi</th><th>Waktu</th><th>Total</th><th>Bayar</th><th>Aksi</th></tr></thead><tbody>'+rows.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.time)}</td><td>${rupiah(s.total)}</td><td><span class="pill">${esc(s.pay)}</span></td><td><button class="btn-light" onclick="editSale('${esc(s.id)}')">Ubah</button> <button class="btn-danger" onclick="showDeleteSaleConfirm('${esc(s.id)}')">Hapus</button></td></tr>`).join('')+'</tbody></table></div>'}
 function showDeleteSaleConfirm(id){const s=db.sales.find(x=>x.id===id);if(!s)return alert('Transaksi tidak ditemukan.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Hapus Transaksi?</h2><p>Hapus transaksi <b>${esc(s.id)}</b> senilai <b>${rupiah(s.total)}</b>?</p><p class="muted">Stok barang pada transaksi ini akan dikembalikan.</p><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-danger" onclick="deleteSaleHistory('${esc(s.id)}')">Ya, Hapus</button></div></div></div>`}
