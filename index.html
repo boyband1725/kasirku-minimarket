@@ -1186,7 +1186,17 @@ async function lookupInlineProductPhoto(){
     body:{productName:name,barcode,imageUrl:url,sourceName},
     headers:{Authorization:'Bearer '+accessToken}
   });
-  if(aiError)throw new Error(aiError.message||'Tidak dapat menghubungi layanan AI. Periksa Edge Function.');
+  if(aiError){
+   let detail='';
+   try{
+    const ctx=aiError.context;
+    if(ctx&&typeof ctx.clone==='function'){
+     const raw=await ctx.clone().text();
+     try{const parsed=JSON.parse(raw);detail=parsed.error||parsed.message||raw;}catch{detail=raw;}
+    }
+   }catch(_){}
+   throw new Error(detail||aiError.message||'Tidak dapat menghubungi layanan AI. Periksa Edge Function.');
+  }
   if(ai?.error)throw new Error(ai.error);
   setInlinePhotoProgress(88,'Memvalidasi hasil AI…');
   if(!ai?.match)throw new Error('AI tidak yakin foto ini cocok ('+(ai?.confidence||0)+'%). '+(ai?.reason||'Foto ditolak agar tidak salah produk.'));
