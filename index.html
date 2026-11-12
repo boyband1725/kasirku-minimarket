@@ -849,6 +849,32 @@ tr:hover td{background:#f8fcfb}
  #modalroot .modalback .cashier-open-modal{width:calc(100vw - 28px)!important;max-width:360px!important;padding:17px!important}
  #modalroot .cashier-open-modal h2{font-size:20px!important}
 }
+
+/* Keep category-group table fully inside its content panel */
+.cg-move-table{width:100%!important;max-width:100%!important;overflow-x:auto!important;box-sizing:border-box!important}
+.cg-move-table table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important}
+.cg-move-table th,.cg-move-table td{padding:10px 6px!important;font-size:11px!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;box-sizing:border-box!important}
+.cg-move-table th:nth-child(1),.cg-move-table td:nth-child(1){width:20%}
+.cg-move-table th:nth-child(2),.cg-move-table td:nth-child(2){width:8%}
+.cg-move-table th:nth-child(3),.cg-move-table td:nth-child(3){width:12%}
+.cg-move-table th:nth-child(4),.cg-move-table td:nth-child(4){width:10%}
+.cg-move-table th:nth-child(5),.cg-move-table td:nth-child(5){width:5%}
+.cg-move-table th:nth-child(6),.cg-move-table td:nth-child(6){width:10%}
+.cg-move-table th:nth-child(7),.cg-move-table td:nth-child(7){width:12%}
+.cg-move-table th:nth-child(8),.cg-move-table td:nth-child(8){width:23%}
+.cg-move-table td:nth-child(8) select{width:100%!important;min-width:0!important}
+.cg-move-table td:nth-child(7) button,.cg-move-table td:nth-child(8) button{font-size:10px!important;padding:6px 7px!important}
+@media(max-width:1100px){
+ .cg-move-table th,.cg-move-table td{padding:8px 4px!important;font-size:10px!important}
+ .cg-move-table th:nth-child(1),.cg-move-table td:nth-child(1){width:18%}
+ .cg-move-table th:nth-child(2),.cg-move-table td:nth-child(2){width:7%}
+ .cg-move-table th:nth-child(3),.cg-move-table td:nth-child(3){width:11%}
+ .cg-move-table th:nth-child(4),.cg-move-table td:nth-child(4){width:9%}
+ .cg-move-table th:nth-child(5),.cg-move-table td:nth-child(5){width:5%}
+ .cg-move-table th:nth-child(6),.cg-move-table td:nth-child(6){width:10%}
+ .cg-move-table th:nth-child(7),.cg-move-table td:nth-child(7){width:12%}
+ .cg-move-table th:nth-child(8),.cg-move-table td:nth-child(8){width:28%}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -1260,7 +1286,7 @@ function filterCategoryProducts(name){
  const key=categoryGroupKey(name),q=(document.getElementById('categoryProductSearch')?.value||'').toLowerCase(),items=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===key&&[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)),el=document.getElementById('categoryProductTable');
  const count=document.getElementById('categoryProductCount');if(count)count.textContent=items.length+' barang ditampilkan dalam kelompok ini.';
  if(!el)return;
- el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th><th>Status</th><th>Aksi</th><th>Pindahkan ke Kelompok</th></tr></thead><tbody>'+items.map(p=>{const active=p.active!==false,targets=getCategoryGroups().filter(g=>categoryGroupKey(g.name)!==key);return '<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td><td><span class="cg-product-status '+(active?'is-active':'is-inactive')+'">'+(active?'Aktif':'Tidak Aktif')+'</span></td><td><button class="cg-toggle-product '+(active?'deactivate':'activate')+'" onclick="toggleCategoryProductActive(\''+esc(p.id)+'\')">'+(active?'Nonaktifkan':'Aktifkan')+'</button></td><td><div style="display:flex;gap:6px;align-items:center;min-width:230px"><select class="field" id="moveGroup_'+esc(p.id)+'" style="min-width:130px;max-width:180px;padding:7px 9px;font-size:12px"><option value="">Pilih kelompok...</option>'+targets.map(g=>'<option value="'+esc(g.name)+'">'+esc(g.name)+'</option>').join('')+'</select><button class="btn-primary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="moveCategoryProduct(\''+esc(p.id)+'\',document.getElementById(\'moveGroup_'+esc(p.id)+'\').value)">Pindahkan</button></div></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
+ el.innerHTML=items.length?'<div class="tablewrap cg-move-table"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th><th>Status</th><th>Aksi</th><th>Pindahkan ke Kelompok</th></tr></thead><tbody>'+items.map(p=>{const active=p.active!==false,targets=getCategoryGroups().filter(g=>categoryGroupKey(g.name)!==key);return '<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td><td><span class="cg-product-status '+(active?'is-active':'is-inactive')+'">'+(active?'Aktif':'Tidak Aktif')+'</span></td><td><button class="cg-toggle-product '+(active?'deactivate':'activate')+'" onclick="toggleCategoryProductActive(\''+esc(p.id)+'\')">'+(active?'Nonaktifkan':'Aktifkan')+'</button></td><td><div style="display:flex;gap:4px;align-items:center;min-width:0;width:100%;flex-wrap:wrap"><select class="field" id="moveGroup_'+esc(p.id)+'" style="min-width:0;width:100%;max-width:100%;padding:6px 7px;font-size:11px;box-sizing:border-box"><option value="">Pilih kelompok...</option>'+targets.map(g=>'<option value="'+esc(g.name)+'">'+esc(g.name)+'</option>').join('')+'</select><button class="btn-primary" style="padding:6px 9px;font-size:11px;white-space:nowrap;max-width:100%" onclick="moveCategoryProduct(\''+esc(p.id)+'\',document.getElementById(\'moveGroup_'+esc(p.id)+'\').value)">Pindahkan</button></div></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
 }
 async function toggleCategoryProductActive(id){
  const p=db.products.find(x=>String(x.id)===String(id));
