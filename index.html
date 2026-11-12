@@ -1222,11 +1222,45 @@ async function assignProductToGroup(){
   openCategoryProducts(name);
  }catch(e){p.kategori=previous;save();alert('Kategori belum berhasil disimpan ke cloud: '+(e.message||e));}
 }
+
+async function moveCategoryProduct(id,target){
+ const p=db.products.find(x=>String(x.id)===String(id)),from=window.openCategoryName;
+ const destination=String(target||'').trim();
+ if(!p||!destination)return alert('Pilih kelompok tujuan terlebih dahulu.');
+ if(categoryGroupKey(destination)===categoryGroupKey(p.kategori||'Umum'))return alert('Barang sudah berada di kelompok tersebut.');
+ const previous=p.kategori||'Umum';
+ if(!confirm('Pindahkan "'+p.nama+'" dari "'+previous+'" ke "'+destination+'"?'))return;
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ try{
+  if(sb&&store){
+   let categoryId=null;
+   if(categoryGroupKey(destination)!=='umum'){
+    let category=await sb.from('categories').select('id').eq('store_id',store).ilike('name',destination).limit(1).maybeSingle();
+    if(category.error)throw category.error;
+    if(!category.data){
+     const created=await sb.from('categories').insert({store_id:store,name:destination}).select('id').single();
+     if(created.error)throw created.error;
+     categoryId=created.data.id;
+    }else categoryId=category.data.id;
+   }
+   const update=await sb.from('products').update({category_id:categoryId}).eq('id',p.id).eq('store_id',store);
+   if(update.error)throw update.error;
+  }else{
+   if(!confirm('Koneksi cloud belum tersedia. Pindahkan di perangkat ini saja?'))return;
+  }
+  p.kategori=destination;save();
+  if(categoryGroupKey(destination)!=='umum'&&!db.categoryGroups.some(g=>categoryGroupKey(g.name)===categoryGroupKey(destination))){
+   db.categoryGroups.push({name:destination,hidden:false});save();
+  }
+  alert('Barang berhasil dipindahkan ke kelompok '+destination+'.');
+  openCategoryProducts(from);
+ }catch(e){console.error('Gagal memindahkan barang:',e);alert('Barang belum dipindahkan. Data barang tetap seperti semula.\n'+(e.message||e));}
+}
 function filterCategoryProducts(name){
  const key=categoryGroupKey(name),q=(document.getElementById('categoryProductSearch')?.value||'').toLowerCase(),items=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===key&&[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)),el=document.getElementById('categoryProductTable');
  const count=document.getElementById('categoryProductCount');if(count)count.textContent=items.length+' barang ditampilkan dalam kelompok ini.';
  if(!el)return;
- el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+items.map(p=>{const active=p.active!==false;return '<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td><td><span class="cg-product-status '+(active?'is-active':'is-inactive')+'">'+(active?'Aktif':'Tidak Aktif')+'</span></td><td><button class="cg-toggle-product '+(active?'deactivate':'activate')+'" onclick="toggleCategoryProductActive(\''+esc(p.id)+'\')">'+(active?'Nonaktifkan':'Aktifkan')+'</button></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
+ el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th><th>Status</th><th>Aksi</th><th>Pindahkan ke Kelompok</th></tr></thead><tbody>'+items.map(p=>{const active=p.active!==false,targets=getCategoryGroups().filter(g=>categoryGroupKey(g.name)!==key);return '<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td><td><span class="cg-product-status '+(active?'is-active':'is-inactive')+'">'+(active?'Aktif':'Tidak Aktif')+'</span></td><td><button class="cg-toggle-product '+(active?'deactivate':'activate')+'" onclick="toggleCategoryProductActive(\''+esc(p.id)+'\')">'+(active?'Nonaktifkan':'Aktifkan')+'</button></td><td><div style="display:flex;gap:6px;align-items:center;min-width:230px"><select class="field" id="moveGroup_'+esc(p.id)+'" style="min-width:130px;max-width:180px;padding:7px 9px;font-size:12px"><option value="">Pilih kelompok...</option>'+targets.map(g=>'<option value="'+esc(g.name)+'">'+esc(g.name)+'</option>').join('')+'</select><button class="btn-primary" style="padding:7px 10px;font-size:12px;white-space:nowrap" onclick="moveCategoryProduct(\''+esc(p.id)+'\',document.getElementById(\'moveGroup_'+esc(p.id)+'\').value)">Pindahkan</button></div></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
 }
 async function toggleCategoryProductActive(id){
  const p=db.products.find(x=>String(x.id)===String(id));
