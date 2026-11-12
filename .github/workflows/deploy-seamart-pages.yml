@@ -15,8 +15,9 @@ permissions:
   pages: write
   id-token: write
 
+# Hanya workflow ini yang menerbitkan seluruh situs (admin + /web/toko.html).
 concurrency:
-  group: pages
+  group: pages-main-site
   cancel-in-progress: true
 
 jobs:
