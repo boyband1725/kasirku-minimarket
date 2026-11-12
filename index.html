@@ -375,6 +375,34 @@
  .topbar .avatar{width:27px;height:27px;flex:0 0 27px}
  .mobile-menu-btn{padding:7px 8px!important;font-size:11px!important;white-space:nowrap}
 }
+
+/* Responsive master barang: cegah konten terpotong pada layar laptop/tablet */
+#view{min-width:0;max-width:100%}
+#view .toolbar{width:100%;min-width:0;align-items:stretch}
+#view .toolbar .field{min-width:0;max-width:100%}
+#view .toolbar .search{flex:1 1 260px}
+#view .toolbar button{flex:0 0 auto;white-space:nowrap}
+#view .panel{min-width:0;max-width:100%}
+#ptable{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
+#ptable .tablewrap{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+#ptable table{width:max-content;min-width:1120px}
+@media(max-width:1100px){
+ .content{padding:18px 16px}
+ #view .toolbar .search{flex:1 1 100%}
+ #view .toolbar .field{flex:1 1 180px}
+ #view .toolbar button{flex:1 1 auto}
+}
+@media(max-width:700px){
+ .content{padding:14px 10px}
+ #view .pagehead{gap:10px}
+ #view .pagehead h1{font-size:21px}
+ #view .toolbar{gap:7px}
+ #view .toolbar .field{flex:1 1 100%;width:100%}
+ #view .toolbar button{flex:1 1 calc(50% - 7px);font-size:12px;padding:9px 8px}
+ #view .panel{padding:12px}
+ #ptable table{min-width:1080px}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
