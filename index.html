@@ -1364,6 +1364,58 @@ async function autoCategorizeProducts(){
 function categoryGroupsPage(){document.getElementById('view').innerHTML='<div class="sm-groups"><div class="pagehead"><div><h1>Kelompok Barang</h1><div class="sub">Atur kelompok yang tampil pada filter barang dan kasir.</div></div><div class="group-actions"><button class="group-btn outline" data-auto-groups="1" onclick="autoCategorizeProducts()">✦ Kelompokkan Otomatis</button><button class="group-btn primary" onclick="addCategoryGroup()">＋ Tambah</button></div></div><div class="panel"><div class="group-actions" style="justify-content:space-between;margin-bottom:13px"><div class="group-filter"><button class="group-chip active" data-gfilter="semua" onclick="filterCategoryGroups(\'semua\',this)">Semua</button><button class="group-chip" data-gfilter="aktif" onclick="filterCategoryGroups(\'aktif\',this)">Aktif</button><button class="group-chip" data-gfilter="hidden" onclick="filterCategoryGroups(\'hidden\',this)">Hidden</button></div><div class="group-actions"><button class="group-btn primary" onclick="setAllCategoryGroupsHidden(true)">◉ Hide Semua</button><button class="group-btn outline" onclick="setAllCategoryGroupsHidden(false)">◎ Unhide Semua</button></div></div><input id="groupSearch" class="field" style="width:100%;max-width:360px;margin-bottom:12px" placeholder="Cari kelompok barang..." oninput="filterCategoryGroups()"><div id="groupTable"></div></div></div>';window.groupFilter='semua';renderCategoryGroupTable()}
 function filterCategoryGroups(mode){if(mode)window.groupFilter=mode;document.querySelectorAll('[data-gfilter]').forEach(b=>b.classList.toggle('active',b.dataset.gfilter===window.groupFilter));renderCategoryGroupTable()}
 function renderCategoryGroupTable(){const el=document.getElementById('groupTable');if(!el)return;const q=(document.getElementById('groupSearch')?.value||'').toLowerCase(),mode=window.groupFilter||'semua',groups=getCategoryGroups().filter(g=>(mode==='semua'||(mode==='aktif'?!g.hidden:g.hidden))&&g.name.toLowerCase().includes(q));el.innerHTML=groups.length?'<div class="tablewrap"><table class="group-table"><thead><tr><th>Kelompok Barang</th><th>Jumlah Barang</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+groups.map(g=>{const count=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===categoryGroupKey(g.name)).length;return '<tr><td><div class="group-row" role="button" tabindex="0" title="Lihat daftar barang" style="cursor:pointer" data-group="'+esc(g.name)+'" onclick="openCategoryProducts(this.dataset.group)"><span class="group-dot">▦</span><span class="group-row-name">'+esc(g.name)+'</span></div></td><td>'+count+'</td><td><span class="group-status '+(g.hidden?'is-hidden':'')+'">'+(g.hidden?'Hidden':'Aktif')+'</span></td><td><button class="group-btn '+(g.hidden?'outline':'primary')+'" onclick="toggleCategoryGroup('+JSON.stringify(g.name).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+','+(g.hidden?'false':'true')+')">'+(g.hidden?'Unhide':'Hide')+'</button></td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">Kelompok tidak ditemukan.</div>'}
+async function findAutomaticProductPhoto(p){
+ const name=String(p.nama||'').trim(),barcode=String(p.barcode||'').trim();
+ if(!name)return null;
+ const imageUrl=front=>{if(!front)return '';const v=front.hires||front.display||front.small||front;return typeof v==='string'?v:(v&&typeof v==='object'?(v.en||Object.values(v)[0]||''):'')};
+ let candidates=[],verifiedBarcode=false;
+ if(barcode){
+  try{
+   const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
+   if(r.ok){
+    const d=await r.json(),p0=d.product;
+    if(d.status===1&&p0&&String(p0.code||'').replace(/\D/g,'')===barcode.replace(/\D/g,'')){
+     const url=imageUrl(p0.selected_images?.front);
+     if(url){candidates.push({url,source:p0.product_name||'',verified:true});verifiedBarcode=true;}
+    }
+   }
+  }catch(e){}
+ }
+ if(!candidates.length){
+  try{
+   const url='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(name)+'&search_simple=1&action=process&json=1&page_size=15&fields=code,product_name,selected_images';
+   const r=await fetch(url);
+   if(r.ok){const d=await r.json();candidates=(d.products||[]).map(x=>({url:imageUrl(x.selected_images?.front),source:x.product_name||'',verified:false})).filter(x=>x.url&&x.source);}
+  }catch(e){}
+ }
+ for(const item of candidates){
+  try{const check=await validateProductPhoto(item.url,name,item.source,item.verified||false);return {url:item.url,source:item.source,check};}catch(e){}
+ }
+ return null;
+}
+async function autoFillMissingProductPhotos(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return alert('Koneksi cloud belum siap. Muat ulang halaman lalu coba lagi.');
+ const missing=db.products.filter(p=>!String(p.foto||'').trim());
+ if(!missing.length)return alert('Semua barang sudah memiliki foto. Tidak ada yang perlu dicari.');
+ if(!confirm('Cari foto otomatis untuk '+missing.length+' barang yang belum memiliki foto? Foto lama tidak akan diubah.'))return;
+ const status=document.getElementById('auto_photo_status');
+ let found=0,uploaded=0,skipped=0,errors=[];
+ const categoryCache=new Map();
+ for(let i=0;i<missing.length;i++){
+  const p=missing[i];
+  if(status)status.textContent='Memeriksa '+(i+1)+'/'+missing.length+': '+p.nama;
+  try{
+   const result=await findAutomaticProductPhoto(p);
+   if(!result){skipped++;continue;}
+   p.foto=result.url;save();found++;
+   await syncOneProduct(p,categoryCache);uploaded++;
+  }catch(e){errors.push(p.nama+': '+(e.message||e));}
+  if(i<missing.length-1)await new Promise(resolve=>setTimeout(resolve,900));
+ }
+ if(status)status.textContent='Selesai. Foto ditemukan '+found+'/'+missing.length+'; berhasil masuk toko online '+uploaded+'; dilewati '+skipped+'.';
+ alert('Pencarian foto otomatis selesai.\nFoto ditemukan: '+found+'\nBerhasil masuk toko online: '+uploaded+'\nDilewati/tidak cocok: '+skipped+(errors.length?'\nGagal sinkron: '+errors.length+'\n'+errors.slice(0,5).join('\n'):''));
+}
 async function syncAllProductPhotos(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return alert('Koneksi cloud belum siap. Muat ulang halaman lalu coba lagi.');
@@ -1375,7 +1427,7 @@ async function syncAllProductPhotos(){
  for(const p of withPhoto){try{await syncOneProduct(p,cache);ok++;}catch(e){failed.push(p.nama+': '+(e.message||e));}}
  alert('Sinkronisasi foto selesai.\nBerhasil: '+ok+'\nGagal: '+failed.length+(failed.length?'\n\n'+failed.slice(0,5).join('\n'):''));
 }
-function products(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Produk & Kategori</h1><div class="sub">Kelola master barang SeaMart.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-light" onclick="syncAllProductPhotos()">↻ Sinkronkan Foto Online</button><button class="btn-primary" onclick="productModal()">＋ Tambah Produk</button></div></div><div class="toolbar"><input id="psearch" class="field search" placeholder="Cari nama, kode, atau barcode…" oninput="filterProducts()"><select id="pgroup" class="field" onchange="filterProducts()"><option value="">Semua kelompok aktif</option>${getVisibleCategoryGroups().map(g=>'<option value="'+esc(g.name)+'">'+esc(g.name)+'</option>').join('')}</select><button class="btn-light" onclick="document.getElementById('csvfile').click()">⇧ Impor CSV</button><button class="btn-light" onclick="exportCSV()">⇩ Ekspor CSV</button></div><div class="panel"><div id="ptable"></div></div>`;filterProducts()}
+function products(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Produk & Kategori</h1><div class="sub">Kelola master barang SeaMart.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-light" onclick="autoFillMissingProductPhotos()">✦ Cari Foto Otomatis Semua Barang</button><button class="btn-light" onclick="syncAllProductPhotos()">↻ Sinkronkan Foto Online</button><button class="btn-primary" onclick="productModal()">＋ Tambah Produk</button></div></div><div id="auto_photo_status" class="emptyhint" style="margin:8px 0"></div><div class="toolbar"><input id="psearch" class="field search" placeholder="Cari nama, kode, atau barcode…" oninput="filterProducts()"><select id="pgroup" class="field" onchange="filterProducts()"><option value="">Semua kelompok aktif</option>${getVisibleCategoryGroups().map(g=>'<option value="'+esc(g.name)+'">'+esc(g.name)+'</option>').join('')}</select><button class="btn-light" onclick="document.getElementById('csvfile').click()">⇧ Impor CSV</button><button class="btn-light" onclick="exportCSV()">⇩ Ekspor CSV</button></div><div class="panel"><div id="ptable"></div></div>`;filterProducts()}
 function filterProducts(){let q=(document.getElementById('psearch')?.value||'').toLowerCase(),group=document.getElementById('pgroup')?.value||'',a=db.products.filter(p=>(!group||String(p.kategori||'Umum')===group)&&[p.nama,p.barcode,p.kode,p.kategori].join(' ').toLowerCase().includes(q));document.getElementById('ptable').innerHTML=a.length?'<div class="tablewrap"><table><thead><tr><th>Nama Produk</th><th>Kode</th><th>Barcode</th><th>Kategori</th><th>Harga Beli</th><th>Jual 1 (Kasir)</th><th>Jual 2</th><th>Jual 3</th><th>Stok</th><th></th></tr></thead><tbody>'+a.map(p=>`<tr><td><b>${esc(p.nama)}</b></td><td>${esc(p.kode||'-')}</td><td>${esc(p.barcode||'-')}</td><td>${esc(p.kategori||'Umum')}</td><td>${rupiah(p.harga_beli||0)}</td><td><b>${rupiah(p.harga_jual_1??p.harga)}</b></td><td>${rupiah(p.harga_jual_2||0)}</td><td>${rupiah(p.harga_jual_3||0)}</td><td>${p.stok}</td><td class="muted">—</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Belum ada produk. Impor master CSV untuk mulai mengisi barang.</div>'}
 function editProductsPage(){document.getElementById('view').innerHTML=`<div class="pagehead"><div><h1>Ubah Data Barang</h1><div class="sub">Formulir perubahan berada di atas. Cari dan pilih barang pada daftar di bawah.</div></div></div><div class="panel"><h3>Formulir Ubah Data Barang</h3><div id="inline_edit_form"><div class="empty">Pilih barang dari daftar di bawah untuk menampilkan formulir di sini.</div></div></div><div class="panel"><h3>Cari Barang</h3><input id="edit_product_search" class="field" style="width:100%;max-width:620px" placeholder="Ketik nama barang, kode, atau barcode..." oninput="renderEditProductOptions()"><div id="edit_product_results" style="margin-top:14px"></div></div>`;window.selectedEditProductId='';window.pendingInlinePhoto=null;renderEditProductOptions()}
 function renderEditProductOptions(){let q=(document.getElementById('edit_product_search')?.value||'').toLowerCase(),a=db.products.filter(p=>[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)).slice(0,40),el=document.getElementById('edit_product_results');if(!el)return;el.innerHTML=a.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Kategori</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>'+a.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+esc(p.kategori||'Umum')+'</td><td>'+Number(p.stok||0)+'</td><td><button class="btn-light" data-id="'+esc(p.id)+'" onclick="selectProductForEdit(this.dataset.id)">Pilih</button></td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Barang tidak ditemukan.</div>'}
