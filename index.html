@@ -1175,7 +1175,19 @@ async function lookupInlineProductPhoto(){
   const front=product.selected_images?.front||{};
   const imageInfo=product.images?.front||{};
   const asUrl=value=>typeof value==='string'?value:(value&&typeof value==='object'?(value.en||Object.values(value).find(v=>typeof v==='string')||''):'');
-  const candidates=[imageInfo.url,imageInfo.imgid,front.full,front.display,product.image_front_url,front.small,product.image_front_small_url].map(asUrl).filter(Boolean);
+  const fullResolutionUrls=[];
+  const cleanCode=String(product.code||barcode).replace(/\\D/g,'');
+  if(cleanCode){
+   let folder=cleanCode.length<13?cleanCode.padStart(13,'0'):cleanCode;
+   if(folder.length>8)folder=folder.replace(/^(...)(...)(...)(.*)$/,'$1/$2/$3/$4');
+   const imageMap=product.images||{};
+   const frontKeys=Object.keys(imageMap).filter(key=>/^front(?:_[a-z]{2})?$/i.test(key));
+   frontKeys.forEach(key=>{
+    const meta=imageMap[key]||{},rev=meta.rev;
+    if(rev!==undefined&&rev!==null)fullResolutionUrls.push('https://images.openfoodfacts.org/images/products/'+folder+'/'+key+'.'+encodeURIComponent(rev)+'.full.jpg');
+   });
+  }
+  const candidates=[...fullResolutionUrls,imageInfo.url,imageInfo.imgid,front.full,front.display,product.image_front_url,front.small,product.image_front_small_url].map(asUrl).filter(Boolean);
   const expanded=[];
   candidates.forEach(u=>{expanded.push(u);const full=u.replace(/\.(?:200|400|200x200|400x400)(\.(?:jpg|jpeg|png|webp))(?:\?.*)?$/i,'$1');if(full!==u)expanded.push(full)});
   const unique=[...new Set(expanded)];
