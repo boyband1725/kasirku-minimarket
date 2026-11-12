@@ -511,22 +511,36 @@ db.sales=Array.isArray(db.sales)?db.sales.filter(t=>t&&typeof t==='object'):[];
 db.sales.forEach(t=>{if(!Array.isArray(t.items))t.items=[];});
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{products:[],moves:[],sales:[]}}catch(e){return {products:[],moves:[],sales:[]}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
-async function syncOneProduct(p){
+async function syncOneProduct(p,categoryCache=new Map()){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
- if(!sb||!store)return;
+ if(!sb||!store)throw new Error('Koneksi cloud belum siap.');
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(p.id||'')))p.id=crypto.randomUUID();
  let categoryId=null;
- if(p.kategori&&p.kategori!=='Umum'){
-  const c=await sb.from('categories').select('id').eq('store_id',store).eq('name',p.kategori).limit(1).maybeSingle();
-  if(c.error)throw c.error;
-  if(c.data)categoryId=c.data.id;
+ const categoryName=String(p.kategori||'Umum').trim();
+ if(categoryName&&categoryGroupKey(categoryName)!=='umum'){
+  if(!categoryCache.has(categoryGroupKey(categoryName))){
+   categoryCache.set(categoryGroupKey(categoryName),(async()=>{
+    let found=await sb.from('categories').select('id').eq('store_id',store).ilike('name',categoryName).limit(1).maybeSingle();
+    if(found.error)throw found.error;
+    if(found.data?.id)return found.data.id;
+    const created=await sb.from('categories').insert({store_id:store,name:categoryName}).select('id').single();
+    if(!created.error&&created.data?.id)return created.data.id;
+    // Jika kategori dibuat hampir bersamaan dari perangkat lain, ambil ulang sebelum gagal.
+    const retry=await sb.from('categories').select('id').eq('store_id',store).ilike('name',categoryName).limit(1).maybeSingle();
+    if(retry.error)throw retry.error;
+    if(retry.data?.id)return retry.data.id;
+    throw created.error||new Error('Kategori '+categoryName+' gagal dibuat di cloud.');
+   })());
+  }
+  categoryId=await categoryCache.get(categoryGroupKey(categoryName));
  }
- const row={id:p.id,store_id:store,code:p.kode||null,barcode:p.barcode||null,name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Number(p.stok||0),active:true};
+ const row={id:p.id,store_id:store,code:p.kode||null,barcode:(String(p.barcode||'').trim()||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false};
  const result=await sb.from('products').upsert(row,{onConflict:'id'});
  if(result.error)throw result.error;
 }
 async function syncAllProducts(){
- for(const p of db.products)await syncOneProduct(p);
+ const categoryCache=new Map();
+ for(const p of db.products)await syncOneProduct(p,categoryCache);
 }
 
 async function loadCategoryVisibility(){
