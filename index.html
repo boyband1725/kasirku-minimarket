@@ -634,6 +634,30 @@
  #loginroot .login-actions button{min-height:7.5dvh!important;font-size:clamp(14px,4vw,18px)!important}
 }
 
+
+/* Tighten SeaMart login card: remove excessive blank space below buttons */
+#loginroot .login-card{
+ height:auto!important;
+ min-height:0!important;
+ max-height:calc(100dvh - 36px)!important;
+ padding-bottom:28px!important;
+}
+@media(max-width:600px){
+ #loginroot .login-card{
+  height:auto!important;
+  min-height:0!important;
+  max-height:calc(100dvh - 36px)!important;
+  padding:24px 24px 26px!important;
+ }
+ #loginroot .login-brand{margin-bottom:12px!important}
+ #loginroot .login-card h2{margin-bottom:14px!important}
+ #loginroot .login-card label{margin:10px 0 6px!important}
+ #loginroot .login-card input{height:50px!important}
+ #loginroot .login-forgot{margin-top:10px!important}
+ #loginroot .login-actions{margin-top:17px!important}
+ #loginroot .login-actions button{min-height:50px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
