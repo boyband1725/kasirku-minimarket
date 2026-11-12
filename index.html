@@ -412,6 +412,31 @@
 #loginroot .login-forgot{display:block!important;margin:14px auto 0!important}
 #loginroot #cloudLoginError{margin:10px 0 0!important;font-size:12px!important}
 
+
+/* Match approved SeaMart login reference on mobile and desktop */
+#loginroot{position:fixed!important;inset:0!important;z-index:99999!important;background:linear-gradient(145deg,#087b43,#075b36 58%,#064d35)!important}
+#loginroot .login-screen{display:flex!important;align-items:center!important;justify-content:center!important;background:linear-gradient(145deg,#087b43 0%,#075b36 58%,#064d35 100%)!important;padding:18px!important}
+#loginroot .login-card{width:min(520px,calc(100vw - 36px))!important;max-width:520px!important;padding:28px!important;border-radius:24px!important}
+#loginroot .login-brand{width:210px!important;margin:0 auto 18px!important}
+#loginroot .login-card h2{text-align:left!important;font-size:23px!important;margin:0 0 18px!important;color:#075b36!important}
+#loginroot .login-card label{font-size:14px!important;margin:14px 0 6px!important;color:#53615a!important}
+#loginroot .login-card input{height:52px!important;border:1px solid #d5ded8!important;border-radius:13px!important;padding:13px 15px!important;font-size:15px!important}
+#loginroot .login-password-wrap{margin-top:7px!important}
+#loginroot .login-password-wrap input{padding-right:58px!important}
+#loginroot .password-toggle{right:8px!important;width:38px!important;height:38px!important;min-height:38px!important;border-radius:9px!important;background:transparent!important;color:#087b43!important;font-size:20px!important}
+#loginroot .login-actions{display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(110px,1fr)!important;gap:12px!important;margin-top:22px!important}
+#loginroot .login-actions button{width:100%!important;min-height:54px!important;border-radius:13px!important;font-size:16px!important;font-weight:750!important}
+#loginroot .login-actions .btn-primary{background:#087b43!important;color:#fff!important}
+#loginroot .login-actions .btn-light{background:#fff!important;color:#087b43!important;border:2px solid #087b43!important}
+#loginroot .login-forgot{margin:15px 0 0 auto!important;font-size:15px!important}
+@media(max-width:520px){
+ #loginroot .login-card{width:calc(100vw - 36px)!important;padding:22px!important;border-radius:20px!important}
+ #loginroot .login-brand{width:185px!important;margin-bottom:15px!important}
+ #loginroot .login-card h2{font-size:21px!important}
+ #loginroot .login-actions{grid-template-columns:minmax(0,1.5fr) minmax(96px,1fr)!important;gap:9px!important}
+ #loginroot .login-actions button{min-height:49px!important;font-size:14px!important;padding:9px 8px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -463,7 +488,7 @@ if(!db.users.some(u=>u.username==='kasir'))db.users.push({username:'kasir',passw
 db.shifts=Array.isArray(db.shifts)?db.shifts:[];
 let currentUser=null;
 let currentShift=()=>db.shifts.find(x=>x.status==='open'&&x.username===currentUser?.username);
-function showLogin(){const root=document.getElementById('loginroot');root.style.cssText='display:block!important;position:fixed!important;inset:0!important;z-index:99999!important;visibility:visible!important;opacity:1!important';root.innerHTML='<div class="login-screen" style="display:grid!important;position:fixed!important;inset:0!important;z-index:100000!important"><form class="login-card" onsubmit="event.preventDefault();doLogin()"><div class="login-brand" aria-label="SeaMart"><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlowLogin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlowLogin)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlowLogin)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg></div><h2>Login Admin / Kasir</h2><label>Email<input id="loginUser" class="field" type="email" autocomplete="username" required placeholder="Email akun Supabase"></label><label>Password<div class="login-password-wrap"><input id="loginPass" class="field" type="password" autocomplete="current-password" required placeholder="Password"><button class="password-toggle" type="button" onclick="toggleLoginPassword()" aria-label="Tampilkan password" aria-pressed="false"><span id="passwordEyeIcon">◉</span><span id="passwordEyeText">Lihat</span></button></div></label><div class="login-actions"><button id="cloudLoginBtn" class="btn-primary" type="submit">Log in</button><button class="btn-light" type="button" onclick="cancelLoginForm()">Cancel</button></div><button class="login-forgot" type="button" onclick="forgotLoginPassword()">Lupa password?</button><p id="cloudLoginError" class="muted" style="margin-top:12px" aria-live="polite"></p></form></div>';}
+function showLogin(){const root=document.getElementById('loginroot');root.style.cssText='display:block!important;position:fixed!important;inset:0!important;z-index:99999!important;visibility:visible!important;opacity:1!important';root.innerHTML='<div class="login-screen" style="display:flex!important;align-items:center!important;justify-content:center!important;position:fixed!important;inset:0!important;z-index:100000!important;background:linear-gradient(145deg,#087b43 0%,#075b36 58%,#064d35 100%)!important;padding:18px!important;box-sizing:border-box!important"><form class="login-card" onsubmit="event.preventDefault();doLogin()"><div class="login-brand" aria-label="SeaMart"><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlowLogin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlowLogin)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlowLogin)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg></div><h2>Login Admin / Kasir</h2><label>Email<input id="loginUser" class="field" type="email" autocomplete="username" required placeholder="Email akun Supabase"></label><label>Password<div class="login-password-wrap"><input id="loginPass" class="field" type="password" autocomplete="current-password" required placeholder="Password"><button class="password-toggle" type="button" onclick="toggleLoginPassword()" aria-label="Tampilkan password" aria-pressed="false"><span id="passwordEyeIcon">◉</span><span id="passwordEyeText">Lihat</span></button></div></label><div class="login-actions"><button id="cloudLoginBtn" class="btn-primary" type="submit">Log in</button><button class="btn-light" type="button" onclick="cancelLoginForm()">Cancel</button></div><button class="login-forgot" type="button" onclick="forgotLoginPassword()">Lupa password?</button><p id="cloudLoginError" class="muted" style="margin-top:12px" aria-live="polite"></p></form></div>';}
 
 function toggleLoginPassword(){const input=document.getElementById("loginPass"),btn=document.querySelector("#loginroot .password-toggle"),txt=document.getElementById("passwordEyeText"),icon=document.getElementById("passwordEyeIcon");if(!input||!btn)return;const reveal=input.type==="password";input.type=reveal?"text":"password";btn.setAttribute("aria-pressed",String(reveal));btn.setAttribute("aria-label",reveal?"Sembunyikan password":"Tampilkan password");if(txt)txt.textContent=reveal?"Sembunyi":"Lihat";if(icon)icon.textContent=reveal?"◎":"◉";}
 function cancelLoginForm(){const email=document.getElementById('loginUser'),pass=document.getElementById('loginPass'),msg=document.getElementById('cloudLoginError');if(email)email.value='';if(pass)pass.value='';if(msg)msg.textContent='Form login dibersihkan.';email?.focus();}
