@@ -725,7 +725,7 @@ function filterCategoryProducts(name){
 function guessProductGroup(name){
  const n=String(name||'').toLocaleLowerCase('id-ID');
  const rules=[
-  ['Pakaian',/\\b(pakaian|baju|kaos|t-shirt|kemeja|celana|jeans|rok|dress|gaun|daster|gamis|jaket|hoodie|sweater|seragam|piyama|pakaian dalam|singlet|kaus kaki|jilbab|hijab|kerudung|mukena|sarung|peci|topi|rompi|legging|shorts|underwear|bra|boxer)\\b/i],
+  ['Pakaian',/\b(pakaian|baju|kaos|t-shirt|kemeja|celana|jeans|rok|dress|gaun|daster|gamis|jaket|hoodie|sweater|seragam|piyama|pakaian dalam|singlet|kaus kaki|jilbab|hijab|kerudung|mukena|sarung|peci|topi|rompi|legging|shorts|underwear|bra|boxer)\b/i],
   ['Es Krim',/\b(es krim|ice cream|icecream|magnum|cornetto|aice|walls|wall's|campina|paddle pop|joyday|glico wings|viennetta)\b/i],
   ['Rokok',/\b(rokok|cigarette|djarum|sampoerna|marlboro|gudang garam|surya|la bold|esse|camel|dunhill|lucky strike|winston|clas mild|jarum|filter kretek)\b/i],
   ['Mie Instan',/\b(mie|mi instan|noodle|indomie|sarimi|supermi|pop mie|popmi|mie sedaap|gaga|lemonilo)\b/i],
