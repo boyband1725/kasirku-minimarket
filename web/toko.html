@@ -35,7 +35,7 @@ const SUPABASE_URL='https://kvavvulwrrxfqtihmfnu.supabase.co';
 const SUPABASE_KEY='sb_publishable_Pb_d6PJahuegzMdGVPjeOQ_jw8OQoqV';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let allProducts=[],activeCategory='all',cart=[];
-const rupiah=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const rupiah=n=>Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function imageFor(p){return p.image_url||p.foto||p.image||''}
 function fallback(name){const n=String(name||'').toLowerCase();if(/air|mineral|susu|kopi|teh|sirup|jus|minum/.test(n))return '🥤';if(/mie|roti|beras|gula|tepung|snack|biskuit|makanan/.test(n))return '🛒';if(/baju|kaos|celana|pakaian/.test(n))return '👕';if(/sabun|sampo|deterjen|rumah/.test(n))return '🧼';return '🛍️'}
