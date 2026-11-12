@@ -493,6 +493,29 @@
 #loginroot .login-actions button svg{width:27px!important;height:27px!important;flex:0 0 27px!important;fill:none!important;stroke:currentColor!important;stroke-width:2.5!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 #loginroot .login-actions .btn-primary svg{stroke:#fff!important}
 
+
+/* Final proportion tuning: match the taller, narrower reference card */
+@media(max-width:600px){
+ #loginroot .login-screen{padding:16px!important;align-items:center!important;justify-content:center!important}
+ #loginroot .login-card{
+  width: min(84vw, 560px)!important;
+  min-height: 86dvh!important;
+  max-height: 90dvh!important;
+  padding: 34px 28px 42px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+ }
+ #loginroot .login-brand{width: min(58vw, 235px)!important;margin: 12px auto 26px!important}
+ #loginroot .login-card h2{font-size:clamp(21px,3.4vw,26px)!important;margin-bottom:24px!important}
+ #loginroot .login-card label{margin:18px 0 9px!important}
+ #loginroot .login-card input{height:58px!important}
+ #loginroot .login-forgot{margin-top:20px!important}
+ #loginroot .login-actions{margin-top:30px!important;gap:12px!important}
+ #loginroot .login-actions button{min-height:58px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
