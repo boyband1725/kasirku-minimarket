@@ -667,6 +667,15 @@
 .sm-groups .group-dot{background:#e0f5e7!important;color:#087b43!important}
 .sm-groups .group-row-name{color:#174b35!important}
 
+
+/* Active/inactive controls in category product list */
+.cg-product-status{display:inline-block;padding:5px 9px;border-radius:16px;font-size:12px;font-weight:700;white-space:nowrap}
+.cg-product-status.is-active{background:#e1f5e8;color:#087b43}
+.cg-product-status.is-inactive{background:#f1f3f5;color:#68727b}
+.cg-toggle-product{padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap}
+.cg-toggle-product.deactivate{background:#fff2e8;color:#a34b13;border:1px solid #f1c7a9}
+.cg-toggle-product.activate{background:#087b43;color:#fff;border:1px solid #087b43}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -1017,7 +1026,24 @@ function filterCategoryProducts(name){
  const key=categoryGroupKey(name),q=(document.getElementById('categoryProductSearch')?.value||'').toLowerCase(),items=db.products.filter(p=>categoryGroupKey(p.kategori||'Umum')===key&&[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)),el=document.getElementById('categoryProductTable');
  const count=document.getElementById('categoryProductCount');if(count)count.textContent=items.length+' barang ditampilkan dalam kelompok ini.';
  if(!el)return;
- el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th></tr></thead><tbody>'+items.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
+ el.innerHTML=items.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Harga Jual</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+items.map(p=>{const active=p.active!==false;return '<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+rupiah(p.harga_jual_1??p.harga??0)+'</td><td>'+Number(p.stok||0)+'</td><td><span class="cg-product-status '+(active?'is-active':'is-inactive')+'">'+(active?'Aktif':'Tidak Aktif')+'</span></td><td><button class="cg-toggle-product '+(active?'deactivate':'activate')+'" onclick="toggleCategoryProductActive(\''+esc(p.id)+'\')">'+(active?'Nonaktifkan':'Aktifkan')+'</button></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty">Belum ada barang di kelompok '+esc(name)+'. Pilih barang dari master barang di atas untuk memasukkannya ke kelompok ini.</div>';
+}
+async function toggleCategoryProductActive(id){
+ const p=db.products.find(x=>String(x.id)===String(id));
+ if(!p)return alert('Barang tidak ditemukan.');
+ const next=p.active===false;
+ const previous=p.active;
+ p.active=next;save();filterCategoryProducts(window.openCategoryName);
+ try{
+  const sb=window.seamartSupabase,store=window.seamartStoreId;
+  if(!sb||!store)throw new Error('Koneksi cloud belum siap. Perubahan belum disimpan ke server.');
+  const result=await sb.from('products').update({active:next}).eq('id',p.id).eq('store_id',store);
+  if(result.error)throw result.error;
+  alert(next?'Barang berhasil diaktifkan.':'Barang berhasil dinonaktifkan.');
+ }catch(e){
+  p.active=previous;save();filterCategoryProducts(window.openCategoryName);
+  alert('Status barang gagal disimpan: '+(e.message||e));
+ }
 }
 function guessProductGroup(name){
  const n=String(name||'').toLocaleLowerCase('id-ID');
