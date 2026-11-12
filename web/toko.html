@@ -83,6 +83,11 @@ function changeQty(id,d){const p=cart.find(x=>String(x.id)===String(id));if(!p)r
 function openCart(){document.getElementById('drawerback').classList.add('show');updateCart()}function closeCart(){document.getElementById('drawerback').classList.remove('show')}
 function toggleAddress(){const pickup=document.querySelector('input[name="fulfillment"]:checked').value==='pickup';document.getElementById('addressWrap').style.display=pickup?'none':'grid';document.getElementById('customerAddress').required=!pickup}
 function submitOrder(e){e.preventDefault();alert('Checkout belum aktif. Jangan kirim pembayaran sebelum admin mengaktifkan sistem pesanan SeaMart.')}
+// Sinkronkan katalog dengan status aktif/nonaktif dari admin POS.
 loadCatalog();
+let catalogRefreshTimer=null;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadCatalog()});
+window.addEventListener('focus',()=>loadCatalog());
+catalogRefreshTimer=setInterval(()=>{if(!document.hidden)loadCatalog()},30000);
 </script>
 </body></html>
