@@ -1381,13 +1381,13 @@ function editProductsPage(){document.getElementById('view').innerHTML=`<div clas
 function renderEditProductOptions(){let q=(document.getElementById('edit_product_search')?.value||'').toLowerCase(),a=db.products.filter(p=>[p.nama,p.kode,p.barcode].join(' ').toLowerCase().includes(q)).slice(0,40),el=document.getElementById('edit_product_results');if(!el)return;el.innerHTML=a.length?'<div class="tablewrap"><table><thead><tr><th>Nama Barang</th><th>Kode</th><th>Barcode</th><th>Kategori</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>'+a.map(p=>'<tr><td><b>'+esc(p.nama)+'</b></td><td>'+esc(p.kode||'-')+'</td><td>'+esc(p.barcode||'-')+'</td><td>'+esc(p.kategori||'Umum')+'</td><td>'+Number(p.stok||0)+'</td><td><button class="btn-light" data-id="'+esc(p.id)+'" onclick="selectProductForEdit(this.dataset.id)">Pilih</button></td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Barang tidak ditemukan.</div>'}
 function selectProductForEdit(id){window.selectedEditProductId=id;window.pendingInlinePhoto=null;let p=db.products.find(x=>x.id===id),el=document.getElementById('inline_edit_form');if(!p||!el)return;el.innerHTML=`<div class="formgrid"><label>Nama Barang<input id="if_nama" class="field" value="${esc(p.nama)}"></label><label>Kode Barang<input id="if_kode" class="field" value="${esc(p.kode||'')}"></label><label>Barcode<input id="if_barcode" class="field" value="${esc(p.barcode||'')}"></label><label>Kelompok Barang<input id="if_kategori" class="field" value="${esc(p.kategori||'Umum')}"></label><label>Harga Beli<input id="if_hb" type="number" class="field" value="${Number(p.harga_beli||0)}"></label><label>Harga Jual 1 (Kasir)<input id="if_h1" type="number" class="field" value="${Number(p.harga_jual_1??p.harga??0)}"></label><label>Harga Jual 2<input id="if_h2" type="number" class="field" value="${Number(p.harga_jual_2||0)}"></label><label>Harga Jual 3<input id="if_h3" type="number" class="field" value="${Number(p.harga_jual_3||0)}"></label><label>Stok<input id="if_stok" type="number" class="field" value="${Number(p.stok||0)}"></label></div><label style="display:block;margin-top:14px">Foto Produk<input type="file" accept="image/*" class="field" style="display:block;width:100%;margin-top:6px" onchange="previewInlineProductPhoto(this)"></label><div id="inline_photo_preview" style="margin-top:8px">${p.foto?'<img src="'+p.foto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px">':'<span class="emptyhint">Belum ada foto. Ikon kategori akan digunakan.</span>'}</div><button type="button" class="btn-light" style="margin-top:9px" onclick="lookupInlineProductPhoto()">Cari Foto Otomatis (Barcode / Nama)</button><div id="inline_photo_status" class="emptyhint" style="margin-top:6px">Foto dicari memakai barcode barang di atas.</div><div class="actions"><button class="btn-light" onclick="editProductsPage()">Batal</button><button class="btn-primary" onclick="saveInlineProduct()">Simpan Perubahan</button></div>`;el.scrollIntoView({behavior:'smooth',block:'start'})}
 
-async function validateProductPhoto(url,targetName,sourceName){
+async function validateProductPhoto(url,targetName,sourceName,barcodeVerified=false){
  const clean=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(x=>x.length>=3&&!['produk','barang','pack','pcs','piece','gram','gr','ml','liter'].includes(x));
  const wanted=clean(targetName),found=clean(sourceName);
  if(!wanted.length||!found.length||!found.includes(wanted[0]))throw new Error('Merek/nama utama tidak cocok. Foto ditolak.');
  const numbers=s=>(String(s||'').match(/\d+(?:[.,]\d+)?/g)||[]).map(x=>x.replace(',','.'));
  const wantedNumbers=numbers(targetName),foundNumbers=numbers(sourceName);
- if(wantedNumbers.some(n=>!foundNumbers.includes(n)))throw new Error('Ukuran/isi produk tidak cocok. Foto ditolak.');
+ if(!barcodeVerified&&wantedNumbers.length&&foundNumbers.length&&wantedNumbers.some(n=>!foundNumbers.includes(n)))throw new Error('Ukuran/isi produk tidak cocok. Foto ditolak.');
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat. Foto ditolak.'));img.src=url});
  if(img.naturalWidth<500||img.naturalHeight<500)throw new Error('Resolusi foto kurang dari 500×500 ('+img.naturalWidth+'×'+img.naturalHeight+'). Foto ditolak.');
@@ -1401,12 +1401,15 @@ async function lookupInlineProductPhoto(){
  if(!barcode){if(status)status.textContent='Isi barcode barang terlebih dahulu.';return}
  if(status)status.textContent='Memeriksa kecocokan nama dan kualitas foto…';
  try{
+  let barcodeVerified=false;
   const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
   if(!response.ok)throw new Error('Server foto memberi HTTP '+response.status+(response.status===503?' (sedang sibuk / batas permintaan). Coba lagi beberapa menit.':response.status===429?' (terlalu banyak permintaan). Tunggu sebelum mencoba lagi.':' . Coba lagi nanti.'));
   const data=await response.json(),front=data.product?.selected_images?.front,images=front?.display||front?.small||front;
   const url=typeof images==='string'?images:(images&&typeof images==='object'?(images.en||Object.values(images)[0]||''):'');
   if(data.status!==1||!url)throw new Error('Foto untuk barcode ini belum tersedia. Coba unggah dari galeri.');
-  const check=await validateProductPhoto(url,name,data.product.product_name);
+  barcodeVerified=String(data.product.code||'').replace(/\\D/g,'')===barcode.replace(/\\D/g,'');
+  if(!barcodeVerified)throw new Error('Barcode sumber tidak sama. Foto ditolak.');
+  const check=await validateProductPhoto(url,name,data.product.product_name,true);
   window.pendingInlinePhoto=url;
   const preview=document.getElementById('inline_photo_preview');
   if(preview)preview.innerHTML='<img src="'+esc(url)+'" style="width:120px;height:120px;object-fit:contain;border-radius:9px;background:#f5f7f9">';
@@ -1424,7 +1427,7 @@ async function lookupProductPhoto(){
  if(!barcode&&!name){if(status)status.textContent='Isi nama barang atau barcode terlebih dahulu.';return}
  if(status)status.textContent='Mencari foto produk dengan pemeriksaan merek, ukuran, dan kualitas…';
  try{
-  let candidates=[];
+  let candidates=[],barcodeVerified=false;
   const imageUrl=front=>{if(!front)return '';const images=front.hires||front.display||front.small||front;return typeof images==='string'?images:(images&&typeof images==='object'?(images.en||Object.values(images)[0]||''):'')};
   if(barcode){
    const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,selected_images');
@@ -1445,7 +1448,7 @@ async function lookupProductPhoto(){
   }
   if(!candidates.length)throw new Error('Foto untuk barcode/nama ini tidak ditemukan. Tidak ada gambar yang dipasang.');
   let chosen=null,lastError=null;
-  for(const item of candidates){try{const check=await validateProductPhoto(item.url,name,item.product_name);chosen={...item,check};break}catch(e){lastError=e}}
+  for(const item of candidates){try{const check=await validateProductPhoto(item.url,name,item.product_name,barcodeVerified);chosen={...item,check};break}catch(e){lastError=e}}
   if(!chosen)throw new Error(lastError?.message||'Tidak ada foto yang cukup cocok dan tajam. Silakan unggah foto produk sendiri.');
   window.pendingProductPhoto=chosen.url;
   const preview=document.getElementById('foto_preview');
