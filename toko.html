@@ -471,4 +471,14 @@ async function startStorefront(){
  }
 }
 startStorefront();
+</script><script id="seamart-clean-stray-newlines">
+(function(){
+  function removeStrayMarkers(){
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),nodes=[];
+    while(walker.nextNode()){var n=walker.currentNode;if(/^\\n+$/.test((n.nodeValue||'').trim()))nodes.push(n);}
+    nodes.forEach(function(n){n.parentNode&&n.parentNode.removeChild(n);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeStrayMarkers,{once:true});
+  else removeStrayMarkers();
+})();
 </script></body></html>
