@@ -1127,9 +1127,12 @@ async function finishSeaMartLogin(user){
  const local=[...db.products];
  const hasMatch=(a,b)=>String(a.id||'')===String(b.id||'')||(a.barcode&&b.barcode&&String(a.barcode)===String(b.barcode))||(a.kode&&b.code&&String(a.kode)===String(b.code));
  for(const p of (remote.data||[])){
-  if(!local.some(x=>hasMatch(x,p))){
-   local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false});
+  const localMatch=local.find(x=>hasMatch(x,p));
+  if(localMatch){
+   if(!localMatch.foto&&p.image_url)localMatch.foto=p.image_url;
+   continue;
   }
+  local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false,foto:p.image_url||''});
  }
  db.products=local;save();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
@@ -1326,15 +1329,19 @@ async function syncOneProduct(p,categoryCache=new Map()){
  // but have a different UUID from this browser's local copy. Reuse that cloud ID.
  let existing=null;
  if(row.code){
-  const lookup=await sb.from('products').select('id,name').eq('store_id',store).eq('code',row.code).limit(1).maybeSingle();
+  const lookup=await sb.from('products').select('id,name,image_url').eq('store_id',store).eq('code',row.code).limit(1).maybeSingle();
   if(lookup.error)throw lookup.error;
   existing=lookup.data;
  }
  if(existing){
+  if(!row.image_url&&existing.image_url)row.image_url=existing.image_url;
   const result=await sb.from('products').update({code:row.code,barcode:row.barcode,name:row.name,category_id:row.category_id,price:row.price,stock:row.stock,active:row.active,image_url:row.image_url}).eq('id',existing.id).eq('store_id',store);
   if(result.error)throw result.error;
   p.id=existing.id;
  }else{
+  const byId=await sb.from('products').select('id,image_url').eq('id',row.id).eq('store_id',store).maybeSingle();
+  if(byId.error)throw byId.error;
+  if(!row.image_url&&byId.data?.image_url)row.image_url=byId.data.image_url;
   const result=await sb.from('products').upsert(row,{onConflict:'id'});
   if(result.error)throw result.error;
  }
