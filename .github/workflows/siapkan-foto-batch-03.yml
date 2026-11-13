@@ -52,9 +52,8 @@ jobs:
                   failed.append((filename, name, str(e)))
                   print("FAILED", filename, name, e)
           with open("photos/DAFTAR-FOTO.txt","w",encoding="utf-8") as f:
-              f.write("SeaMart Batch 03 - foto referensi, cocokkan varian sebelum impor\\n")\n              f.write("Indomie Goreng dilewati: barcode master perlu verifikasi format sebelum nama file dibuat.\\n")
-              for filename,name,size in ok: f.write(f"{filename} | {name} | berhasil\\n")
-              for filename,name,err in failed: f.write(f"GAGAL | {filename} | {name} | {err}\\n")
+              f.write("SeaMart Batch 03 - foto referensi, cocokkan varian sebelum impor\\n")
+                            for filename,name,err in failed: f.write(f"GAGAL | {filename} | {name} | {err}\\n")
           if failed:
               raise SystemExit(f"{len(failed)} foto gagal diunduh; periksa log.")
           PY
