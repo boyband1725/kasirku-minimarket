@@ -1748,15 +1748,15 @@ async function lookupInlineProductPhoto(){
   if(!unique.length)throw new Error('Foto untuk barcode ini belum tersedia. Silakan unggah foto sendiri dari galeri.');
   setInlinePhotoProgress(68,'Memilih foto dengan resolusi paling tinggi…');
   const tested=await Promise.all(unique.map(async url=>{try{const img=new Image();img.crossOrigin='anonymous';await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});return {url,width:img.naturalWidth,height:img.naturalHeight,area:img.naturalWidth*img.naturalHeight}}catch(_){return null}}));
-  const best=tested.filter(x=>x&&x.width>=400&&x.height>=400).sort((x,y)=>y.area-x.area)[0];
-  if(!best)throw new Error('Katalog hanya menyediakan foto kecil atau buram. Tidak disimpan. Unggah foto kemasan yang lebih jernih dari galeri.');
+  const best=tested.filter(x=>x&&x.width>=800&&x.height>=800).sort((x,y)=>y.area-x.area)[0];
+  if(!best)throw new Error('Katalog tidak menyediakan foto tajam minimal 800×800 piksel. Foto buram tidak disimpan. Coba barcode lain atau unggah foto asli dari galeri.');
   setInlinePhotoProgress(86,'Memeriksa kecocokan nama dan ketajaman…');
   const validation=await validateProductPhoto(best.url,name,sourceName);
   window.pendingInlinePhoto=best.url;
   const preview=document.getElementById('inline_photo_preview');
   if(preview)preview.innerHTML='<img src="'+esc(best.url)+'" style="width:150px;height:150px;object-fit:contain;border-radius:9px;background:#fff;border:1px solid #e8ebef;padding:5px">';
   setInlinePhotoProgress(100,'Foto jernih ditemukan dan siap disimpan');
-  if(status)status.textContent='Foto katalog terbaik ditemukan ('+best.width+'×'+best.height+' px). Nama cocok ('+validation.matched+'). Periksa pratinjau, lalu tekan Simpan Perubahan.';
+  if(status)status.textContent='Foto resolusi tinggi ditemukan ('+best.width+'×'+best.height+' px). Nama cocok ('+validation.matched+'). Periksa pratinjau, lalu tekan Simpan Perubahan.';
  }catch(err){
   window.pendingInlinePhoto=null;setInlinePhotoProgress(0,'Foto belum memenuhi kualitas',false);
   if(status)status.textContent=err.message||'Foto berkualitas belum ditemukan. Silakan unggah dari galeri.';
