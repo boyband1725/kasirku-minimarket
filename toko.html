@@ -325,14 +325,16 @@ body{background:#f5f7f8;color:#27323b}
 .search-close{width:98px;height:80px;flex:none;border:0;border-radius:0 12px 12px 0;background:#2787c4;color:#fff;font-size:34px;line-height:1;display:grid;place-items:center;padding:0}
 .search-panel-open{animation:searchPanelIn .18s ease-out}
 @keyframes searchPanelIn{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
-</style>\n<style id="promo-marquee-style">
+</style>
+<style id="promo-marquee-style">
 /* Scrolling promotion ribbon above the expandable search bar */
 .promo-strip{height:42px!important;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:flex-start!important;background:#2787c4;color:#fff;font-size:15px;font-weight:700;white-space:nowrap}
 .promo-marquee{display:flex;align-items:center;width:max-content;min-width:200%;animation:seamartPromoScroll 22s linear infinite}
 .promo-marquee span{display:block;flex:none;padding-right:24px}
 @keyframes seamartPromoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.promo-marquee{animation:none;min-width:100%;justify-content:center}.promo-marquee span:nth-child(2){display:none}}
-</style>\n</head>
+</style>
+</head>
 <body>
 <header class="top" style="background:#ffffff!important;background-color:#ffffff!important;box-shadow:0 2px 12px rgba(25,45,60,.10)!important;border-bottom:1px solid #e8edf0!important"><div class="brand"><div class="brand-left"><button class="menu-trigger" id="shopMenuButton" type="button" aria-label="Buka menu">☰</button><div><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg><div class="tag">Belanja mudah, dekat, dan hemat</div></div></div><div class="header-actions"><button class="header-icon" type="button" aria-label="Cari produk" onclick="focusShopSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button><button class="header-icon" type="button" aria-label="Notifikasi" onclick="showShopNotifications()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></button><button class="header-cart" type="button" aria-label="Buka keranjang" onclick="openCartDrawer()">🛒<span class="header-cart-count" id="headerCartCount">0</span></button></div></div></header>
 <div class="promo-strip" aria-label="Promosi SeaMart"><div class="promo-marquee"><span>Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart • Temukan harga spesial setiap hari • </span><span aria-hidden="true">Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart • Temukan harga spesial setiap hari • </span></div></div>
