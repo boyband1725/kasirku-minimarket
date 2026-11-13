@@ -869,6 +869,90 @@ td{border-bottom-color:#e8f2ee!important}
 #loginroot .login-actions button .login-submit-icon{display:inline-flex!important;flex:0 0 32px!important;width:32px!important;height:32px!important;align-items:center!important;justify-content:center!important;margin:0 12px 0 0!important;padding:0!important;vertical-align:middle!important;line-height:1!important;opacity:1!important}
 #loginroot .login-actions button .login-submit-icon svg{display:block!important;width:32px!important;height:32px!important;overflow:visible!important;fill:none!important;stroke:#fff!important;stroke-width:2.5!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 #loginroot .login-actions button{display:flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
+
+/* SeaMart mobile login fix v2 — desktop rules remain untouched */
+@media (max-width: 760px) {
+  #loginroot .seamart-login-screen {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    padding: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+  }
+  #loginroot .login-shell {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    width: min(440px, 100%) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+    align-content: start !important;
+    border-radius: 22px !important;
+  }
+  #loginroot .login-visual {
+    min-height: 0 !important;
+    padding: 12px 18px 10px !important;
+  }
+  #loginroot .login-visual .login-brand {
+    width: min(180px, 70%) !important;
+    margin: 0 auto 4px !important;
+  }
+  #loginroot .login-visual h2 {
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+    margin: 2px 0 8px !important;
+  }
+  #loginroot .login-features {
+    gap: 7px !important;
+  }
+  #loginroot .login-features > div {
+    gap: 5px !important;
+    font-size: 10px !important;
+  }
+  #loginroot .login-feature-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+  }
+  #loginroot .login-form-panel {
+    min-height: 0 !important;
+    padding: 18px 22px 22px !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+  }
+  #loginroot .login-form-heading {
+    margin: 0 0 14px !important;
+  }
+  #loginroot .login-form-heading p {
+    margin-top: 6px !important;
+  }
+  #loginroot .login-form-panel label {
+    margin: 0 0 12px !important;
+  }
+  #loginroot .login-form-panel input.field {
+    height: 48px !important;
+    min-height: 48px !important;
+  }
+  #loginroot .login-forgot {
+    margin: 0 0 14px !important;
+  }
+  #loginroot .login-actions button {
+    min-height: 50px !important;
+  }
+  #loginroot .login-or {
+    margin: 10px 0 4px !important;
+  }
+}
+@media (max-width: 380px) {
+  #loginroot .login-visual { padding: 10px 14px 8px !important; }
+  #loginroot .login-form-panel { padding: 15px 16px 18px !important; }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
