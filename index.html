@@ -1594,14 +1594,29 @@ function renderEditProductOptions(){let q=(document.getElementById('edit_product
 function selectProductForEdit(id){window.selectedEditProductId=id;window.pendingInlinePhoto=null;let p=db.products.find(x=>x.id===id),el=document.getElementById('inline_edit_form');if(!p||!el)return;el.innerHTML=`<div class="formgrid"><label>Nama Barang<input id="if_nama" class="field" value="${esc(p.nama)}"></label><label>Kode Barang<input id="if_kode" class="field" value="${esc(p.kode||'')}"></label><label>Barcode<input id="if_barcode" class="field" value="${esc(p.barcode||'')}"></label><label>Kelompok Barang<input id="if_kategori" class="field" value="${esc(p.kategori||'Umum')}"></label><label>Harga Beli<input id="if_hb" type="number" class="field" value="${Number(p.harga_beli||0)}"></label><label>Harga Jual 1 (Kasir)<input id="if_h1" type="number" class="field" value="${Number(p.harga_jual_1??p.harga??0)}"></label><label>Harga Jual 2<input id="if_h2" type="number" class="field" value="${Number(p.harga_jual_2||0)}"></label><label>Harga Jual 3<input id="if_h3" type="number" class="field" value="${Number(p.harga_jual_3||0)}"></label><label>Stok<input id="if_stok" type="number" class="field" value="${Number(p.stok||0)}"></label></div><label style="display:flex;align-items:center;gap:9px;margin-top:14px"><input id="f_active" type="checkbox" ${p.active!==false?"checked":""} style="width:18px;height:18px"> Tampilkan barang ini di Kasir dan Toko Online</label><label style="display:block;margin-top:14px">Foto Produk<input type="file" accept="image/*" class="field" style="display:block;width:100%;margin-top:6px" onchange="previewInlineProductPhoto(this)"></label><div id="inline_photo_preview" style="margin-top:8px">${p.foto?'<img src="'+p.foto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px">':'<span class="emptyhint">Belum ada foto. Ikon kategori akan digunakan.</span>'}</div><button type="button" class="btn-light" style="margin-top:9px" onclick="lookupInlineProductPhoto()">Cari Foto Otomatis dari Barcode</button><div id="inline_photo_status" class="emptyhint" style="margin-top:8px">AI akan mencocokkan foto dengan nama produk dan barcode.</div><div id="inline_photo_progress" style="display:none;margin-top:10px;padding:12px;border:1px solid #d7eee5;border-radius:12px;background:#f3fcf8"><div style="display:flex;justify-content:space-between;gap:8px;font-weight:700;color:#17634b"><span id="inline_photo_progress_text">Menyiapkan AI…</span><span id="inline_photo_progress_pct">0%</span></div><div style="height:9px;background:#dceee6;border-radius:99px;overflow:hidden;margin-top:8px"><div id="inline_photo_progress_bar" style="height:100%;width:0%;background:linear-gradient(90deg,#008e9e,#00c853);border-radius:99px;transition:width .35s"></div></div></div><div class="actions"><button class="btn-light" onclick="editProductsPage()">Batal</button><button class="btn-primary" onclick="saveInlineProduct()">Simpan Perubahan</button></div>`;el.scrollIntoView({behavior:'smooth',block:'start'})}
 
 async function validateProductPhoto(url,targetName,sourceName){
- const tokens=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(x=>x.length>=3&&!['produk','barang','pack','pcs','piece','gram','gr'].includes(x));
+ const normalize=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9. ]/g,' ').replace(/\s+/g,' ').trim();
+ const tokens=s=>normalize(s).split(' ').filter(x=>x.length>=3&&!['produk','barang','pack','pcs','piece','gram','gr'].includes(x));
  const wanted=tokens(targetName),found=tokens(sourceName),shared=wanted.filter(x=>found.includes(x));
  if(!wanted.length||!shared.length)throw new Error('Nama produk tidak cocok dengan data foto. Foto ditolak.');
+ const variants=s=>{
+  const n=normalize(s),out=[];
+  const re=/(\d+(?:\.\d+)?)\s*(ml|milliliter|l|liter|gr|g|kg|kilogram)\b/g;let m;
+  while((m=re.exec(n))!==null){let unit=m[2];if(unit==='milliliter')unit='ml';if(unit==='liter')unit='l';if(unit==='kilogram')unit='kg';if(unit==='gr')unit='g';out.push(Number(m[1])+' '+unit);}
+  if(/\b(galon|gal\.?|dispenser)\b/.test(n))out.push('kemasan-galon');
+  if(/\b(botol|btl)\b/.test(n))out.push('kemasan-botol');
+  if(/\b(kaleng|can)\b/.test(n))out.push('kemasan-kaleng');
+  if(/\b(sachet|saset)\b/.test(n))out.push('kemasan-sachet');
+  return [...new Set(out)];
+ };
+ const wantedVariants=variants(targetName),foundVariants=variants(sourceName);
+ if(wantedVariants.length&&(!foundVariants.length||wantedVariants.some(v=>!foundVariants.includes(v)))){
+  throw new Error('Varian/ukuran foto tidak dapat dipastikan cocok. Barang: '+wantedVariants.join(', ')+'. Data katalog: '+(foundVariants.join(', ')||'ukuran/kemasan tidak tercantum')+'. Foto ditolak agar tidak salah produk.');
+ }
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat.'));img.src=url});
  if(img.naturalWidth<350||img.naturalHeight<350)throw new Error('Foto katalog terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Minimal 350×350 piksel. Foto ditolak agar katalog SeaMart tetap tajam.');
  const ratio=img.naturalWidth/img.naturalHeight;
- if(ratio<0.3||ratio>2.5)throw new Error('Proporsi gambar tidak layak untuk foto produk. Foto ditolak.');
+ if(ratio<0.3||ratio>2.5)throw new Error('Proporsi gambar tidak layak untuk foto produk.');
  return {width:img.naturalWidth,height:img.naturalHeight,matched:shared.join(', ')};
 }
 function setInlinePhotoProgress(percent,message,show=true){
