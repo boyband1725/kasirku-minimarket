@@ -73,12 +73,11 @@ jobs:
           print(f"SELESAI: {len(items)} barang; foto={ok}; tidak ditemukan={miss}; error={err}; skip={skip}")
           PY
           python prepare.py
-          cd photos && zip -9 -r ../SeaMart-Foto-Batch-04.zip .
       - name: Unggah ZIP
         uses: actions/upload-artifact@v4
         with:
           name: SeaMart-Foto-Batch-04
-          path: SeaMart-Foto-Batch-04.zip
+          path: photos/
           if-no-files-found: error
           retention-days: 30
 
