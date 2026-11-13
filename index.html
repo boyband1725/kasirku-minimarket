@@ -1613,10 +1613,32 @@ async function fetchPhotoSourceWithRetry(url,options={},attempts=3){
    if(response.ok)return response;
    lastError=new Error('Server katalog HTTP '+response.status);
    if(response.status<500||attempt===attempts)throw lastError;
-  }catch(error){clearTimeout(timer);lastError=error;if(attempt===attempts)break;}
+  }catch(error){clearTimeout(timer);lastError=error;if(/^Server katalog HTTP 4(?!29)\\d{2}$/.test(error.message||'')||attempt===attempts)break;}
   await new Promise(resolve=>setTimeout(resolve,700*attempt));
  }
  throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));
+}
+async function fetchProductRecordByBarcode(barcode){
+ const fields='code,product_name,image_front_url,selected_images';
+ let v3Error=null;
+ try{
+  const url='https://world.openfoodfacts.org/api/v3/product/'+encodeURIComponent(barcode)+'?product_type=all&fields='+fields;
+  const response=await fetchPhotoSourceWithRetry(url);
+  const data=await response.json();
+  if(data.product?.product_name)return data.product;
+  v3Error=new Error('API v3 tidak mengembalikan nama produk');
+ }catch(error){v3Error=error;}
+ try{
+  const url='https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields='+fields;
+  const response=await fetchPhotoSourceWithRetry(url);
+  const data=await response.json();
+  if(data.status===1&&data.product?.product_name)return data.product;
+  throw new Error('Barcode tidak ditemukan di katalog v2');
+ }catch(error){
+  const detail=error.message||String(error);
+  if(v3Error?.message?.includes('HTTP 404')&&detail.includes('HTTP 404'))throw new Error('Barcode tidak terdaftar di katalog Open Food Facts (API v3 dan v2).');
+  throw new Error('Pencarian katalog gagal. v3: '+(v3Error?.message||'tidak tersedia')+'; v2: '+detail);
+ }
 }
 async function syncAllProductPhotos(limit=null){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
@@ -1639,9 +1661,7 @@ async function syncAllProductPhotos(limit=null){
    await Promise.all(batch.map(async row=>{
     try{
      const barcode=String(row.barcode).trim();
-     const api=await fetchPhotoSourceWithRetry('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,image_front_url,selected_images');
-     const data=await api.json(),product=data.product||{};
-     if(data.status!==1||!product.product_name)throw new Error('Barcode tidak ditemukan di katalog');
+     const product=await fetchProductRecordByBarcode(barcode);
      const sourceName=String(product.product_name||'').toLowerCase();
      const targetName=String(row.name||'').toLowerCase();
      const tokens=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(t=>t.length>=3&&!['produk','barang','pack','pcs','piece'].includes(t));
@@ -1650,8 +1670,8 @@ async function syncAllProductPhotos(limit=null){
      let url=product.image_front_url||product.selected_images?.front?.display?.en||product.selected_images?.front?.display?.[Object.keys(product.selected_images?.front?.display||{})[0]];
      if(!url)throw new Error('Foto depan tidak tersedia');
      await validateProductPhoto(url,row.name,product.product_name);
-     const imageResponse=await fetchPhotoSourceWithRetry(url,{mode:'cors'});
-     if(!imageResponse.ok)throw new Error('Foto tidak dapat diunduh untuk disimpan');
+     let imageResponse;
+     try{imageResponse=await fetchPhotoSourceWithRetry(url,{mode:'cors'});}catch(error){throw new Error('Data produk ditemukan, tetapi file foto gagal diunduh: '+(error.message||String(error)));}
      const blob=await imageResponse.blob();
      if(!blob.type.startsWith('image/'))throw new Error('Sumber bukan file gambar');
      const path=store+'/'+row.id+'.jpg';
