@@ -2612,7 +2612,8 @@ async function importProductPhotosZip(){
     const cloudId=lookup.data[0].id,path=store+'/'+cloudId+'.jpg';
     const upload=await sb.storage.from('seamart-product-photos').upload(path,imageBlob,{contentType:'image/jpeg',upsert:true,cacheControl:'3600'});
     if(upload.error)throw new Error(upload.error.message+' (periksa bucket dan izin foto di Supabase)');
-    const publicUrl=sb.storage.from('seamart-product-photos').getPublicUrl(path).data.publicUrl;
+    const basePublicUrl=sb.storage.from('seamart-product-photos').getPublicUrl(path).data.publicUrl;
+    const publicUrl=basePublicUrl+(basePublicUrl.includes('?')?'&':'?')+'v='+Date.now();
     const update=await sb.from('products').update({image_url:publicUrl}).eq('id',cloudId).eq('store_id',store);
     if(update.error)throw update.error;
     product.foto=publicUrl;product.image_url=publicUrl;stats.ok++;save();
