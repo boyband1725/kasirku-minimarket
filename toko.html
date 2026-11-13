@@ -355,7 +355,7 @@ function renderProducts(){
   const qty=cart.get(p.id)?.qty||0;
   const photo=p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
   const qtyControl=qty>0
-   ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\\''+p.id+'\\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\\''+p.id+'\\')">+</button></div>'
+   ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\''+p.id+'\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+</button></div>'
    : '<div class="product-qty-placeholder" aria-hidden="true"></div>';  const cartButton='<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
   return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div>'+qtyControl+cartButton+'<button type="button" class="buy-now-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
  }).join(''):'<div class="empty">Barang tidak ditemukan.</div>';
