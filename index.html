@@ -1603,7 +1603,21 @@ function setInlinePhotoProgress(percent,message,show=true){
  const value=Math.max(0,Math.min(100,Math.round(percent)));
  if(bar)bar.style.width=value+'%';if(pct)pct.textContent=value+'%';if(label)label.textContent=message||'Memproses…';
 }
-async function fetchPhotoSourceWithRetry(url,options={},attempts=3){\n let lastError;\n for(let attempt=1;attempt<=attempts;attempt++){\n  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);\n  try{const response=await fetch(url,{...options,signal:controller.signal});clearTimeout(timer);if(response.ok)return response;if(response.status>=500&&attempt<attempts){lastError=new Error('Server katalog HTTP '+response.status);await new Promise(resolve=>setTimeout(resolve,700*attempt));continue;}throw new Error('Server katalog HTTP '+response.status);}\n  catch(error){clearTimeout(timer);lastError=error;if(attempt===attempts)break;await new Promise(resolve=>setTimeout(resolve,700*attempt));}\n }\n throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));\n}\nasync function syncAllProductPhotos(limit=null){
+async function fetchPhotoSourceWithRetry(url,options={},attempts=3){
+ let lastError;
+ for(let attempt=1;attempt<=attempts;attempt++){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+  try{
+   const response=await fetch(url,{...options,signal:controller.signal});
+   clearTimeout(timer);
+   if(response.ok)return response;
+   lastError=new Error('Server katalog HTTP '+response.status);
+   if(response.status<500||attempt===attempts)throw lastError;
+  }catch(error){clearTimeout(timer);lastError=error;if(attempt===attempts)break;}
+  await new Promise(resolve=>setTimeout(resolve,700*attempt));
+ }
+ throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));
+}
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return alert('Login ke SeaMart terlebih dahulu.');
  const button=document.getElementById('bulkPhotoButton'),testButton=document.getElementById('bulkPhotoTestButton'),panel=document.getElementById('bulkPhotoPanel'),status=document.getElementById('bulkPhotoStatus'),bar=document.getElementById('bulkPhotoBar'),pct=document.getElementById('bulkPhotoPct'),summaryEl=document.getElementById('bulkPhotoSummary');
@@ -1619,8 +1633,8 @@ async function fetchPhotoSourceWithRetry(url,options={},attempts=3){\n let lastE
   stats.total=targets.length;
   if(!targets.length){set(100,'Selesai. Tidak ada barang tanpa foto yang memiliki barcode.', 'Periksa kembali barang tanpa barcode atau yang fotonya sudah tersedia.');return;}
   let done=0;
-  for(let i=0;i<targets.length;i+=3){
-   const batch=targets.slice(i,i+3);
+  for(let i=0;i<targets.length;i+=1){
+   const batch=targets.slice(i,i+1);
    await Promise.all(batch.map(async row=>{
     try{
      const barcode=String(row.barcode).trim();
