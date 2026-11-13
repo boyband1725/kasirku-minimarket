@@ -1415,6 +1415,51 @@ td{border-bottom-color:#e8f2ee!important}
   #posproducts .pos-featured-grid,#posproducts .pos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+/* Tablet POS inspired by the Odoo reference: product browser left, live order right */
+@media screen and (min-width:761px) and (max-width:1100px){
+  .topbar{background:linear-gradient(100deg,#102d66,#174f9d)!important;color:#fff!important;border-bottom:0!important}
+  .topbar button,.topbar .btn-light{background:#2459a6!important;color:#fff!important;border-color:#4778bc!important}
+  .odoo-pos-head h1{color:#123c78!important;font-size:22px!important}
+  .odoo-pos-head .sub{color:#58708f!important}
+  .odoo-pos-tools{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important}
+  .odoo-pos-tools #posbarcode{grid-column:1/-1!important;width:100%!important;min-width:0!important}
+  .odoo-pos-layout{display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(310px,.95fr)!important;gap:10px!important;align-items:stretch!important}
+  .odoo-category-panel{display:none!important}
+  .odoo-catalog-panel{grid-column:1!important;min-width:0!important;padding:12px!important;min-height:calc(100vh - 220px)!important;border-radius:12px!important}
+  .odoo-catalog-top{display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin-bottom:10px!important}
+  .odoo-catalog-top h3{font-size:15px!important;color:#173d78!important}
+  .odoo-catalog-search{display:flex!important;flex:1 1 100%!important;min-width:0!important;gap:7px!important}
+  .odoo-catalog-search .field{width:100%!important;min-width:0!important}
+  #posproducts .pos-featured-grid,#posproducts .pos-products-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .odoo-product{padding:9px!important;border:1px solid #dce7f7!important;border-radius:10px!important;background:#fff!important;cursor:default!important}
+  #posproducts .odoo-product-image{height:clamp(88px,13vw,132px)!important;min-height:0!important;background:#f1f6ff!important}
+  .odoo-product-name{font-size:11px!important;line-height:1.35!important;min-height:30px!important;color:#243b5a!important}
+  .odoo-product-price{font-size:13px!important;color:#0756c9!important}
+  .product-qty-control{grid-template-columns:32px minmax(25px,1fr) 32px!important;gap:5px!important}
+  .product-qty-control button{width:32px!important;min-width:32px!important;height:34px!important;touch-action:manipulation!important;cursor:default!important}
+  .odoo-order-panel{grid-column:2!important;position:sticky!important;top:8px!important;align-self:start!important;min-width:0!important;height:calc(100vh - 135px)!important;max-height:760px!important;overflow:hidden!important;border:1px solid #c9d9f0!important;border-radius:12px!important;background:#fff!important;box-shadow:0 5px 20px #102d6614!important}
+  .odoo-order-head{min-height:58px!important;padding:13px 14px!important;background:linear-gradient(100deg,#edf4ff,#f8fbff)!important;border-bottom:1px solid #dce7f7!important}
+  .odoo-order-head h3{font-size:15px!important;color:#153d79!important}
+  .odoo-order-head .pill{background:#dceaff!important;color:#164d9b!important;font-weight:800!important}
+  .odoo-order-body{display:flex!important;flex-direction:column!important;gap:8px!important;padding:12px!important;height:calc(100% - 58px)!important;max-height:none!important;overflow-y:auto!important}
+  .odoo-order-lines{flex:1 1 auto!important;min-height:160px!important;max-height:none!important;overflow:auto!important;border-bottom:1px solid #e7edf5!important}
+  .odoo-order-panel .cartline{padding:11px 2px!important;border-bottom:1px solid #edf1f6!important}
+  .odoo-order-panel .cartline b{color:#263b58!important}
+  .odoo-order-panel .totalrow{padding:8px 2px!important}
+  .odoo-order-panel .totalrow.grand{padding:13px!important;margin-top:2px!important;border-radius:10px!important;background:#edf4ff!important;color:#124b9c!important;font-size:21px!important}
+  .odoo-checkout,.odoo-order-panel .btn-primary{min-height:48px!important;background:linear-gradient(110deg,#236bd2,#1249a7)!important;color:#fff!important;border-radius:10px!important;font-size:15px!important;font-weight:800!important;touch-action:manipulation!important}
+  .odoo-order-panel .btn-danger{min-height:40px!important;border-radius:9px!important}
+  .odoo-scan-hint{background:#f5f8fc!important;color:#61738c!important;border-radius:8px!important}
+  .odoo-category-panel,.odoo-catalog-panel,.odoo-order-panel{border-color:#dce6f3!important}
+  .odoo-product:hover{transform:none!important;box-shadow:none!important}
+  button,input,select{touch-action:manipulation!important}
+}
+@media screen and (min-width:761px) and (max-width:850px){
+ .odoo-pos-layout{grid-template-columns:minmax(0,.95fr) minmax(285px,1.05fr)!important}
+ #posproducts .pos-featured-grid,#posproducts .pos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
