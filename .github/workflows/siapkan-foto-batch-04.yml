@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
+      - name: Ambil kode dan manifest
+        uses: actions/checkout@v4
       - name: Siapkan lingkungan
         run: |
           python -m pip install --upgrade pip
