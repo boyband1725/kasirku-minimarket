@@ -1017,6 +1017,27 @@ td{border-bottom-color:#e8f2ee!important}
   #loginroot .login-form-heading h2 { font-size: 21px !important; }
 }
 
+
+/* SeaMart mobile catalog and cart correction */
+.odoo-product-image{background:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+.odoo-product-image img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center center!important;padding:5px!important;background:#fff!important}
+@media(max-width:1100px){
+ .odoo-order-panel{position:relative!important;inset:auto!important;max-height:none!important;overflow:visible!important;z-index:1!important;margin:14px 0 18px!important;box-shadow:0 4px 16px #17212b12!important}
+ .odoo-order-lines{max-height:180px!important;min-height:0!important;overflow:auto!important}
+ .odoo-order-head{padding:11px 13px!important}
+ .odoo-order-body{padding:10px 13px!important}
+ .odoo-order-lines .empty{padding:15px 8px!important}
+ .odoo-order-panel .cartline{padding:7px 0!important}
+ .odoo-order-panel .grand{font-size:18px!important;padding-top:8px!important;margin-top:4px!important}
+ .odoo-checkout{padding:12px!important}
+ .odoo-product-image{height:92px!important}
+}
+@media(max-width:520px){
+ .odoo-product-image{height:96px!important}
+ .odoo-product{padding:8px!important}
+ .odoo-order-panel{margin-top:12px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
