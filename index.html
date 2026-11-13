@@ -1609,8 +1609,14 @@ async function validateProductPhoto(url,targetName,sourceName){
   return [...new Set(out)];
  };
  const wantedVariants=variants(targetName),foundVariants=variants(sourceName);
- if(wantedVariants.length&&(!foundVariants.length||wantedVariants.some(v=>!foundVariants.includes(v)))){
-  throw new Error('Varian/ukuran foto tidak dapat dipastikan cocok. Barang: '+wantedVariants.join(', ')+'. Data katalog: '+(foundVariants.join(', ')||'ukuran/kemasan tidak tercantum')+'. Foto ditolak agar tidak salah produk.');
+ const wantedSizes=wantedVariants.filter(v=>/^\d/.test(v)),foundSizes=foundVariants.filter(v=>/^\d/.test(v));
+ const wantedPacks=wantedVariants.filter(v=>v.startsWith('kemasan-')),foundPacks=foundVariants.filter(v=>v.startsWith('kemasan-'));
+ // Compare size only when both names state a size, and packaging only when both state a package type.
+ // A catalogue title saying "bottle" alone must not invalidate a target named "Aqua 330 ml".
+ const sizeMismatch=wantedSizes.length&&foundSizes.length&&!wantedSizes.some(v=>foundSizes.includes(v));
+ const packMismatch=wantedPacks.length&&foundPacks.length&&!wantedPacks.some(v=>foundPacks.includes(v));
+ if(sizeMismatch||packMismatch){
+  throw new Error('Ukuran/kemasan foto berbeda. Barang: '+(wantedVariants.join(', ')||'tidak disebutkan')+'. Data katalog: '+(foundVariants.join(', ')||'tidak disebutkan')+'. Foto ditolak agar tidak salah produk.');
  }
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat.'));img.src=url});
