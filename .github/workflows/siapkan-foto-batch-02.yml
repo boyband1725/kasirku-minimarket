@@ -41,7 +41,7 @@ jobs:
           with Image.open(p) as im:
               im = im.convert("RGB")
               w, h = im.size
-              im.crop((0, 0, w, int(h * 0.72))).save(p, quality=94)
+              im.crop((0, 0, w, int(h * 0.71))).save(p, quality=94)
           PY
       - name: Simpan ZIP sebagai artifact
         uses: actions/upload-artifact@v4
