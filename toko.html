@@ -403,9 +403,24 @@ function showProductDetail(id){const p=products.find(x=>x.id===id);if(!p)return;
 function closeProductDetail(){document.getElementById('productDetail').classList.remove('show')}
 function focusShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search');if(!panel||!e)return;panel.classList.remove('hide');panel.classList.add('search-panel-open');setTimeout(()=>{e.focus({preventScroll:true});renderSearchSuggestions()},120)}
 function closeShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search'),suggest=document.getElementById('searchSuggest');if(!panel||!e)return;e.value='';renderProducts();suggest?.classList.add('hide');panel.classList.add('hide');panel.classList.remove('search-panel-open');}
-function searchWordStats(){const stop=new Set(['dan','atau','untuk','dari','isi','pcs','pack','pck','ml','gr','kg','liter','l','botol','sachet','bungkus','kemasan']);const counts={};products.forEach(p=>String(p.name||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\\s+/).forEach(w=>{if(w.length>2&&!/^\\d+$/.test(w)&&!stop.has(w))counts[w]=(counts[w]||0)+1}));return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5).map(x=>x[0]);}
+function searchWordStats(){const stop=new Set(['dan','atau','untuk','dari','isi','pcs','pack','pck','ml','gr','kg','liter','l','botol','sachet','bungkus','kemasan']);const counts={};products.forEach(p=>String(p.name||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).forEach(w=>{if(w.length>2&&!/^\d+$/.test(w)&&!stop.has(w))counts[w]=(counts[w]||0)+1}));return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5).map(x=>x[0]);}
 function chooseSearchTerm(term){const e=document.getElementById('search');e.value=term;renderProducts();document.getElementById('searchSuggest')?.classList.add('hide');e.focus({preventScroll:true});}
-function renderSearchSuggestions(){const input=document.getElementById('search'),box=document.getElementById('searchSuggest');if(!input||!box)return;const q=input.value.trim().toLowerCase();const matches=products.filter(p=>p.name.toLowerCase().includes(q)||(q&&String(p.barcode||'').includes(q))).slice(0,6);const suggestionRoot=document.getElementById('searchSuggestions'),topRoot=document.getElementById('searchTop');suggestionRoot.innerHTML=matches.length?matches.map(p=>'<button type="button" class="suggest-row" onclick="chooseSearchTerm(\\''+esc(p.name).replace(/\\'/g,'&#39;')+'\\')"><span class="suggest-glass">⌕</span><span class="suggest-label">'+esc(p.name)+'</span></button>').join(''):'<div class="suggest-empty">'+(q?'Produk tidak ditemukan':'Ketik nama barang untuk mencari')+'</div>';const topWords=searchWordStats();topRoot.innerHTML=topWords.length?topWords.map((w,i)=>'<button type="button" class="suggest-row" onclick="chooseSearchTerm(\\''+esc(w)+'\\')"><span class="suggest-rank">'+(i+1)+'.</span><span class="suggest-label">'+esc(w.charAt(0).toUpperCase()+w.slice(1))+'</span></button>').join(''):'<div class="suggest-empty">Belum ada rekomendasi</div>';box.classList.remove('hide');}
+function renderSearchSuggestions(){
+ const input=document.getElementById('search'),box=document.getElementById('searchSuggest');
+ if(!input||!box)return;
+ const q=input.value.trim().toLowerCase(),suggestionRoot=document.getElementById('searchSuggestions'),topRoot=document.getElementById('searchTop');
+ if(!suggestionRoot||!topRoot)return;
+ const makeRow=(term,rank)=>{const button=document.createElement('button');button.type='button';button.className='suggest-row';const mark=document.createElement('span');mark.className=rank?'suggest-rank':'suggest-glass';mark.textContent=rank?rank+'.':'⌕';const label=document.createElement('span');label.className='suggest-label';label.textContent=term;button.append(mark,label);button.addEventListener('click',()=>chooseSearchTerm(term));return button;};
+ const matches=products.filter(p=>String(p.name||'').toLowerCase().includes(q)||(q&&String(p.barcode||'').includes(q))).slice(0,6);
+ suggestionRoot.replaceChildren();
+ if(matches.length)matches.forEach(p=>suggestionRoot.appendChild(makeRow(p.name,0)));
+ else{const empty=document.createElement('div');empty.className='suggest-empty';empty.textContent=q?'Produk tidak ditemukan':'Ketik nama barang untuk mencari';suggestionRoot.appendChild(empty);}
+ topRoot.replaceChildren();
+ const words=searchWordStats();
+ if(words.length)words.forEach((w,i)=>topRoot.appendChild(makeRow(w.charAt(0).toUpperCase()+w.slice(1),i+1)));
+ else{const empty=document.createElement('div');empty.className='suggest-empty';empty.textContent='Belum ada rekomendasi';topRoot.appendChild(empty);}
+ box.classList.remove('hide');
+}
 function showShopNotifications(){const e=document.getElementById('shopAnnouncement');if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('notification-highlight');setTimeout(()=>e.classList.remove('notification-highlight'),1600)}else{say('Belum ada notifikasi baru.')}}
 function openShopMenu(){document.getElementById('shopDrawer').classList.add('open');document.body.style.overflow='hidden'}
 function closeShopMenu(){document.getElementById('shopDrawer').classList.remove('open');document.body.style.overflow=''}
@@ -475,7 +490,7 @@ startStorefront();
 (function(){
   function removeStrayMarkers(){
     var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),nodes=[];
-    while(walker.nextNode()){var n=walker.currentNode;if(/^\\n+$/.test((n.nodeValue||'').trim()))nodes.push(n);}
+    while(walker.nextNode()){var n=walker.currentNode;if(/^(?:\\n)+$/.test((n.nodeValue||'').trim()))nodes.push(n);}
     nodes.forEach(function(n){n.parentNode&&n.parentNode.removeChild(n);});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeStrayMarkers,{once:true});
