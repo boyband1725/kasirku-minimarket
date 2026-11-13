@@ -1460,6 +1460,45 @@ td{border-bottom-color:#e8f2ee!important}
  #posproducts .pos-featured-grid,#posproducts .pos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+/* SeaMart tablet cashier: LOTTE MART blue theme; phone and desktop stay unchanged */
+@media (min-width:701px) and (max-width:1100px){
+ :root{--green:#0756a5;--green2:#e8f2ff;--nav:#123b68}
+ .topbar{border-bottom-color:#d7e7f7}
+ .odoo-pos-head h1{color:#123b68}
+ .odoo-pos-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(285px,38%)!important;
+  grid-template-areas:"categories categories" "catalog order";
+  gap:10px!important;align-items:start!important;width:100%!important;
+ }
+ .odoo-category-panel{grid-area:categories;display:block!important;position:static!important;width:100%!important;min-width:0!important;padding:8px 10px!important;background:#f4f8ff!important;border:1px solid #d7e7f7!important}
+ .odoo-category-heading{margin:0 0 6px!important}
+ .odoo-category-heading .odoo-panel-label{display:block!important;color:#174f86!important;padding:0!important}
+ #poscategories{display:flex!important;flex-direction:row!important;gap:6px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;scrollbar-width:thin!important}
+ #poscategories .pos-category-row{display:inline-flex!important;flex:0 0 auto!important;width:auto!important}
+ #poscategories .odoo-cat{display:inline-flex!important;width:auto!important;min-height:36px!important;white-space:nowrap!important;padding:8px 12px!important;background:#fff!important;border:1px solid #dce8f5!important;color:#24445f!important}
+ #poscategories .odoo-cat.active{background:#0756a5!important;border-color:#0756a5!important;color:#fff!important}
+ #poscategories .odoo-cat.active .odoo-cat-icon{background:#ffffff26!important;color:#fff!important}
+ .odoo-catalog-panel{grid-area:catalog;display:block!important;width:100%!important;min-width:0!important;padding:11px!important}
+ .odoo-products{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+ .odoo-product{min-width:0!important;padding:8px!important;border-color:#e1eaf4!important}
+ .odoo-product-image{height:88px!important}
+ .odoo-product-price{color:#0756a5!important}
+ .odoo-order-panel{grid-area:order;display:block!important;position:sticky!important;top:76px!important;bottom:auto!important;width:100%!important;max-height:calc(100vh - 88px)!important;overflow:auto!important;z-index:2!important;border-color:#d7e7f7!important}
+ .odoo-order-head{background:#f4f8ff!important;border-bottom-color:#d7e7f7!important}
+ .odoo-order-head h3{color:#123b68!important}
+ .odoo-checkout,.btn-primary{background:#0756a5!important;color:#fff!important}
+ .odoo-order-lines{max-height:34vh!important;overflow:auto!important}
+ .odoo-pos-tools .field:focus{border-color:#4b91d0!important;box-shadow:0 0 0 3px #0756a51a!important}
+}
+@media (min-width:701px) and (max-width:850px){
+ .odoo-pos-layout{grid-template-columns:minmax(0,1fr) minmax(260px,40%)!important}
+ .odoo-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .odoo-product-image{height:78px!important}
+ .content{padding:12px 9px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
