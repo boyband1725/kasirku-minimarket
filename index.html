@@ -1282,6 +1282,11 @@ td{border-bottom-color:#e8f2ee!important}
  .user #mobileCartTrigger{margin:0 4px!important}
 }
 
+/* SeaMart catalog photo standard — desktop/PC POS */
+#posproducts .odoo-product-image{height:250px!important;min-height:250px!important;width:100%!important;aspect-ratio:1/1!important;background:#fff!important;padding:8px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;overflow:hidden!important}
+#posproducts .odoo-product-image img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important;background:#fff!important}
+.product .tile{height:250px!important;min-height:250px!important;background:#fff!important}
+.product .tile img{width:100%!important;height:100%!important;object-fit:contain!important;background:#fff!important;padding:8px!important}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -2742,19 +2747,6 @@ function printPurchaseInvoice(inv){
  if(!w)return alert('Izinkan pop-up browser untuk mencetak faktur.');
  const rows=(inv.items||[]).map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.name)+'</td><td>'+x.qty+'</td><td>'+formatMoveAmount(x.cost)+'</td><td>'+formatMoveAmount(x.qty*x.cost)+'</td></tr>').join('');
  const html='<!doctype html><html><head><meta charset="utf-8"><title>Faktur Pembelian</title><style>body{font:14px Arial;padding:28px}h1{text-align:center;color:#087443}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #bbb;padding:9px}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:20px}
-/* SeaMart catalog photo standard — desktop/PC POS */
-#posproducts .odoo-product-image{
- height:250px!important;min-height:250px!important;width:100%!important;
- aspect-ratio:1/1!important;background:#fff!important;padding:8px!important;
- display:flex!important;align-items:center!important;justify-content:center!important;
- box-sizing:border-box!important;overflow:hidden!important
-}
-#posproducts .odoo-product-image img{
- width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
- object-fit:contain!important;object-position:center!important;background:#fff!important
-}
-.product .tile{height:250px!important;min-height:250px!important;background:#fff!important}
-.product .tile img{width:100%!important;height:100%!important;object-fit:contain!important;background:#fff!important;padding:8px!important}
 </style></head><body><h1>SEAMART</h1><h2>FAKTUR PEMBELIAN</h2>No. Faktur: '+esc(inv.number)+'<br>Tanggal: '+esc(inv.date)+'<br>Supplier: <b>'+esc(inv.supplier)+'</b><table><thead><tr><th>No</th><th>Barang</th><th>Qty</th><th>Harga Beli</th><th>Subtotal</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">TOTAL: '+formatMoveAmount(inv.total)+'</div><p>Catatan: '+esc(inv.note||'-')+'</p><br><br>Supplier, ____________________<br><br><br>Penerima, ____________________<script>window.onload=()=>window.print()<\\/script></body></html>';
  w.document.open();w.document.write(html);w.document.close();
 }
