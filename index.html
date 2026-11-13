@@ -1660,29 +1660,14 @@ async function syncAllProductPhotos(limit=null){
    const batch=targets.slice(i,i+1);
    await Promise.all(batch.map(async row=>{
     try{
-     const barcode=String(row.barcode).trim();
-     const product=await fetchProductRecordByBarcode(barcode);
-     const sourceName=String(product.product_name||'').toLowerCase();
-     const targetName=String(row.name||'').toLowerCase();
-     const tokens=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(t=>t.length>=3&&!['produk','barang','pack','pcs','piece'].includes(t));
-     const wanted=tokens(targetName),found=tokens(sourceName);
-     if(!wanted.some(t=>found.includes(t)))throw new Error('Nama produk tidak cocok — foto ditolak');
-     let url=product.image_front_url||product.selected_images?.front?.display?.en||product.selected_images?.front?.display?.[Object.keys(product.selected_images?.front?.display||{})[0]];
-     if(!url)throw new Error('Foto depan tidak tersedia');
-     await validateProductPhoto(url,row.name,product.product_name);
-     let imageResponse;
-     try{imageResponse=await fetchPhotoSourceWithRetry(url,{mode:'cors'});}catch(error){throw new Error('Data produk ditemukan, tetapi file foto gagal diunduh: '+(error.message||String(error)));}
-     const blob=await imageResponse.blob();
-     if(!blob.type.startsWith('image/'))throw new Error('Sumber bukan file gambar');
-     const path=store+'/'+row.id+'.jpg';
-     const upload=await sb.storage.from('seamart-product-photos').upload(path,blob,{contentType:blob.type,upsert:true,cacheControl:'3600'});
-     if(upload.error)throw upload.error;
-     const publicUrl=sb.storage.from('seamart-product-photos').getPublicUrl(path).data.publicUrl;
-     const saved=await sb.from('products').update({image_url:publicUrl}).eq('id',row.id).eq('store_id',store);
-     if(saved.error)throw saved.error;
-     const local=db.products.find(p=>String(p.id)===String(row.id)||String(p.barcode||'')===barcode);
+     const {data:photoResult,error:photoError}=await sb.functions.invoke('product-photo-sync',{body:{productId:row.id}});
+     if(photoError)throw new Error(photoError.message||'Server foto produk gagal dipanggil');
+     if(!photoResult?.success)throw new Error(photoResult?.error||'Server tidak berhasil menyimpan foto');
+     if(photoResult.skipped){stats.skipped++;return;}
+     const publicUrl=photoResult.imageUrl;
+     const local=db.products.find(p=>String(p.id)===String(row.id));
      if(local)local.foto=publicUrl;
-     stats.updated++;if(stats.successes.length<10)stats.successes.push(row.name||barcode);
+     stats.updated++;if(stats.successes.length<10)stats.successes.push(photoResult.productName||row.name);
     }catch(e){stats.failed++;if(stats.errors.length<5)stats.errors.push((row.name||row.barcode)+': '+(e.message||String(e)));}
     finally{done++;set(done/targets.length*100,'Memeriksa '+done+' dari '+targets.length+' barang…','Berhasil '+stats.updated+' • Dilewati/gagal '+stats.failed);}
    }));
