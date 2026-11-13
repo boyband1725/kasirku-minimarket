@@ -1,0 +1,67 @@
+name: Siapkan Foto SeaMart Batch 03
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Siapkan lingkungan
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow requests
+      - name: Unduh dan rapikan foto produk
+        run: |
+          mkdir -p photos
+          cat > prepare.py <<'PY'
+          import io, os, requests
+          from PIL import Image, ImageOps
+          items = [
+            ("8886008101053.jpg", "https://down-id.img.susercontent.com/file/sg-11134201-8262x-mjy1hynpo5qacb", "AQUA 600 ml"),
+            ("8996001600269.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/86/MTA-150331612/br-m036969-10492_le-minerale-air-mineral-kemasan-330ml-600ml-1500ml_full01-6cc5c11f.jpg", "Le Minerale 600 ml"),
+            ("8996001600146.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/97/MTA-40557327/teh_pucuk_teh_pucuk_350ml_full01_njk2s9q8.jpg", "Teh Pucuk Harum 350 ml"),
+            ("089686060027.jpg", "https://down-id.img.susercontent.com/file/id-11134207-7rask-m53u8x0q0vpe5e", "Pop Mie Rasa Ayam 75 g"),
+            ("8992696400924.jpg", "https://yoline.co.id/media/products/ProductNescafeclassicjar100gr.webp", "Nescafe Classic 100 g"),
+            ("8999999195656.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/81/MTA-22703100/sariwangi_teh-sari-wangi-50-sachet_full01.jpg", "Sariwangi Teh Asli 50 sachet"),
+            ("8992761002022.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/92/MTA-183516130/brd-10374_sprite-soft-drink-pet-390ml_full01-67886ccc.webp", "Sprite PET 390 ml"),
+            ("8998866202893.jpg", "https://sg-test-11.slatic.net/p/408dad6d18754901ee5df0696ba96bde.jpg", "Golda Cappuccino 200 ml"),
+            ("89686010947.jpg", "https://www.toko360.com/product/100009/104625/1672023663/26/6e49560710ff85f49f3c913783af7a21.jpeg", "Indomie Goreng 85 g"),
+            ("8992761002039.jpg", "https://www.coca-cola.com/content/dam/onexp/id/id/brands/fanta/asp-brandexpression-fanta-strawberry-pet-390ml_1100x1100.png", "Fanta Strawberry PET 390 ml"),
+            ("8997035563544.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/106/MTA-92757057/pocari_sweat_pocari_sweat_ion_supply_drink_350_ml_full01_qujp9dac.jpg", "Pocari Sweat 350 ml"),
+            ("8992761002015.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/MTA-63668229/coca_cola_coca-cola_original_minuman_soda_rasa_kola_botol_390_ml_full06_e99z29lg.jpeg", "Coca-Cola PET 390 ml"),
+          ]
+          ok, failed = [], []
+          for filename, url, name in items:
+              try:
+                  r = requests.get(url, timeout=35, headers={"User-Agent":"Mozilla/5.0 SeaMartCatalog/1.0"})
+                  r.raise_for_status()
+                  im = Image.open(io.BytesIO(r.content)).convert("RGB")
+                  if im.width < 350 or im.height < 350:
+                      raise ValueError(f"resolusi terlalu kecil: {im.size}")
+                  # Preserve the whole package; fit on a clean white square.
+                  im.thumbnail((900, 900), Image.Resampling.LANCZOS)
+                  canvas = Image.new("RGB", (900, 900), "white")
+                  canvas.paste(im, ((900-im.width)//2, (900-im.height)//2))
+                  canvas.save(os.path.join("photos", filename), "JPEG", quality=92, optimize=True)
+                  ok.append((filename, name, im.size))
+                  print("OK", filename, name, im.size)
+              except Exception as e:
+                  failed.append((filename, name, str(e)))
+                  print("FAILED", filename, name, e)
+          with open("photos/DAFTAR-FOTO.txt","w",encoding="utf-8") as f:
+              f.write("SeaMart Batch 03 - foto referensi, cocokkan varian sebelum impor\\n")
+              for filename,name,size in ok: f.write(f"{filename} | {name} | berhasil\\n")
+              for filename,name,err in failed: f.write(f"GAGAL | {filename} | {name} | {err}\\n")
+          if failed:
+              raise SystemExit(f"{len(failed)} foto gagal diunduh; periksa log.")
+          PY
+          python prepare.py
+          cd photos && zip -9 -r ../SeaMart-Foto-Batch-03.zip .
+      - name: Unggah ZIP sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SeaMart-Foto-Batch-03
+          path: SeaMart-Foto-Batch-03.zip
+          if-no-files-found: error
+          retention-days: 14
