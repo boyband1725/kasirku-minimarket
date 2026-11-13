@@ -1613,7 +1613,7 @@ async function fetchPhotoSourceWithRetry(url,options={},attempts=3){
    if(response.ok)return response;
    lastError=new Error('Server katalog HTTP '+response.status);
    if(response.status<500||attempt===attempts)throw lastError;
-  }catch(error){clearTimeout(timer);lastError=error;if(/^Server katalog HTTP 4(?!29)\\d{2}$/.test(error.message||'')||attempt===attempts)break;}
+  }catch(error){clearTimeout(timer);lastError=error;if(/^Server katalog HTTP 4(?!29)\d{2}$/.test(error.message||'')||attempt===attempts)break;}
   await new Promise(resolve=>setTimeout(resolve,700*attempt));
  }
  throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));
