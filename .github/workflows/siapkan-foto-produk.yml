@@ -8,20 +8,24 @@ jobs:
   build-photo-zip:
     runs-on: ubuntu-latest
     steps:
-      - name: Unduh dan validasi foto AQUA 600 ml
+      - name: Unduh foto AQUA 600 ml
         run: |
           set -euo pipefail
           mkdir -p photo-zip
-          curl --fail --location --retry 3 --user-agent "Mozilla/5.0" \
+          curl --fail --location --retry 3 --user-agent "Mozilla/5.0" --verbose \
             "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/92/MTA-23441519/aqua_aqua_air_mineral_kemasan_botol_600_ml-_1_karton-_24_pcs_full01_eg9ng5lp.jpg" \
             --output photo-zip/8886008101053.jpg
+          test -s photo-zip/8886008101053.jpg
           file photo-zip/8886008101053.jpg
+      - name: Validasi foto
+        run: |
+          python -m pip install --quiet pillow
           python - <<'PY'
           from pathlib import Path
           from PIL import Image
           p = Path("photo-zip/8886008101053.jpg")
-          if not p.exists() or p.stat().st_size < 5000:
-              raise SystemExit("Foto tidak valid: file kosong atau terlalu kecil")
+          if p.stat().st_size < 5000:
+              raise SystemExit("Foto terlalu kecil")
           with Image.open(p) as im:
               im.verify()
           with Image.open(p) as im:
@@ -29,7 +33,7 @@ jobs:
                   raise SystemExit(f"Format tidak didukung: {im.format}")
               if im.width < 350 or im.height < 350:
                   raise SystemExit(f"Resolusi terlalu kecil: {im.size}")
-              print(f"Valid: {im.format}, {im.width}x{im.height}, {p.stat().st_size} bytes")
+              print(f"VALID: {im.format} {im.width}x{im.height}, {p.stat().st_size} bytes")
           PY
       - name: Buat ZIP untuk impor SeaMart
         run: |
