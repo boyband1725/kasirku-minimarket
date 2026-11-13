@@ -1,0 +1,83 @@
+name: Siapkan Foto SeaMart Prioritas 30 - 1000 Produk
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/siapkan-foto-batch-04.yml'
+      - 'data/SeaMart-Foto-Prioritas-30.csv'
+permissions:
+  contents: read
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Ambil kode dan manifest
+        uses: actions/checkout@v4
+      - name: Siapkan lingkungan
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow requests
+      - name: Cari foto produk berdasarkan barcode
+        run: |
+          mkdir -p photos
+          cat > prepare.py <<'PY'
+          import csv, io, os, requests
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          import time
+          from PIL import Image
+          with open("data/SeaMart-Foto-Prioritas-30.csv", encoding="utf-8-sig", newline="") as f:
+              items = list(csv.DictReader(f))
+          headers = {"User-Agent":"SeaMartProductPhotoImporter/1.0"}
+          def process(item):
+              code=(item.get("barcode") or "").strip()
+              if not code.isdigit() or not 8 <= len(code) <= 14:
+                  return ("skip",item,"barcode tidak valid")
+              try:
+                  api=f"https://world.openfoodfacts.org/api/v2/product/{code}.json"
+                  r=None
+                  for attempt in range(2):
+                      r=requests.get(api,params={"fields":"code,product_name,image_front_url,image_front_small_url"},headers=headers,timeout=(5,10))
+                      if r.status_code != 429: break
+                      time.sleep(min(5 * (attempt + 1), 10))
+                  r.raise_for_status(); data=r.json(); p=data.get("product") or {}
+                  if data.get("status")!=1 or str(p.get("code") or "").strip()!=code:
+                      return ("miss",item,"barcode tidak ditemukan")
+                  url=p.get("image_front_url") or p.get("image_front_small_url")
+                  if not url:return ("miss",item,"foto belum tersedia")
+                  imr=requests.get(url,headers=headers,timeout=(5,12));imr.raise_for_status()
+                  if not imr.headers.get("Content-Type","").lower().startswith("image/"):
+                      return ("miss",item,"tautan bukan gambar")
+                  im=Image.open(io.BytesIO(imr.content)).convert("RGB")
+                  if im.width<180 or im.height<180:return ("miss",item,"resolusi terlalu kecil")
+                  im.thumbnail((900,900),Image.Resampling.LANCZOS)
+                  canvas=Image.new("RGB",(900,900),"white");canvas.paste(im,((900-im.width)//2,(900-im.height)//2))
+                  canvas.save(f"photos/{code}.jpg","JPEG",quality=92,optimize=True)
+                  return ("ok",item,p.get("product_name") or item.get("nama",""))
+              except Exception as e:return ("error",item,str(e)[:180])
+          os.makedirs("photos",exist_ok=True);results=[]
+          with ThreadPoolExecutor(max_workers=6) as pool:
+              futures=[]
+              for x in items:
+                  futures.append(pool.submit(process,x))
+              for n,f in enumerate(as_completed(futures),1):
+                  results.append(f.result())
+                  if n%25==0:print(f"PROGRES {n}/{len(items)} foto cocok {sum(x[0]=='ok' for x in results)}")
+          with open("photos/LAPORAN-BATCH-04.csv","w",encoding="utf-8-sig",newline="") as f:
+              w=csv.writer(f);w.writerow(["kode","nama","barcode","status","catatan"])
+              for status,item,note in results:w.writerow([item.get("kode",""),item.get("nama",""),item.get("barcode",""),status,note])
+          ok=sum(x[0]=="ok" for x in results);miss=sum(x[0]=="miss" for x in results);err=sum(x[0]=="error" for x in results);skip=sum(x[0]=="skip" for x in results)
+          with open("photos/RINGKASAN.txt","w",encoding="utf-8") as f:
+              f.write(f"Barang diproses: {len(items)}\nFoto cocok: {ok}\nTidak ditemukan/tidak ada foto: {miss}\nError: {err}\nBarcode tidak valid: {skip}\n")
+          print(f"SELESAI: {len(items)} barang; foto={ok}; tidak ditemukan={miss}; error={err}; skip={skip}")
+          PY
+          python prepare.py
+      - name: Unggah ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: SeaMart-Foto-Prioritas-30
+          path: photos/
+          if-no-files-found: error
+          retention-days: 30
+
+# Jalankan ulang Prioritas 30 setelah perbaikan checkout.
