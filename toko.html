@@ -313,7 +313,7 @@ body{background:#f5f7f8;color:#27323b}
 </style>
 <style id="seamart-aqua330-image-crop">
 @media(max-width:599px){
- #products>.item>.thumb img.photo-aqua330{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.28)!important}
+ #products>.item>.thumb img.photo-aqua330{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center center!important;transform:none!important}
 }
 </style>
 </head>
@@ -370,7 +370,7 @@ function renderProducts(){
  document.getElementById('productCount').textContent=rows.length+' produk';
  document.getElementById('products').innerHTML=rows.length?rows.map(p=>{
   const qty=cart.get(p.id)?.qty||0;
-  const photo=p.image_url?'<img class="product-photo '+(/AQUA\\s*330\\s*ML/i.test(p.name)?'photo-aqua330':'')+'" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
+  const photo=p.image_url?'<img class="product-photo '+(/AQUA\s*330\s*ML/i.test(p.name)?'photo-aqua330':'')+'" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
   const qtyControl=qty>0
    ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\''+p.id+'\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+</button></div>'
    : '';  const cartButton='<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
