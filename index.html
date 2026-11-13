@@ -2900,15 +2900,15 @@ async function importProductPhotosZip(){
  const stats={ok:0,fail:0,skip:0};let entries=[];
  try{
   const JSZip=await loadSeaMartZipLibrary(),zip=await JSZip.loadAsync(file);
-  entries=Object.values(zip.files).filter(x=>!x.dir&&/\\.(jpe?g|png|webp)$/i.test(x.name));
+  entries=Object.values(zip.files).filter(x=>!x.dir&&/\.(jpe?g|png|webp)$/i.test(x.name));
   if(!entries.length)throw new Error('Tidak ada file JPG, PNG, atau WEBP di dalam ZIP.');
   if(entries.length>1000)throw new Error('ZIP berisi '+entries.length+' foto. Batas satu kali impor adalah 1.000 foto; bagi menjadi beberapa ZIP.');
   if(!confirm('Impor '+entries.length+' foto dari '+file.name+'? Foto hanya dipasang jika barcode cocok tepat satu barang. Foto lama akan diganti untuk barang yang cocok.'))return;
   const productsByBarcode=new Map();
-  db.products.forEach(p=>{const code=String(p.barcode||'').replace(/\\D/g,'');if(code){if(!productsByBarcode.has(code))productsByBarcode.set(code,[]);productsByBarcode.get(code).push(p)}});
+  db.products.forEach(p=>{const code=String(p.barcode||'').replace(/\D/g,'');if(code){if(!productsByBarcode.has(code))productsByBarcode.set(code,[]);productsByBarcode.get(code).push(p)}});
   const candidates=[],barcodes=new Set();
   for(const entry of entries){
-   const filename=entry.name.split('/').pop(),match=filename.match(/\\d{8,14}/);
+   const filename=entry.name.split('/').pop(),match=filename.match(/\d{8,14}/);
    if(!match){stats.skip++;continue;}
    const barcode=match[0],localMatches=productsByBarcode.get(barcode)||[];
    if(localMatches.length!==1){stats.skip++;continue;}
@@ -2922,7 +2922,7 @@ async function importProductPhotosZip(){
    const result=await sb.from('products').select('id,barcode').eq('store_id',store).in('barcode',batch);
    if(result.error)throw result.error;
    for(const row of (result.data||[])){
-    const code=String(row.barcode||'').replace(/\\D/g,'');
+    const code=String(row.barcode||'').replace(/\D/g,'');
     if(!cloudByBarcode.has(code))cloudByBarcode.set(code,[]);
     cloudByBarcode.get(code).push(row);
    }
