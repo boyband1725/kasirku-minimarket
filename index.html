@@ -1655,7 +1655,10 @@ async function syncAllProductPhotos(limit=null){
    save();
   }
   set(100,Number.isInteger(limit)?'Tes foto selesai.':'Sinkron foto selesai.','Diperiksa '+targets.length+' dari '+allTargets.length+' barang tanpa foto dan ber-barcode • Berhasil '+stats.updated+' • Ditolak/gagal '+stats.failed+(Number.isInteger(limit)&&allTargets.length>targets.length?' • Masih ada '+(allTargets.length-targets.length)+' barang untuk tahap berikutnya':'')+' • Tanpa barcode: '+(rows.length-allTargets.length));
-  if(stats.errors.length)console.warn('Rincian sinkron foto:',stats.errors);
+  if(stats.errors.length){
+   console.warn('Rincian sinkron foto:',stats.errors);
+   if(summaryEl)summaryEl.textContent += ' • Contoh alasan: '+stats.errors.join(' | ');
+  }
  }catch(e){set(100,'Sinkronisasi terhenti: '+(e.message||String(e)),'Silakan coba lagi setelah koneksi pulih.');}
  finally{if(button)button.disabled=false;if(testButton)testButton.disabled=false;}
 }
