@@ -1592,7 +1592,7 @@ async function validateProductPhoto(url,targetName,sourceName){
  if(!wanted.length||!shared.length)throw new Error('Nama produk tidak cocok dengan data foto. Foto ditolak.');
  const img=new Image();img.crossOrigin='anonymous';
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat.'));img.src=url});
- if(img.naturalWidth<400||img.naturalHeight<400)throw new Error('Foto katalog terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Minimal 400×400 piksel. Foto ditolak agar katalog SeaMart tetap tajam.');
+ if(img.naturalWidth<350||img.naturalHeight<350)throw new Error('Foto katalog terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Minimal 350×350 piksel. Foto ditolak agar katalog SeaMart tetap tajam.');
  const ratio=img.naturalWidth/img.naturalHeight;
  if(ratio<0.3||ratio>2.5)throw new Error('Proporsi gambar tidak layak untuk foto produk. Foto ditolak.');
  return {width:img.naturalWidth,height:img.naturalHeight,matched:shared.join(', ')};
@@ -1603,7 +1603,7 @@ function setInlinePhotoProgress(percent,message,show=true){
  const value=Math.max(0,Math.min(100,Math.round(percent)));
  if(bar)bar.style.width=value+'%';if(pct)pct.textContent=value+'%';if(label)label.textContent=message||'Memproses…';
 }
-async function syncAllProductPhotos(limit=null){
+async function fetchPhotoSourceWithRetry(url,options={},attempts=3){\n let lastError;\n for(let attempt=1;attempt<=attempts;attempt++){\n  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);\n  try{const response=await fetch(url,{...options,signal:controller.signal});clearTimeout(timer);if(response.ok)return response;if(response.status>=500&&attempt<attempts){lastError=new Error('Server katalog HTTP '+response.status);await new Promise(resolve=>setTimeout(resolve,700*attempt));continue;}throw new Error('Server katalog HTTP '+response.status);}\n  catch(error){clearTimeout(timer);lastError=error;if(attempt===attempts)break;await new Promise(resolve=>setTimeout(resolve,700*attempt));}\n }\n throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));\n}\nasync function syncAllProductPhotos(limit=null){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return alert('Login ke SeaMart terlebih dahulu.');
  const button=document.getElementById('bulkPhotoButton'),testButton=document.getElementById('bulkPhotoTestButton'),panel=document.getElementById('bulkPhotoPanel'),status=document.getElementById('bulkPhotoStatus'),bar=document.getElementById('bulkPhotoBar'),pct=document.getElementById('bulkPhotoPct'),summaryEl=document.getElementById('bulkPhotoSummary');
@@ -1636,7 +1636,7 @@ async function syncAllProductPhotos(limit=null){
      let url=product.image_front_url||product.selected_images?.front?.display?.en||product.selected_images?.front?.display?.[Object.keys(product.selected_images?.front?.display||{})[0]];
      if(!url)throw new Error('Foto depan tidak tersedia');
      await validateProductPhoto(url,row.name,product.product_name);
-     const imageResponse=await fetch(url,{mode:'cors'});
+     const imageResponse=await fetchPhotoSourceWithRetry(url,{mode:'cors'});
      if(!imageResponse.ok)throw new Error('Foto tidak dapat diunduh untuk disimpan');
      const blob=await imageResponse.blob();
      if(!blob.type.startsWith('image/'))throw new Error('Sumber bukan file gambar');
