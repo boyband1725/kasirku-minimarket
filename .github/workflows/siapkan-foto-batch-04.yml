@@ -73,3 +73,5 @@ jobs:
           path: SeaMart-Foto-Batch-04.zip
           if-no-files-found: error
           retention-days: 30
+
+# Jalankan ulang Batch 04 setelah perbaikan checkout.
