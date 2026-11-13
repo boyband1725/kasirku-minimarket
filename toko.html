@@ -290,6 +290,14 @@ body{background:#f5f7f8;color:#27323b}
  #products>.item>.buy-now-btn{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;height:42px!important;min-height:42px!important;margin:8px 0 0!important;padding:0 5px!important;border:0!important;border-radius:8px!important;background:#2787c4!important;color:#fff!important;font-size:13px!important;font-weight:800!important}
 }
 
+/* Reserve the quantity row so all product action buttons align like the reference */
+@media(max-width:599px){
+ #products>.item>.product-qty,
+ #products>.item>.product-qty-placeholder{box-sizing:border-box!important;flex:0 0 40px!important;width:82%!important;height:40px!important;min-height:40px!important;margin:10px auto 8px!important}
+ #products>.item>.product-qty{display:grid!important;grid-template-columns:38px minmax(0,1fr) 38px!important}
+ #products>.item>.product-qty-placeholder{display:block!important;border:0!important;background:transparent!important}
+ #products>.item>.detail-btn{margin:0!important}
+}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style></head>
 <body>
@@ -347,9 +355,8 @@ function renderProducts(){
   const qty=cart.get(p.id)?.qty||0;
   const photo=p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
   const qtyControl=qty>0
-   ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\''+p.id+'\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+</button></div>'
-   : '';
-  const cartButton='<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
+   ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\\''+p.id+'\\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\\''+p.id+'\\')">+</button></div>'
+   : '<div class="product-qty-placeholder" aria-hidden="true"></div>';  const cartButton='<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
   return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div>'+qtyControl+cartButton+'<button type="button" class="buy-now-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
  }).join(''):'<div class="empty">Barang tidak ditemukan.</div>';
 }
