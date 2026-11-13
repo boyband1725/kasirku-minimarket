@@ -1624,7 +1624,7 @@ async function syncAllProductPhotos(limit=null){
  const button=document.getElementById('bulkPhotoButton'),testButton=document.getElementById('bulkPhotoTestButton'),panel=document.getElementById('bulkPhotoPanel'),status=document.getElementById('bulkPhotoStatus'),bar=document.getElementById('bulkPhotoBar'),pct=document.getElementById('bulkPhotoPct'),summaryEl=document.getElementById('bulkPhotoSummary');
  if(button)button.disabled=true;if(testButton)testButton.disabled=true;if(panel)panel.style.display='block';
  const set=(n,msg,detail='')=>{const v=Math.max(0,Math.min(100,Math.round(n)));if(bar)bar.style.width=v+'%';if(pct)pct.textContent=v+'%';if(status)status.textContent=msg;if(summaryEl)summaryEl.textContent=detail;};
- const stats={total:0,updated:0,skipped:0,failed:0,errors:[]};
+ const stats={total:0,updated:0,skipped:0,failed:0,errors:[],successes:[]};
  try{
   set(2,Number.isInteger(limit)?'Menyiapkan tes maksimal '+limit+' foto…':'Mengambil seluruh data barang dari database…');
   const result=await fetchAllStoreProducts(sb,store);
@@ -1662,13 +1662,14 @@ async function syncAllProductPhotos(limit=null){
      if(saved.error)throw saved.error;
      const local=db.products.find(p=>String(p.id)===String(row.id)||String(p.barcode||'')===barcode);
      if(local)local.foto=publicUrl;
-     stats.updated++;
+     stats.updated++;if(stats.successes.length<10)stats.successes.push(row.name||barcode);
     }catch(e){stats.failed++;if(stats.errors.length<5)stats.errors.push((row.name||row.barcode)+': '+(e.message||String(e)));}
     finally{done++;set(done/targets.length*100,'Memeriksa '+done+' dari '+targets.length+' barang…','Berhasil '+stats.updated+' • Dilewati/gagal '+stats.failed);}
    }));
    save();
   }
   set(100,Number.isInteger(limit)?'Tes foto selesai.':'Sinkron foto selesai.','Diperiksa '+targets.length+' dari '+allTargets.length+' barang tanpa foto dan ber-barcode • Berhasil '+stats.updated+' • Ditolak/gagal '+stats.failed+(Number.isInteger(limit)&&allTargets.length>targets.length?' • Masih ada '+(allTargets.length-targets.length)+' barang untuk tahap berikutnya':'')+' • Tanpa barcode: '+(rows.length-allTargets.length));
+  if(stats.successes.length&&summaryEl)summaryEl.textContent += ' • Foto berhasil: '+stats.successes.join(' | ');
   if(stats.errors.length){
    console.warn('Rincian sinkron foto:',stats.errors);
    if(summaryEl)summaryEl.textContent += ' • Contoh alasan: '+stats.errors.join(' | ');
