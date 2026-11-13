@@ -1259,6 +1259,29 @@ td{border-bottom-color:#e8f2ee!important}
  .user #mobileCartTrigger{flex-basis:33px!important;width:33px!important;min-width:33px!important;height:34px!important;min-height:34px!important}
 }
 
+
+/* Compact single-colour cart button with breathing room in mobile header */
+@media(max-width:1100px){
+ .user{gap:8px!important}
+ .user #shiftAction{margin-right:2px!important}
+ .user #mobileCartTrigger{
+  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+  height:32px!important;min-height:32px!important;margin:0 5px!important;
+  padding:0!important;border:1px solid rgba(255,255,255,.55)!important;
+  border-radius:8px!important;background:#078b78!important;
+  background-image:none!important;box-shadow:none!important;color:#fff!important
+ }
+ .user #mobileCartTrigger>span{font-size:16px!important;color:#fff!important}
+ .user #mobileCartTrigger>b{
+  background:#e53935!important;color:#fff!important;border:2px solid #fff!important;
+  right:-6px!important;top:-7px!important
+ }
+}
+@media(max-width:390px){
+ .user{gap:6px!important}
+ .user #mobileCartTrigger{margin:0 4px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
