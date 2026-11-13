@@ -3197,7 +3197,7 @@ async function importProductPhotoSources(){
  if(!sb||!store)return alert('Login admin dan koneksi cloud SeaMart harus aktif.');
  if(!Array.isArray(db.products)||!db.products.length)return alert('Master barang belum dimuat.');
  button.disabled=true;button.textContent='Memasang foto…';
- const files=['product-photo-sources-batch-01.csv','product-photo-sources-batch-02.csv','product-photo-sources-batch-03.csv','product-photo-sources-batch-04.csv'];
+ const files=['product-photo-sources-batch-01.csv','product-photo-sources-batch-02.csv','product-photo-sources-batch-03.csv','product-photo-sources-batch-04.csv','product-photo-sources-batch-05.csv'];
  const stats={ok:0,skip:0,fail:0};let records=[];
  try{
   for(const file of files){
