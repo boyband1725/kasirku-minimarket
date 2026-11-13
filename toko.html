@@ -275,28 +275,22 @@ body{background:#f5f7f8;color:#27323b}
 #products>.item>.product-qty+.detail-btn{margin-top:0!important}
 
 
-/* SeaMart product cards: follow the supplied reference layout while retaining LOTTE MART blue/white palette */
+/* SeaMart catalogue cards refined to the supplied LOTTE MART reference; keep blue/white brand palette */
 @media(max-width:599px){
  #products{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;column-gap:14px!important;row-gap:18px!important;align-items:stretch!important}
- #products>.item{box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-self:stretch!important;height:100%!important;min-width:0!important;padding:10px!important;margin:0!important;background:#fff!important;border:1px solid #e4e9ed!important;border-radius:15px!important;box-shadow:0 3px 12px rgba(25,45,60,.09)!important;overflow:hidden!important}
- #products>.item>.thumb{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 148px!important;width:100%!important;height:148px!important;min-height:148px!important;max-height:148px!important;margin:0 0 10px!important;padding:0!important;background:#fff!important;border:0!important;border-radius:8px!important;overflow:hidden!important}
+ #products>.item{box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-self:stretch!important;height:100%!important;min-width:0!important;padding:10px!important;margin:0!important;background:#fff!important;border:1px solid #e5e9ed!important;border-radius:14px!important;box-shadow:0 2px 9px rgba(25,45,60,.08)!important;overflow:hidden!important}
+ #products>.item>.thumb{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 174px!important;width:100%!important;height:174px!important;min-height:174px!important;max-height:174px!important;margin:0 0 8px!important;padding:0!important;background:#fff!important;border:0!important;border-radius:7px!important;overflow:hidden!important}
  #products>.item>.thumb img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
  #products>.item>.name{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;min-height:40px!important;height:40px!important;max-height:40px!important;margin:5px 0 7px!important;padding:0!important;font-size:14px!important;line-height:1.4!important;font-weight:600!important;color:#303942!important}
  #products>.item>.price{min-height:24px!important;margin:0!important;color:#3287b7!important;font-size:18px!important;line-height:1.3!important;font-weight:800!important}
  #products>.item>.stock{display:none!important}
- #products>.item>.product-qty{flex:0 0 40px!important;width:82%!important;height:40px!important;min-height:40px!important;margin:10px auto 8px!important;grid-template-columns:38px minmax(0,1fr) 38px!important}
- #products>.item>.detail-btn{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 40px!important;height:40px!important;min-height:40px!important;margin:10px 0 0!important;padding:0 5px!important;border:1.5px solid #3287b7!important;border-radius:8px!important;background:#fff!important;color:#3287b7!important;font-size:13px!important;font-weight:700!important}
- #products>.item>.product-qty+.detail-btn{margin-top:0!important}
- #products>.item>.buy-now-btn{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;height:42px!important;min-height:42px!important;margin:8px 0 0!important;padding:0 5px!important;border:0!important;border-radius:8px!important;background:#2787c4!important;color:#fff!important;font-size:13px!important;font-weight:800!important}
-}
-
-/* Reserve the quantity row so all product action buttons align like the reference */
-@media(max-width:599px){
- #products>.item>.product-qty,
- #products>.item>.product-qty-placeholder{box-sizing:border-box!important;flex:0 0 40px!important;width:82%!important;height:40px!important;min-height:40px!important;margin:10px auto 8px!important}
- #products>.item>.product-qty{display:grid!important;grid-template-columns:38px minmax(0,1fr) 38px!important}
+ #products>.item>.product-qty,#products>.item>.product-qty-placeholder{box-sizing:border-box!important;flex:0 0 40px!important;width:82%!important;height:40px!important;min-height:40px!important;margin:10px auto 8px!important}
+ #products>.item>.product-qty{display:grid!important;grid-template-columns:38px minmax(0,1fr) 38px!important;align-items:center!important;gap:0!important;padding:0!important;border:1px solid #d8dde1!important;border-radius:9px!important;background:#fff!important;overflow:hidden!important}
+ #products>.item>.product-qty button{width:100%!important;height:38px!important;border:0!important;border-radius:0!important;background:#fff!important;color:#3287b7!important;font-size:22px!important}
+ #products>.item>.product-qty b{height:38px!important;display:grid!important;place-items:center!important;border-left:1px solid #d8dde1!important;border-right:1px solid #d8dde1!important;color:#303942!important;font-size:16px!important}
  #products>.item>.product-qty-placeholder{display:block!important;border:0!important;background:transparent!important}
- #products>.item>.detail-btn{margin:0!important}
+ #products>.item>.detail-btn{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 40px!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0 5px!important;border:1.5px solid #3287b7!important;border-radius:8px!important;background:#fff!important;color:#3287b7!important;font-size:13px!important;font-weight:700!important}
+ #products>.item>.buy-now-btn{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;height:42px!important;min-height:42px!important;margin:8px 0 0!important;padding:0 5px!important;border:0!important;border-radius:8px!important;background:#2787c4!important;color:#fff!important;font-size:13px!important;font-weight:800!important}
 }
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style></head>
