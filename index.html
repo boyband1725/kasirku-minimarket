@@ -1190,6 +1190,20 @@ td{border-bottom-color:#e8f2ee!important}
  .odoo-pos-head .pill{font-size:10px!important;padding:4px 7px!important}
 }
 
+
+/* Single unified menu control: no separate grid launcher */
+.app-launcher-trigger{display:none!important}
+.mobile-menu-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;
+ background:#e8f5ef!important;color:#176b49!important;border:1px solid #cfe6d8!important;
+ padding:9px 13px!important;border-radius:9px!important;font-size:13px!important;font-weight:700!important;
+ white-space:nowrap!important;min-height:40px!important}
+.app-launcher-backdrop{inset:64px 0 0!important}
+@media(max-width:1100px){
+ .topbar-left{gap:8px!important}
+ .mobile-menu-btn{height:38px!important;min-height:38px!important;padding:0 12px!important}
+ .app-launcher-backdrop{inset:58px 0 0!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -1224,7 +1238,7 @@ window.addEventListener('error', function(e) {
  <div class="sidefoot">SeaMart POS · Web Preview</div>
 </aside>
 <main class="main">
- <header class="topbar"><div class="topbar-left"><button class="app-launcher-trigger" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">▦</button><button class="mobile-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><span id="sessionUser">Belum login</span><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
+ <header class="topbar"><div class="topbar-left"><button class="mobile-menu-btn" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><span id="sessionUser">Belum login</span><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
 <div class="launcher-heading">APLIKASI</div><div class="launcher-grid">
 <button class="launcher-tile" onclick="openAppPage('dashboard')"><span class="launcher-icon icon-0">▥</span><b>Dashboard</b></button>
 <button class="launcher-tile" onclick="openAppPage('kasir')"><span class="launcher-icon icon-1">▣</span><b>Point of Sale</b></button>
