@@ -214,7 +214,49 @@ body{background:#f5f7f8;color:#27323b}
 .tag{color:#687681!important}
 .menu-trigger{background:#f1f5f7!important;color:#263746!important;border:1px solid #e6ecef}
 .header-icon,.header-cart{background:#f1f5f7!important;color:#344452!important;border:1px solid #e6ecef}
-.product-qty{display:grid;grid-template-columns:46px 1fr 46px;align-items:center;gap:0;margin-top:8px;height:46px;border:1px solid #dce4e9;border-radius:10px;background:#fff;overflow:hidden}.product-qty button{height:100%;border:0;background:#f3f7f9;color:#2787c4;font-size:25px;font-weight:700}.product-qty button:disabled{color:#b9c2c9;background:#f5f6f7}.product-qty b{text-align:center;color:#273744;font-size:18px}</style>
+.product-qty{display:grid;grid-template-columns:46px 1fr 46px;align-items:center;gap:0;margin-top:8px;height:46px;border:1px solid #dce4e9;border-radius:10px;background:#fff;overflow:hidden}.product-qty button{height:100%;border:0;background:#f3f7f9;color:#2787c4;font-size:25px;font-weight:700}.product-qty button:disabled{color:#b9c2c9;background:#f5f6f7}.product-qty b{text-align:center;color:#273744;font-size:18px}
+/* Quantity selector styled like Lotte Mart: one clean segmented control */
+.product-qty{
+ display:grid!important;
+ grid-template-columns:46px minmax(0,1fr) 46px!important;
+ align-items:stretch!important;
+ gap:0!important;
+ height:44px!important;
+ margin:10px 0 8px!important;
+ padding:0!important;
+ background:#fff!important;
+ border:1px solid #d5d9dd!important;
+ border-radius:10px!important;
+ overflow:hidden!important;
+ box-shadow:none!important
+}
+.product-qty button{
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ padding:0!important;
+ border:0!important;
+ border-radius:0!important;
+ background:#fff!important;
+ color:#2787c4!important;
+ font-size:25px!important;
+ font-weight:600!important;
+ line-height:1!important
+}
+.product-qty button:first-child{border-right:1px solid #d5d9dd!important}
+.product-qty button:last-child{border-left:1px solid #d5d9dd!important}
+.product-qty button:disabled{background:#f5f6f7!important;color:#c3cbd1!important;opacity:1!important}
+.product-qty b{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ min-width:0!important;
+ padding:0!important;
+ color:#344452!important;
+ font-size:18px!important;
+ font-weight:600!important
+}
+</style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style></head>
 <body>
 <div class="promo-strip">Hemat, Mudah, Cepat!</div><header class="top" style="background:#ffffff!important;background-color:#ffffff!important;box-shadow:0 2px 12px rgba(25,45,60,.10)!important;border-bottom:1px solid #e8edf0!important"><div class="brand"><div class="brand-left"><button class="menu-trigger" type="button" aria-label="Buka menu" onclick="openShopMenu()">☰</button><div><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg><div class="tag">Belanja mudah, dekat, dan hemat</div></div></div><div class="header-actions"><button class="header-icon" type="button" aria-label="Cari produk" onclick="focusShopSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button><button class="header-icon" type="button" aria-label="Notifikasi" onclick="showShopNotifications()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></button><button class="header-cart" type="button" aria-label="Buka keranjang" onclick="openCartDrawer()">🛒<span class="header-cart-count" id="headerCartCount">0</span></button></div></div></header>
