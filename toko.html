@@ -318,7 +318,7 @@ body{background:#f5f7f8;color:#27323b}
 </style>
 <style id="header-search-panel">
 /* Search opens from the header icon, like the Lotte Mart mobile search */
-.search-panel{margin:0 0 14px;position:relative}
+.search-panel{position:fixed;z-index:60;top:120px;left:50%;transform:translateX(-50%);width:calc(100vw - 26px);max-width:860px;margin:0}
 .search-panel-inner{display:flex;align-items:center;gap:10px;min-height:58px;padding:0 10px 0 16px;background:#fff;border:1px solid #dce4e9;border-radius:12px;box-shadow:0 3px 12px #172b3a12}
 .search-panel-icon{width:22px;height:22px;flex:none;fill:none;stroke:#7a8790;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .search-panel .search{flex:1;min-width:0;margin:0;padding:14px 0;border:0!important;outline:none!important;box-shadow:none!important;background:transparent;font:inherit}
@@ -390,7 +390,7 @@ function renderProducts(){
 function buyNow(id){const p=products.find(x=>x.id===id);if(!p)return;if(Number(p.stock)<=0){alert('Stok barang sedang kosong.');return}addItem(id);closeProductDetail();closeCartDrawer();openCheckout()}
 function showProductDetail(id){const p=products.find(x=>x.id===id);if(!p)return;document.getElementById('detailContent').innerHTML='<div class="detail-photo">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'">':'<div class="no-photo">Foto belum tersedia</div>')+'</div><div class="detail-title">'+esc(p.name)+'</div><div class="price" style="font-size:22px">'+rupiah(p.price)+'</div><div class="detail-meta">Kategori: '+esc(p.category||'Lainnya')+'<br>Barcode: '+esc(p.barcode||'-')+'<br>Stok tersedia: '+Number(p.stock)+'</div><button class="primary" style="margin-top:14px" type="button" onclick="addItem(\''+p.id+'\');closeProductDetail()">Tambah ke Keranjang</button>';document.getElementById('productDetail').classList.add('show')}
 function closeProductDetail(){document.getElementById('productDetail').classList.remove('show')}
-function focusShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search');if(!panel||!e)return;panel.classList.remove('hide');panel.classList.add('search-panel-open');panel.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>e.focus(),250)}
+function focusShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search'),header=document.querySelector('.top');if(!panel||!e)return;const rect=header?header.getBoundingClientRect():{bottom:0};panel.style.top=Math.max(8,rect.bottom+8)+'px';panel.classList.remove('hide');panel.classList.add('search-panel-open');setTimeout(()=>{e.focus({preventScroll:true});},120)}
 function closeShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search');if(!panel||!e)return;e.value='';renderProducts();panel.classList.add('hide');panel.classList.remove('search-panel-open');}
 function showShopNotifications(){const e=document.getElementById('shopAnnouncement');if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('notification-highlight');setTimeout(()=>e.classList.remove('notification-highlight'),1600)}else{say('Belum ada notifikasi baru.')}}
 function openShopMenu(){document.getElementById('shopDrawer').classList.add('open');document.body.style.overflow='hidden'}
