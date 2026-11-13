@@ -43,14 +43,10 @@ jobs:
               w, h = im.size
               im.crop((0, 0, w, int(h * 0.76))).save(p, quality=94)
           PY
-      - name: Buat ZIP untuk impor SeaMart
-        run: |
-          cd photos
-          zip -9 ../SeaMart-Foto-Batch-02.zip 8996006856074.jpg 8992696404441.jpg 8998866202893.jpg 8996001600269.jpg 8997035563544.png 8992761002039.png
       - name: Simpan ZIP sebagai artifact
         uses: actions/upload-artifact@v4
         with:
           name: SeaMart-Foto-Batch-02
-          path: SeaMart-Foto-Batch-02.zip
+          path: photos/*
           if-no-files-found: error
           retention-days: 14
