@@ -29,7 +29,6 @@ jobs:
             ("8999999195656.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/81/MTA-22703100/sariwangi_teh-sari-wangi-50-sachet_full01.jpg", "Sariwangi Teh Asli 50 sachet"),
             ("8992761002022.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/92/MTA-183516130/brd-10374_sprite-soft-drink-pet-390ml_full01-67886ccc.webp", "Sprite PET 390 ml"),
             ("8998866202893.jpg", "https://sg-test-11.slatic.net/p/408dad6d18754901ee5df0696ba96bde.jpg", "Golda Cappuccino 200 ml"),
-            ("89686010947.jpg", "https://www.toko360.com/product/100009/104625/1672023663/26/6e49560710ff85f49f3c913783af7a21.jpeg", "Indomie Goreng 85 g"),
             ("8992761002039.jpg", "https://www.coca-cola.com/content/dam/onexp/id/id/brands/fanta/asp-brandexpression-fanta-strawberry-pet-390ml_1100x1100.png", "Fanta Strawberry PET 390 ml"),
             ("8997035563544.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/106/MTA-92757057/pocari_sweat_pocari_sweat_ion_supply_drink_350_ml_full01_qujp9dac.jpg", "Pocari Sweat 350 ml"),
             ("8992761002015.jpg", "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/MTA-63668229/coca_cola_coca-cola_original_minuman_soda_rasa_kola_botol_390_ml_full06_e99z29lg.jpeg", "Coca-Cola PET 390 ml"),
@@ -53,7 +52,7 @@ jobs:
                   failed.append((filename, name, str(e)))
                   print("FAILED", filename, name, e)
           with open("photos/DAFTAR-FOTO.txt","w",encoding="utf-8") as f:
-              f.write("SeaMart Batch 03 - foto referensi, cocokkan varian sebelum impor\\n")
+              f.write("SeaMart Batch 03 - foto referensi, cocokkan varian sebelum impor\\n")\n              f.write("Indomie Goreng dilewati: barcode master perlu verifikasi format sebelum nama file dibuat.\\n")
               for filename,name,size in ok: f.write(f"{filename} | {name} | berhasil\\n")
               for filename,name,err in failed: f.write(f"GAGAL | {filename} | {name} | {err}\\n")
           if failed:
