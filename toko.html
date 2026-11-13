@@ -76,14 +76,50 @@ main{width:100%;max-width:760px;margin:0 auto;padding:14px 13px 110px;overflow:h
 .shop-tools{gap:8px}.shop-tools select{max-width:190px}
 @media(min-width:600px){main{padding-left:18px;padding-right:18px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.thumb{height:180px}}
 @media(max-width:360px){.brandmark{width:158px!important}.brand>b{font-size:11px}.item{padding:7px}.price{font-size:15px}}
+
+.promo-strip{display:flex;align-items:center;justify-content:center}
+.top{background:#fff!important;padding:12px 16px!important;box-shadow:0 2px 8px #1b2a3a12}
+.brand{min-height:72px;gap:12px}.brandmark{width:190px!important;max-width:58vw}
+.brandmark .sea{fill:#fff!important}.brandmark .mart{fill:#a7ff24!important}
+.top .tag{color:#687782!important}.brand>b{color:#344452!important;font-size:14px}
+.announcement{display:flex;align-items:center;gap:10px;background:#fff9e9;border:1px solid #f5e5b5;padding:12px 14px;color:#9b6220;font-size:13px;margin:0 -13px 10px}
+.announcement .ann-icon{width:28px;height:28px;border-radius:50%;background:#f3a51e;color:white;display:grid;place-items:center;font-weight:900;flex:none}
+.announcement strong{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.announcement button{border:0;background:transparent;color:#9b6220;font-size:19px;padding:0 4px}
+.home-banners{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:8px 0 24px}
+.home-main-banner{grid-column:1/-1;min-height:178px;border-radius:10px;padding:18px 17px;position:relative;overflow:hidden;color:#fff;background:linear-gradient(110deg,#0b6596,#2a9bc4 60%,#e5f3e8)}
+.home-main-banner:after{content:"";position:absolute;right:-18px;bottom:-45px;width:190px;height:190px;border-radius:50%;background:#ffffff25}
+.banner-kicker{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:.9}
+.home-main-banner h1{font-size:25px;line-height:1.08;max-width:68%;margin:9px 0 7px}
+.home-main-banner p{font-size:12px;max-width:65%;margin:0;line-height:1.45;color:#effaff}
+.banner-art{position:absolute;right:8px;bottom:9px;font-size:78px;filter:drop-shadow(0 7px 6px #16364a30)}
+.home-promo-tile{min-height:116px;border-radius:9px;padding:13px 12px;position:relative;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.home-promo-tile strong{font-size:17px;line-height:1.05;max-width:75%;text-transform:uppercase}
+.home-promo-tile span{font-size:11px;margin-top:7px;max-width:75%}
+.home-promo-tile i{position:absolute;right:7px;bottom:5px;font-style:normal;font-size:43px}
+.tile-blue{background:linear-gradient(130deg,#1c6f9d,#55a9c7)}.tile-green{background:linear-gradient(130deg,#087b53,#32a77b)}
+.tile-gold{background:linear-gradient(130deg,#b86a19,#edb84c)}.tile-navy{background:linear-gradient(130deg,#263b58,#51718c)}
+.home-section-title{font-size:22px;font-weight:850;color:#17212c;margin:18px 2px 12px}
+.home-catalog-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 2px}
+.home-catalog-heading h2{font-size:21px;margin:0;color:#17212c}.home-catalog-heading span{font-size:12px;color:#75818a;white-space:nowrap}
+@media(max-width:380px){.brandmark{width:160px!important}.brand>b{font-size:12px}.home-main-banner{min-height:158px}.home-main-banner h1{font-size:22px}.banner-art{font-size:64px}.home-promo-tile{min-height:105px}.home-promo-tile strong{font-size:15px}}
 </style>
 </head>
 <body>
 <div class="promo-strip">Hemat, Mudah, Cepat!</div><header class="top"><div class="brand"><div><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg><div class="tag">Belanja mudah, dekat, dan hemat</div></div><b style="color:#dce4e9">🛍 Toko Online</b></div></header>
-<main><section class="hero"><h1>Belanja kebutuhan harian</h1><p>Pilih barang favoritmu. Pesan langsung dari HP tanpa perlu membuat akun.</p></section>
+<main>
+<div class="announcement" id="shopAnnouncement"><span class="ann-icon">!</span><strong>Pengumuman SeaMart: Belanja mudah, dekat, dan hemat!</strong><button type="button" aria-label="Tutup pengumuman" onclick="document.getElementById('shopAnnouncement').remove()">×</button></div>
+<section class="home-banners" aria-label="Promo SeaMart">
+<div class="home-main-banner"><div class="banner-kicker">Selamat datang di SeaMart</div><h1>Belanja lebih mudah, hemat setiap hari!</h1><p>Penuhi kebutuhan rumah tangga langsung dari toko kami</p><div class="banner-art">🛒</div></div>
+<div class="home-promo-tile tile-green"><strong>Gratis belanja*</strong><span>Belanja praktis dari rumah</span><i>🛵</i></div>
+<div class="home-promo-tile tile-blue"><strong>Harga spesial</strong><span>Temukan pilihan hemat hari ini</span><i>🏷️</i></div>
+<div class="home-promo-tile tile-gold"><strong>Produk harian</strong><span>Kebutuhan rumah tersedia</span><i>🥫</i></div>
+<div class="home-promo-tile tile-navy"><strong>Belanja banyak</strong><span>Pilih semua kebutuhanmu</span><i>🧺</i></div>
+</section>
+<div class="home-section-title">Special Price</div>
 <input id="search" class="search" placeholder="Cari nama barang atau barcode..." autocomplete="off">
 <div id="cats" class="cats"><button class="cat active" data-cat="">Semua</button></div><div class="shop-tools"><label id="filterLabel">Urutkan produk</label><select id="sortProducts" aria-labelledby="filterLabel"><option value="recommended">Rekomendasi</option><option value="name">Nama A–Z</option><option value="price-low">Harga terendah</option><option value="price-high">Harga tertinggi</option><option value="stock">Stok terbanyak</option></select></div>
-<div id="status" class="msg">Memuat katalog SeaMart...</div><div class="catalog-head"><h2>Pilihan untukmu</h2><span id="productCount">Memuat produk...</span></div><section id="products" class="grid"></section>
+<div id="status" class="msg">Memuat katalog SeaMart...</div><div class="home-catalog-heading"><h2>Pilihan untukmu</h2><span id="productCount">Memuat produk...</span></div><section id="products" class="grid"></section>
 <section id="checkout" class="panel hide"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px"><h2 style="margin:0">Keranjang & Checkout</h2><button type="button" class="clear-cart" onclick="clearCart()">Kosongkan Keranjang</button></div><div id="cart"></div><div class="total"><span>Total</span><span id="total">Rp0</span></div><form id="orderForm"><label>Nama pelanggan</label><input class="field" name="name" required minlength="2" placeholder="Nama lengkap"><label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"><label>Alamat pengantaran / catatan</label><textarea class="field" name="address" rows="2" placeholder="Alamat (opsional untuk ambil di toko)"></textarea><label>Catatan pesanan</label><input class="field" name="note" placeholder="Contoh: jangan pakai kantong"><label>Metode pembayaran</label><select class="field" name="payment"><option value="qris">QRIS</option><option value="cod">Tunai saat diterima / diambil</option></select><button class="primary" id="submit" type="submit">Buat Pesanan</button><div class="muted" style="margin-top:8px">Pesanan akan dikirim ke SeaMart. Pembayaran QRIS menunggu konfirmasi admin.</div></form><div id="orderResult"></div></section>
 <section class="panel" id="trackPanel"><h2>📦 Lacak Pesanan</h2><p class="muted">Masukkan nomor pesanan dan nomor WhatsApp yang digunakan saat checkout.</p><form id="trackForm"><label>Nomor pesanan</label><input class="field" name="code" required placeholder="Contoh: SM-XXXXXXXXXX" autocomplete="off"><label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"><button class="primary" id="trackBtn" type="submit">Lacak Pesanan</button></form><div id="trackingResult" aria-live="polite"></div></section>
 </main><div class="detail-overlay" id="productDetail" onclick="if(event.target===this)closeProductDetail()"><section class="detail-card"><div class="detail-head"><b>Detail Produk</b><button class="detail-close" type="button" onclick="closeProductDetail()" aria-label="Tutup">×</button></div><div id="detailContent"></div></section></div><div class="bar"><div class="barin"><div class="barinfo"><small id="count">0 barang di keranjang</small><b id="barTotal">Rp0</b></div><button class="primary checkout-cta" id="checkoutCta" onclick="openCheckout()">Checkout →</button></div></div>
