@@ -953,6 +953,70 @@ td{border-bottom-color:#e8f2ee!important}
   #loginroot .login-form-panel { padding: 15px 16px 18px !important; }
 }
 
+
+/* SeaMart mobile login polish v3: compact header, remove dead space; desktop untouched */
+@media (max-width: 760px) {
+  #loginroot .seamart-login-screen {
+    min-height: 100dvh !important; height: 100dvh !important;
+    padding: 14px !important; box-sizing: border-box !important;
+    display: flex !important; align-items: center !important;
+    justify-content: center !important; overflow-y: auto !important;
+  }
+  #loginroot .login-shell {
+    display: grid !important; grid-template-columns: minmax(0,1fr) !important;
+    grid-template-rows: auto auto !important;
+    width: min(440px,100%) !important; height: auto !important;
+    min-height: 0 !important; max-height: none !important;
+    overflow: hidden !important; align-content: start !important;
+    border-radius: 22px !important; margin: auto !important;
+  }
+  #loginroot .login-visual {
+    position: relative !important; min-height: 0 !important; height: auto !important;
+    padding: 18px 16px 16px !important; display: flex !important;
+    align-items: center !important; justify-content: center !important;
+    overflow: hidden !important;
+  }
+  #loginroot .login-visual-content {
+    position: relative !important; width: 100% !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    gap: 5px !important; transform: none !important;
+  }
+  #loginroot .login-visual .login-brand {
+    display: block !important; width: min(190px,68%) !important;
+    max-width: 100% !important; height: auto !important;
+    margin: 0 auto 2px !important; overflow: visible !important;
+  }
+  #loginroot .login-visual .login-brand svg {
+    display: block !important; width: 100% !important; height: auto !important;
+    overflow: visible !important;
+  }
+  #loginroot .login-visual h2 {
+    margin: 2px 0 0 !important; font-size: 15px !important;
+    line-height: 1.3 !important; text-align: center !important;
+  }
+  #loginroot .login-features, #loginroot .login-wave { display: none !important; }
+  #loginroot .login-form-panel {
+    min-height: 0 !important; height: auto !important;
+    padding: 22px 22px 24px !important;
+    display: flex !important; flex-direction: column !important;
+    justify-content: flex-start !important; overflow: visible !important;
+    gap: 0 !important;
+  }
+  #loginroot .login-form-heading { margin: 0 0 18px !important; text-align: center !important; }
+  #loginroot .login-form-heading h2 { margin: 0 0 5px !important; font-size: 23px !important; line-height: 1.2 !important; }
+  #loginroot .login-form-heading p { margin: 0 !important; font-size: 13px !important; line-height: 1.4 !important; }
+  #loginroot .login-form-panel label { margin: 0 0 12px !important; font-size: 12px !important; }
+  #loginroot .login-form-panel input.field { height: 48px !important; min-height: 48px !important; }
+  #loginroot .login-forgot { margin: 0 0 16px !important; }
+  #loginroot .login-actions button { min-height: 50px !important; }
+  #loginroot .login-or { margin: 12px 0 0 !important; }
+}
+@media (max-width: 380px) {
+  #loginroot .login-form-panel { padding: 18px 16px 20px !important; }
+  #loginroot .login-form-heading h2 { font-size: 21px !important; }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
