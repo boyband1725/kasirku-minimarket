@@ -1038,6 +1038,56 @@ td{border-bottom-color:#e8f2ee!important}
  .odoo-order-panel{margin-top:12px!important}
 }
 
+
+/* SeaMart cart panel — Lotte Mart inspired compact blue checkout */
+.odoo-order-panel{
+ background:#fff!important;border:1px solid #cbd9e8!important;border-top:4px solid #1769aa!important;
+ border-radius:12px!important;box-shadow:0 4px 16px rgba(23,67,105,.10)!important;
+}
+.odoo-order-head{
+ background:#f2f7fc!important;padding:13px 16px!important;border-bottom:1px solid #dce6f0!important;
+}
+.odoo-order-head h3{font-size:16px!important;font-weight:800!important;color:#174b78!important}
+.odoo-order-head .pill{background:#e2effb!important;color:#1769aa!important}
+.odoo-order-body{padding:12px 15px 14px!important}
+.odoo-order-lines{min-height:90px!important}
+.odoo-order-lines .empty{padding:22px 8px!important;color:#8794a1!important}
+.odoo-order-panel .cartline{
+ padding:10px 0!important;border-bottom:1px solid #e8edf2!important;gap:8px!important;
+}
+.odoo-order-panel .cartline b{color:#263b4c!important;font-size:12px!important}
+.odoo-order-panel .cartline .muted{font-size:11px!important;color:#788895!important}
+.odoo-order-panel .qty{gap:5px!important;flex-shrink:0}
+.odoo-order-panel .qty button{
+ min-width:27px!important;height:28px!important;padding:3px 7px!important;border:1px solid #d7e2eb!important;
+ border-radius:6px!important;background:#f4f8fb!important;color:#1769aa!important;
+}
+.odoo-order-panel .qty button:last-child{background:#fff3f1!important;color:#c24b45!important;border-color:#f2d7d4!important}
+.odoo-order-panel .totalrow{padding:7px 0!important;color:#526575!important}
+.odoo-order-panel .grand{
+ margin-top:5px!important;padding-top:11px!important;border-top:1px solid #dce6f0!important;
+ color:#174b78!important;font-size:21px!important;font-weight:900!important;
+}
+.odoo-order-panel .grand span:last-child{color:#145f9d!important}
+.odoo-order-panel .odoo-checkout{
+ background:linear-gradient(100deg,#1769aa,#2588c8)!important;color:#fff!important;
+ border-radius:8px!important;font-weight:800!important;box-shadow:0 3px 9px #1769aa25!important;
+}
+.odoo-order-panel .odoo-checkout:disabled{opacity:.45!important}
+.odoo-order-panel .btn-danger{
+ border:1px solid #f1d9d7!important;border-radius:8px!important;background:#fff5f4!important;color:#b34b45!important;
+}
+@media(max-width:1100px){
+ .odoo-order-panel{margin:0 0 14px!important;border-top-width:4px!important}
+ .odoo-order-head{padding:11px 13px!important}
+ .odoo-order-body{padding:10px 12px 12px!important}
+ .odoo-order-lines{max-height:170px!important;min-height:58px!important}
+ .odoo-order-lines .empty{padding:15px 8px!important}
+ .odoo-order-panel .cartline{padding:8px 0!important}
+ .odoo-order-panel .grand{font-size:19px!important}
+ .odoo-order-panel .odoo-checkout{min-height:46px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
