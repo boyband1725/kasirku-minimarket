@@ -2896,44 +2896,71 @@ async function importProductPhotosZip(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return alert('SeaMart belum terhubung ke cloud. Login sebagai admin dan pastikan koneksi Supabase aktif.');
  if(!Array.isArray(db.products)||!db.products.length)return alert('Daftar barang belum dimuat. Muat ulang halaman lalu coba lagi.');
- if(!confirm('Impor foto dari '+file.name+'? Foto hanya akan dipasang jika barcode cocok. Foto lama akan diganti untuk barang yang cocok.'))return;
- button.disabled=true;button.textContent='Memproses ZIP…';
+ button.disabled=true;button.textContent='Memeriksa ZIP…';
  const stats={ok:0,fail:0,skip:0};let entries=[];
  try{
   const JSZip=await loadSeaMartZipLibrary(),zip=await JSZip.loadAsync(file);
-  entries=Object.values(zip.files).filter(x=>!x.dir&&/\.(jpe?g|png|webp)$/i.test(x.name));
+  entries=Object.values(zip.files).filter(x=>!x.dir&&/\\.(jpe?g|png|webp)$/i.test(x.name));
   if(!entries.length)throw new Error('Tidak ada file JPG, PNG, atau WEBP di dalam ZIP.');
-  if(entries.length>3000)throw new Error('ZIP berisi lebih dari 3.000 foto. Bagi menjadi beberapa ZIP.');
+  if(entries.length>1000)throw new Error('ZIP berisi '+entries.length+' foto. Batas satu kali impor adalah 1.000 foto; bagi menjadi beberapa ZIP.');
+  if(!confirm('Impor '+entries.length+' foto dari '+file.name+'? Foto hanya dipasang jika barcode cocok tepat satu barang. Foto lama akan diganti untuk barang yang cocok.'))return;
   const productsByBarcode=new Map();
-  db.products.forEach(p=>{const code=String(p.barcode||'').trim();if(code){if(!productsByBarcode.has(code))productsByBarcode.set(code,[]);productsByBarcode.get(code).push(p)}});
-  let processed=0;
-  setBulkPhotoProgress(0,'Membaca '+entries.length+' foto…',stats);
+  db.products.forEach(p=>{const code=String(p.barcode||'').replace(/\\D/g,'');if(code){if(!productsByBarcode.has(code))productsByBarcode.set(code,[]);productsByBarcode.get(code).push(p)}});
+  const candidates=[],barcodes=new Set();
   for(const entry of entries){
-   processed++;
-   const filename=entry.name.split('/').pop(),match=filename.match(/\d{8,14}/);
-   if(!match){stats.skip++;setBulkPhotoProgress(processed/entries.length*100,'Melewati '+filename,stats);continue;}
-   const barcode=match[0],matches=productsByBarcode.get(barcode)||[];
-   if(matches.length!==1){stats.skip++;setBulkPhotoProgress(processed/entries.length*100,matches.length?'Barcode ganda: '+barcode:'Barang tidak ditemukan: '+barcode,stats);continue;}
-   const product=matches[0];
-   try{
-    const raw=await entry.async('blob');
-    if(!/^image\/(jpeg|png|webp)$/i.test(raw.type||'')&&raw.size===0)throw new Error('Gambar kosong');
-    const imageBlob=await compressProductPhoto(raw);
-    const lookup=await sb.from('products').select('id').eq('store_id',store).eq('barcode',barcode).limit(2);
-    if(lookup.error)throw lookup.error;
-    if(!lookup.data||lookup.data.length!==1)throw new Error('Barang belum ada tepat satu kali di database cloud');
-    const cloudId=lookup.data[0].id,path=store+'/'+cloudId+'.jpg';
-    const upload=await sb.storage.from('seamart-product-photos').upload(path,imageBlob,{contentType:'image/jpeg',upsert:true,cacheControl:'3600'});
-    if(upload.error)throw new Error(upload.error.message+' (periksa bucket dan izin foto di Supabase)');
-    const basePublicUrl=sb.storage.from('seamart-product-photos').getPublicUrl(path).data.publicUrl;
-    const publicUrl=basePublicUrl+(basePublicUrl.includes('?')?'&':'?')+'v='+Date.now();
-    const update=await sb.from('products').update({image_url:publicUrl}).eq('id',cloudId).eq('store_id',store);
-    if(update.error)throw update.error;
-    product.foto=publicUrl;product.image_url=publicUrl;stats.ok++;save();
-   }catch(err){stats.fail++;console.warn('Impor foto gagal untuk '+barcode,err)}
-   setBulkPhotoProgress(processed/entries.length*100,'Memproses '+processed+' dari '+entries.length+' foto',stats);
+   const filename=entry.name.split('/').pop(),match=filename.match(/\\d{8,14}/);
+   if(!match){stats.skip++;continue;}
+   const barcode=match[0],localMatches=productsByBarcode.get(barcode)||[];
+   if(localMatches.length!==1){stats.skip++;continue;}
+   candidates.push({entry,barcode,product:localMatches[0]});barcodes.add(barcode);
   }
-  setBulkPhotoProgress(100,'Selesai. Periksa jumlah berhasil dan gagal.',stats);
+  if(!candidates.length){setBulkPhotoProgress(100,'Tidak ada foto yang cocok dengan master barang.',stats);alert('Tidak ada foto yang cocok. Pastikan nama file diawali barcode barang.');return;}
+  setBulkPhotoProgress(1,'Memeriksa '+candidates.length+' barcode di database cloud…',stats);
+  const cloudByBarcode=new Map(),codes=[...barcodes];
+  for(let i=0;i<codes.length;i+=100){
+   const batch=codes.slice(i,i+100);
+   const result=await sb.from('products').select('id,barcode').eq('store_id',store).in('barcode',batch);
+   if(result.error)throw result.error;
+   for(const row of (result.data||[])){
+    const code=String(row.barcode||'').replace(/\\D/g,'');
+    if(!cloudByBarcode.has(code))cloudByBarcode.set(code,[]);
+    cloudByBarcode.get(code).push(row);
+   }
+  }
+  const ready=[];
+  for(const item of candidates){
+   const rows=cloudByBarcode.get(item.barcode)||[];
+   if(rows.length!==1){stats.skip++;continue;}
+   item.cloud=rows[0];ready.push(item);
+  }
+  if(!ready.length){setBulkPhotoProgress(100,'Tidak ada barcode yang cocok tepat satu barang di cloud.',stats);alert('Tidak ada foto yang bisa dipasang. Periksa barcode master barang dan database cloud.');return;}
+  let next=0,done=0;
+  const worker=async()=>{
+   while(true){
+    const index=next++;if(index>=ready.length)return;
+    const item=ready[index],filename=item.entry.name.split('/').pop();
+    try{
+     const raw=await item.entry.async('blob');
+     if(!raw||!raw.size)throw new Error('Gambar kosong atau rusak');
+     const imageBlob=await compressProductPhoto(raw);
+     if(!imageBlob||!imageBlob.size)throw new Error('Gagal memproses gambar');
+     const cloudId=item.cloud.id,path=store+'/'+cloudId+'.jpg';
+     const upload=await sb.storage.from('seamart-product-photos').upload(path,imageBlob,{contentType:'image/jpeg',upsert:true,cacheControl:'3600'});
+     if(upload.error)throw upload.error;
+     const baseUrl=sb.storage.from('seamart-product-photos').getPublicUrl(path).data.publicUrl;
+     const publicUrl=baseUrl+(baseUrl.includes('?')?'&':'?')+'v='+Date.now();
+     const update=await sb.from('products').update({image_url:publicUrl}).eq('id',cloudId).eq('store_id',store);
+     if(update.error)throw update.error;
+     item.product.foto=publicUrl;item.product.image_url=publicUrl;stats.ok++;
+    }catch(err){stats.fail++;console.warn('Impor foto gagal untuk '+item.barcode+' ('+filename+')',err)}
+    done++;
+    setBulkPhotoProgress(done/ready.length*100,'Mengunggah '+done+' dari '+ready.length+' foto…',stats);
+   }
+  };
+  await Promise.all(Array.from({length:Math.min(3,ready.length)},()=>worker()));
+  save();
+  const message='Impor selesai dari '+entries.length+' file. Berhasil '+stats.ok+', gagal '+stats.fail+', dilewati '+stats.skip+'.';
+  setBulkPhotoProgress(100,message,stats);
   alert('Impor foto selesai. Berhasil: '+stats.ok+' · Gagal: '+stats.fail+' · Dilewati: '+stats.skip+'.');
  }catch(err){setBulkPhotoProgress(0,'Impor terhenti: '+(err.message||err),stats);alert('Impor foto gagal: '+(err.message||err))}
  finally{button.disabled=false;button.textContent='Mulai Impor Foto ZIP';}
