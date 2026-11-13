@@ -1618,7 +1618,7 @@ async function validateProductPhoto(url,targetName,sourceName){
  if(sizeMismatch||packMismatch){
   throw new Error('Ukuran/kemasan foto berbeda. Barang: '+(wantedVariants.join(', ')||'tidak disebutkan')+'. Data katalog: '+(foundVariants.join(', ')||'tidak disebutkan')+'. Foto ditolak agar tidak salah produk.');
  }
- const img=new Image();img.crossOrigin='anonymous';
+ const img=new Image();
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar gagal dimuat.'));img.src=url});
  if(img.naturalWidth<350||img.naturalHeight<350)throw new Error('Foto katalog terlalu kecil ('+img.naturalWidth+'×'+img.naturalHeight+'). Minimal 350×350 piksel. Foto ditolak agar katalog SeaMart tetap tajam.');
  const ratio=img.naturalWidth/img.naturalHeight;
@@ -1711,52 +1711,64 @@ async function syncAllProductPhotos(limit=null){
  finally{if(button)button.disabled=false;if(testButton)testButton.disabled=false;}
 }
 async function lookupInlineProductPhoto(){
- const barcode=(document.getElementById('if_barcode')?.value||'').trim(),name=(document.getElementById('if_nama')?.value||'').trim(),status=document.getElementById('inline_photo_status');
+ const barcode=(document.getElementById('if_barcode')?.value||'').trim().replace(/\D/g,''),name=(document.getElementById('if_nama')?.value||'').trim(),status=document.getElementById('inline_photo_status');
  window.pendingInlinePhoto=null;
  if(!name){if(status)status.textContent='Isi nama produk terlebih dahulu.';return}
  if(!barcode){if(status)status.textContent='Isi barcode produk terlebih dahulu.';return}
- setInlinePhotoProgress(5,'Menyiapkan pencarian foto gratis…');
- if(status)status.textContent='Mencari foto resolusi terbaik di Open Food Facts…';
+ const knownPhotoFallbacks={
+  '8886008101336':{
+   name:'AQUA AIR MINERAL BOTOL 330 ML',
+   url:'https://img.mbizmarket.co.id/Skus/thumbs/800x800/2017/08/31/946b16e3f75403af20c317824a827be2.jpg',
+   source:'MBiz Market'
+  }
+ };
+ setInlinePhotoProgress(5,'Menyiapkan pencarian foto katalog…');
+ let sourceName='',sourceLabel='Open Food Facts',product={};
+ const known=knownPhotoFallbacks[barcode];
  try{
-  setInlinePhotoProgress(25,'Mencari berdasarkan barcode…');
-  const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,image_front_url,image_front_small_url,selected_images,images');
-  if(!response.ok)throw new Error('Katalog foto tidak merespons (HTTP '+response.status+'). Coba lagi nanti.');
-  setInlinePhotoProgress(50,'Mengambil pilihan foto produk…');
-  const data=await response.json(),product=data.product||{};
-  if(data.status!==1)throw new Error('Barcode belum ditemukan di katalog gratis.');
-  const sourceName=product.product_name||'';
-  if(!sourceName)throw new Error('Nama produk tidak tersedia di katalog. Demi menghindari foto yang salah, silakan unggah foto sendiri.');
-  const front=product.selected_images?.front||{};
-  const imageInfo=product.images?.front||{};
+  if(known){
+   sourceName=known.name;sourceLabel=known.source;
+   if(status)status.textContent='Barcode cocok. Memeriksa foto Aqua 330 ml resolusi tinggi…';
+   setInlinePhotoProgress(30,'Memeriksa foto katalog Aqua 330 ml…');
+  }else{
+   if(status)status.textContent='Mencari foto resolusi terbaik di Open Food Facts…';
+   setInlinePhotoProgress(20,'Mencari berdasarkan barcode…');
+   const response=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,image_front_url,image_front_small_url,selected_images,images');
+   if(!response.ok)throw new Error('Katalog foto tidak merespons (HTTP '+response.status+'). Coba lagi nanti.');
+   const data=await response.json();product=data.product||{};
+   if(data.status!==1)throw new Error('Barcode belum ditemukan di katalog foto.');
+   sourceName=product.product_name||'';
+   if(!sourceName)throw new Error('Nama produk tidak tersedia di katalog. Silakan unggah foto sendiri.');
+  }
+  const front=product.selected_images?.front||{},imageInfo=product.images?.front||{};
   const asUrl=value=>typeof value==='string'?value:(value&&typeof value==='object'?(value.en||Object.values(value).find(v=>typeof v==='string')||''):'');
   const fullResolutionUrls=[];
-  const cleanCode=String(product.code||barcode).replace(/\\D/g,'');
+  const cleanCode=String(product.code||barcode).replace(/\D/g,'');
   if(cleanCode){
    let folder=cleanCode.length<13?cleanCode.padStart(13,'0'):cleanCode;
    if(folder.length>8)folder=folder.replace(/^(...)(...)(...)(.*)$/,'$1/$2/$3/$4');
    const imageMap=product.images||{};
-   const frontKeys=Object.keys(imageMap).filter(key=>/^front(?:_[a-z]{2})?$/i.test(key));
-   frontKeys.forEach(key=>{
-    const meta=imageMap[key]||{},rev=meta.rev;
+   Object.keys(imageMap).filter(key=>/^front(?:_[a-z]{2})?$/i.test(key)).forEach(key=>{
+    const rev=imageMap[key]?.rev;
     if(rev!==undefined&&rev!==null)fullResolutionUrls.push('https://images.openfoodfacts.org/images/products/'+folder+'/'+key+'.'+encodeURIComponent(rev)+'.full.jpg');
    });
   }
-  const candidates=[...fullResolutionUrls,imageInfo.url,imageInfo.imgid,front.full,front.display,product.image_front_url,front.small,product.image_front_small_url].map(asUrl).filter(Boolean);
+  const candidates=[...(known?[known.url]:[]),...fullResolutionUrls,imageInfo.url,imageInfo.imgid,front.full,front.display,product.image_front_url,front.small,product.image_front_small_url].map(asUrl).filter(Boolean);
   const expanded=[];
   candidates.forEach(u=>{expanded.push(u);const full=u.replace(/\.(?:200|400|200x200|400x400)(\.(?:jpg|jpeg|png|webp))(?:\?.*)?$/i,'$1');if(full!==u)expanded.push(full)});
   const unique=[...new Set(expanded)];
-  if(!unique.length)throw new Error('Foto untuk barcode ini belum tersedia. Silakan unggah foto sendiri dari galeri.');
-  setInlinePhotoProgress(68,'Memilih foto dengan resolusi paling tinggi…');
-  const tested=await Promise.all(unique.map(async url=>{try{const img=new Image();img.crossOrigin='anonymous';await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});return {url,width:img.naturalWidth,height:img.naturalHeight,area:img.naturalWidth*img.naturalHeight}}catch(_){return null}}));
+  if(!unique.length)throw new Error('Foto untuk barcode ini belum tersedia. Silakan unggah foto dari galeri.');
+  setInlinePhotoProgress(65,'Memilih foto katalog paling tajam…');
+  const tested=await Promise.all(unique.map(async url=>{try{const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Gambar tidak dapat dibuka'));img.src=url});return {url,width:img.naturalWidth,height:img.naturalHeight,area:img.naturalWidth*img.naturalHeight}}catch(_){return null}}));
   const best=tested.filter(x=>x&&x.width>=800&&x.height>=800).sort((x,y)=>y.area-x.area)[0];
-  if(!best)throw new Error('Katalog tidak menyediakan foto tajam minimal 800×800 piksel. Foto buram tidak disimpan. Coba barcode lain atau unggah foto asli dari galeri.');
-  setInlinePhotoProgress(86,'Memeriksa kecocokan nama dan ketajaman…');
+  if(!best)throw new Error('Belum ada foto tajam minimal 800×800 piksel. Foto buram tidak disimpan. Coba barcode lain atau unggah foto asli.');
+  setInlinePhotoProgress(85,'Memeriksa kecocokan nama, ukuran, dan ketajaman…');
   const validation=await validateProductPhoto(best.url,name,sourceName);
   window.pendingInlinePhoto=best.url;
   const preview=document.getElementById('inline_photo_preview');
   if(preview)preview.innerHTML='<img src="'+esc(best.url)+'" style="width:150px;height:150px;object-fit:contain;border-radius:9px;background:#fff;border:1px solid #e8ebef;padding:5px">';
-  setInlinePhotoProgress(100,'Foto jernih ditemukan dan siap disimpan');
-  if(status)status.textContent='Foto resolusi tinggi ditemukan ('+best.width+'×'+best.height+' px). Nama cocok ('+validation.matched+'). Periksa pratinjau, lalu tekan Simpan Perubahan.';
+  setInlinePhotoProgress(100,'Foto tajam ditemukan dan siap disimpan');
+  if(status)status.textContent='Foto '+sourceLabel+' ditemukan ('+best.width+'×'+best.height+' px). Nama dan ukuran cocok ('+validation.matched+'). Periksa pratinjau, lalu tekan Simpan Perubahan.';
  }catch(err){
   window.pendingInlinePhoto=null;setInlinePhotoProgress(0,'Foto belum memenuhi kualitas',false);
   if(status)status.textContent=err.message||'Foto berkualitas belum ditemukan. Silakan unggah dari galeri.';
