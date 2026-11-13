@@ -186,7 +186,26 @@ body{background:#f5f7f8;color:#27323b}
 .header-icon{width:42px;height:42px;border:0;border-radius:10px;background:#f1f6f8;color:#334454;display:grid;place-items:center}
 .header-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:390px){.brand{gap:7px}.brand-left{gap:7px}.brandmark{max-width:49vw!important}.header-actions{gap:5px}.header-icon,.header-cart{width:37px;height:40px}}
-<style>.notification-highlight{outline:3px solid #2787c4;outline-offset:3px;border-radius:8px}</style></style>
+<style>.notification-highlight{outline:3px solid #2787c4;outline-offset:3px;border-radius:8px}
+/* Compact, tidy SeaMart brand header */
+.top{padding:10px 12px!important}
+.brand{gap:8px!important;align-items:center!important}
+.brand-left{gap:9px!important;flex:1;min-width:0;align-items:center}
+.brand-left>div{min-width:0;display:flex;flex-direction:column;justify-content:center}
+.brandmark{width:148px!important;max-width:100%!important;height:auto;display:block;filter:none!important}
+.brandmark text{letter-spacing:-2.4px}
+.tag{font-size:11px!important;line-height:1.2;margin-top:2px;white-space:normal}
+.header-actions{gap:6px!important}
+@media(max-width:420px){
+ .top{padding:9px 10px!important}
+ .brand-left{gap:7px!important}
+ .brandmark{width:clamp(112px,34vw,138px)!important}
+ .tag{font-size:10px!important;max-width:150px}
+ .menu-trigger{width:40px;height:40px;font-size:22px}
+ .header-icon,.header-cart{width:36px;height:38px}
+ .header-icon svg{width:20px;height:20px}
+}
+</style></style>
 </head>
 <body>
 <div class="promo-strip">Hemat, Mudah, Cepat!</div><header class="top"><div class="brand"><div class="brand-left"><button class="menu-trigger" type="button" aria-label="Buka menu" onclick="openShopMenu()">☰</button><div><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea</text><text x="102" y="55" font-size="51" class="mart">Mart</text></svg><div class="tag">Belanja mudah, dekat, dan hemat</div></div></div><div class="header-actions"><button class="header-icon" type="button" aria-label="Cari produk" onclick="focusShopSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button><button class="header-icon" type="button" aria-label="Notifikasi" onclick="showShopNotifications()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></button><button class="header-cart" type="button" aria-label="Buka keranjang" onclick="openCartDrawer()">🛒<span class="header-cart-count" id="headerCartCount">0</span></button></div></div></header>
