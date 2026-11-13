@@ -2308,9 +2308,17 @@ async function printReceiptNow(id,isCopy=false){
   {type:'feed',lines:3}
  ];
  try{
-  const serialReady=await ensureWindowsReceiptPrinter();
-  if(!serialReady){alert('Hubungkan printer Bluetooth satu kali melalui tombol Hubungkan Bluetooth. Pilih port COM printer yang sudah dipasangkan di Windows. Setelah diizinkan, SeaMart akan mencoba menyambungkan kembali otomatis.');return;}
-  if(seamartWindowsSerialPort){await seamartPrintWindowsSerial(s,isCopy);const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}alert(isCopy?'Salinan struk berhasil dicetak.':'Struk berhasil dikirim ke printer Bluetooth Windows.');return;}
+  const choice=document.getElementById('smPrinterChoice')?.value||'browser';
+  if(choice==='browser'){
+   const paper=document.getElementById('smReceiptPaper');const w=window.open('','_blank','width=420,height=720');
+   if(!w)throw new Error('Popup diblokir. Izinkan popup untuk SeaMart.');
+   w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><script>window.onload=function(){window.print()}<\\/script></body></html>');
+   w.document.close();const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}return;
+  }
+  if(choice==='windows'){
+   if(!seamartWindowsSerialPort){await connectWindowsReceiptPrinter();if(!seamartWindowsSerialPort)return;}
+   await seamartPrintWindowsSerial(s,isCopy);const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}alert('Struk berhasil dikirim ke printer PC.');return;
+  }
   const res=await fetch('http://localhost:9100/print',{
    method:'POST',
    headers:{'Content-Type':'application/json'},
