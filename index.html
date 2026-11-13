@@ -1288,6 +1288,18 @@ td{border-bottom-color:#e8f2ee!important}
  #posproducts .odoo-product-image img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}
  #posproducts .odoo-product{padding:9px!important;min-height:0!important}
 }
+
+/* SeaMart POS: remove category sidebar from cashier workspace */
+.odoo-pos-layout .odoo-category-panel{display:none!important}
+@media(min-width:1101px){
+ .odoo-pos-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:12px!important}
+ .odoo-pos-layout .odoo-catalog-panel{grid-column:1!important;min-width:0!important}
+ .odoo-pos-layout .odoo-order-panel{grid-column:2!important;min-width:0!important}
+}
+@media(max-width:1100px){
+ .odoo-pos-layout{display:flex!important;flex-direction:column!important}
+ .odoo-pos-layout .odoo-catalog-panel,.odoo-pos-layout .odoo-order-panel{width:100%!important;min-width:0!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
