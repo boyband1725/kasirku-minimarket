@@ -1,6 +1,9 @@
 name: Siapkan Foto SeaMart Batch 03
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/siapkan-foto-batch-03.yml'
 permissions:
   contents: read
 jobs:
