@@ -10,7 +10,7 @@ permissions:
 jobs:
   photos:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
     steps:
       - name: Ambil kode dan manifest
         uses: actions/checkout@v4
@@ -36,16 +36,16 @@ jobs:
               try:
                   api=f"https://world.openfoodfacts.org/api/v2/product/{code}.json"
                   r=None
-                  for attempt in range(3):
-                      r=requests.get(api,params={"fields":"code,product_name,image_front_url,image_front_small_url"},headers=headers,timeout=35)
+                  for attempt in range(2):
+                      r=requests.get(api,params={"fields":"code,product_name,image_front_url,image_front_small_url"},headers=headers,timeout=(5,10))
                       if r.status_code != 429: break
-                      time.sleep(10 * (attempt + 1))
+                      time.sleep(min(5 * (attempt + 1), 10))
                   r.raise_for_status(); data=r.json(); p=data.get("product") or {}
                   if data.get("status")!=1 or str(p.get("code") or "").strip()!=code:
                       return ("miss",item,"barcode tidak ditemukan")
                   url=p.get("image_front_url") or p.get("image_front_small_url")
                   if not url:return ("miss",item,"foto belum tersedia")
-                  imr=requests.get(url,headers=headers,timeout=40);imr.raise_for_status()
+                  imr=requests.get(url,headers=headers,timeout=(5,12));imr.raise_for_status()
                   if not imr.headers.get("Content-Type","").lower().startswith("image/"):
                       return ("miss",item,"tautan bukan gambar")
                   im=Image.open(io.BytesIO(imr.content)).convert("RGB")
@@ -56,11 +56,10 @@ jobs:
                   return ("ok",item,p.get("product_name") or item.get("nama",""))
               except Exception as e:return ("error",item,str(e)[:180])
           os.makedirs("photos",exist_ok=True);results=[]
-          with ThreadPoolExecutor(max_workers=3) as pool:
+          with ThreadPoolExecutor(max_workers=6) as pool:
               futures=[]
               for x in items:
                   futures.append(pool.submit(process,x))
-                  time.sleep(0.5)
               for n,f in enumerate(as_completed(futures),1):
                   results.append(f.result())
                   if n%25==0:print(f"PROGRES {n}/{len(items)} foto cocok {sum(x[0]=='ok' for x in results)}")
