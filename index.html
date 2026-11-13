@@ -749,6 +749,25 @@ td{border-bottom-color:#e8f2ee!important}
 #loginroot .login-or span{height:1px!important;flex:1!important;background:#c9cdd3!important}
 @media(max-width:760px){#loginroot .login-screen.seamart-login-screen{padding:12px!important}#loginroot .login-shell{grid-template-columns:1fr!important;width:min(520px,calc(100vw - 24px))!important;height:auto!important;min-height:0!important;max-height:calc(100dvh - 24px)!important;border-radius:24px!important}#loginroot .login-visual{min-height:240px!important;padding:24px 20px 48px!important}#loginroot .login-visual .login-brand{width:min(290px,90%)!important}#loginroot .login-visual h2{font-size:17px!important;margin:8px 0 22px!important}#loginroot .login-feature-icon{width:42px!important;height:42px!important;font-size:28px!important}#loginroot .login-features>div,#loginroot .login-features b{font-size:12px!important}#loginroot .login-form-panel{padding:28px 22px!important}#loginroot .login-form-heading h2{font-size:27px!important}#loginroot .login-form-heading p{font-size:14px!important}#loginroot .login-form-panel input.field{height:56px!important;min-height:56px!important;font-size:16px!important;padding-left:58px!important}#loginroot .login-input-icon{left:17px!important;font-size:22px!important}#loginroot .login-lock-icon svg{width:23px!important;height:23px!important}#loginroot .login-actions button{min-height:58px!important;font-size:19px!important}}
 
+
+/* Fine match against the user's live screenshot and approved reference */
+@media(min-width:761px){
+ #loginroot .login-screen.seamart-login-screen{padding:22px!important;background:radial-gradient(ellipse at 12% 8%,#54e9c5 0%,transparent 38%),linear-gradient(120deg,#16c9c5 0%,#10c4d4 55%,#06c5a8 100%)!important}
+ #loginroot .login-shell{width:min(1280px,calc(100vw - 80px))!important;height:min(735px,calc(100dvh - 44px))!important;min-height:min(600px,calc(100dvh - 44px))!important;max-height:760px!important;grid-template-columns:1fr 1fr!important}
+ #loginroot .login-visual{padding:48px!important;background:linear-gradient(145deg,#007b9b 0%,#006d83 53%,#00a991 100%)!important}
+ #loginroot .login-visual:before{inset:-16% 30% 61% -12%!important;border-radius:0 0 72% 0!important;background:linear-gradient(135deg,#00b8dc 0%,#087e9f 78%)!important;clip-path:polygon(0 0,100% 0,72% 48%,48% 72%,20% 100%,0 100%)!important;transform:none!important}
+ #loginroot .login-visual .login-brand{width:min(510px,100%)!important;margin:0 auto 18px!important}
+ #loginroot .login-visual h2{font-size:25px!important;margin:10px 0 48px!important}
+ #loginroot .login-feature-icon{width:62px!important;height:62px!important;font-size:44px!important}
+ #loginroot .login-wave{height:21%!important;left:-2%!important;right:-2%!important;bottom:0!important;background:linear-gradient(165deg,#08d9ee 0 31%,#18d9c0 32% 61%,#a2f343 62% 100%)!important;clip-path:polygon(0 23%,15% 7%,36% 52%,57% 72%,77% 20%,100% 0,100% 100%,0 100%)!important}
+ #loginroot .login-wave:before{content:""!important;position:absolute!important;inset:30% -2% -4% -2%!important;background:linear-gradient(165deg,#18dfc1,#16d7a4 65%,#b2f54b)!important;clip-path:polygon(0 0,18% 28%,39% 65%,62% 78%,81% 25%,100% 12%,100% 100%,0 100%)!important}
+ #loginroot .login-wave:after{content:""!important;position:absolute!important;inset:55% -2% -5% -2%!important;background:linear-gradient(110deg,#04bde8,#04c9e5 55%,#16dfb0)!important;clip-path:polygon(0 0,20% 35%,43% 72%,64% 85%,100% 10%,100% 100%,0 100%)!important}
+ #loginroot .login-form-panel{padding:clamp(42px,4.5vw,66px)!important}
+ #loginroot .login-form-heading{margin-bottom:36px!important}
+ #loginroot .login-form-heading h2{font-size:40px!important}
+ #loginroot .login-form-panel input.field{height:70px!important;min-height:70px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
