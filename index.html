@@ -1282,11 +1282,12 @@ td{border-bottom-color:#e8f2ee!important}
  .user #mobileCartTrigger{margin:0 4px!important}
 }
 
-/* SeaMart catalog photo standard — desktop/PC POS */
-#posproducts .odoo-product-image{height:250px!important;min-height:250px!important;width:100%!important;aspect-ratio:1/1!important;background:#fff!important;padding:8px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;overflow:hidden!important}
-#posproducts .odoo-product-image img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important;background:#fff!important}
-.product .tile{height:250px!important;min-height:250px!important;background:#fff!important}
-.product .tile img{width:100%!important;height:100%!important;object-fit:contain!important;background:#fff!important;padding:8px!important}
+/* Compact PC POS product catalog: keep photo tiles proportional */
+@media(min-width:1101px){
+ #posproducts .odoo-product-image{height:112px!important;min-height:112px!important;width:100%!important;aspect-ratio:auto!important;background:#fff!important;padding:6px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+ #posproducts .odoo-product-image img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}
+ #posproducts .odoo-product{padding:9px!important;min-height:0!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
