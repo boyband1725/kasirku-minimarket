@@ -148,6 +148,11 @@ main{width:100%;max-width:760px;margin:0 auto;padding:14px 13px 110px;overflow:h
 .cart-drawer-foot .primary{width:100%;padding:14px;border-radius:9px}
 .cart-drawer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
 .cart-drawer-actions button{border:0;background:none;color:#b54747;font-size:12px;font-weight:700;padding:6px}
+
+/* Preserve original SeaMart logo colors and ensure contrast */
+.top{background:#17232c!important}
+.brandmark .sea{fill:#fff!important}.brandmark .mart{fill:#a7ff24!important}
+.top .tag{color:#d1dbe2!important}.brand-actions b,.header-actions b{color:#e8eef2!important}
 </style>
 </head>
 <body>
@@ -202,8 +207,24 @@ function addItem(id){const p=products.find(x=>x.id===id);if(!p)return;const x=ca
 function clearCart(){if(!cart.size)return;if(!confirm('Kosongkan semua barang dari keranjang?'))return;cart.clear();renderCart();document.getElementById('orderResult').innerHTML='';document.getElementById('orderForm').reset();}
 function changeQty(id,delta){const x=cart.get(id);if(!x)return;x.qty+=delta;if(x.qty<=0)cart.delete(id);else if(x.qty>x.product.stock){x.qty=x.product.stock;alert('Jumlah melebihi stok tersedia.')}renderCart()}
 function cartTotal(){return [...cart.values()].reduce((n,x)=>n+x.qty*Number(x.product.price),0)}
-function renderCart(){const entries=[...cart.entries()];const qty=entries.reduce((n,[,x])=>n+x.qty,0);const openBtn=document.getElementById('cartOpenBtn');if(openBtn)openBtn.disabled=entries.length===0;document.getElementById('count').textContent=qty+' barang di keranjang';document.getElementById('barTotal').textContent=rupiah(cartTotal());document.getElementById('total').textContent=rupiah(cartTotal());document.getElementById('cart').innerHTML=entries.length?entries.map(([id,x])=>'<div class="cartline"><div><b>'+esc(x.product.name)+'</b><div class="muted">'+rupiah(x.product.price)+' × '+x.qty+'</div></div><div class="qty"><button type="button" onclick="changeQty(\\''+id+'\\',-1)">−</button><b>'+x.qty+'</b><button type="button" onclick="changeQty(\\''+id+'\\',1)">+</button></div></div>').join(''):'<div class="empty">Keranjang masih kosong.</div>';document.getElementById('checkout').classList.toggle('hide',!entries.length);renderCartDrawer();renderProducts()}
-function renderCartDrawer(){const entries=[...cart.entries()],qty=entries.reduce((n,[,x])=>n+x.qty,0);document.getElementById('headerCartCount').textContent=qty;document.getElementById('cartDrawerCount').textContent=qty+' barang';document.getElementById('cartDrawerTotal').textContent=rupiah(cartTotal());document.getElementById('cartDrawerItems').innerHTML=entries.length?entries.map(([id,x])=>'<div class="cart-drawer-line"><div><strong>'+esc(x.product.name)+'</strong><small>'+rupiah(x.product.price)+' × '+x.qty+' = '+rupiah(x.product.price*x.qty)+'</small></div><div class="qty"><button type="button" onclick="changeQty(\\''+id+'\\',-1)">−</button><b>'+x.qty+'</b><button type="button" onclick="changeQty(\\''+id+'\\',1)">+</button></div></div>').join(''):'<div class="cart-drawer-empty">🛒<br><b>Keranjang masih kosong</b><br><small>Yuk pilih produk favoritmu.</small></div>'}
+function renderCart(){
+ const entries=[...cart.entries()];
+ const qty=entries.reduce((n,[,x])=>n+x.qty,0);
+ document.getElementById('count').textContent=qty+' barang di keranjang';
+ document.getElementById('barTotal').textContent=rupiah(cartTotal());
+ document.getElementById('total').textContent=rupiah(cartTotal());
+ document.getElementById('cart').innerHTML=entries.length?entries.map(([id,x])=>`<div class="cartline"><div><b>${esc(x.product.name)}</b><div class="muted">${rupiah(x.product.price)} × ${x.qty}</div></div><div class="qty"><button type="button" onclick="changeQty('${esc(id)}',-1)">−</button><b>${x.qty}</b><button type="button" onclick="changeQty('${esc(id)}',1)">+</button></div></div>`).join(''):'<div class="empty">Keranjang masih kosong.</div>';
+ document.getElementById('checkout').classList.toggle('hide',!entries.length);
+ renderCartDrawer();
+ renderProducts();
+}
+function renderCartDrawer(){
+ const entries=[...cart.entries()],qty=entries.reduce((n,[,x])=>n+x.qty,0);
+ document.getElementById('headerCartCount').textContent=qty;
+ document.getElementById('cartDrawerCount').textContent=qty+' barang';
+ document.getElementById('cartDrawerTotal').textContent=rupiah(cartTotal());
+ document.getElementById('cartDrawerItems').innerHTML=entries.length?entries.map(([id,x])=>`<div class="cart-drawer-line"><div><strong>${esc(x.product.name)}</strong><small>${rupiah(x.product.price)} × ${x.qty} = ${rupiah(x.product.price*x.qty)}</small></div><div class="qty"><button type="button" onclick="changeQty('${esc(id)}',-1)">−</button><b>${x.qty}</b><button type="button" onclick="changeQty('${esc(id)}',1)">+</button></div></div>`).join(''):'<div class="cart-drawer-empty">🛒<br><b>Keranjang masih kosong</b><br><small>Yuk pilih produk favoritmu.</small></div>';
+}
 function openCartDrawer(){document.getElementById('cartDrawer').classList.add('open');document.body.style.overflow='hidden';renderCartDrawer()}
 function closeCartDrawer(){document.getElementById('cartDrawer').classList.remove('open');document.body.style.overflow=''}
 function checkoutFromDrawer(){if(!cart.size){return}closeCartDrawer();openCheckout()}
