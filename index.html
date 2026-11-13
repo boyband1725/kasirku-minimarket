@@ -1618,6 +1618,7 @@ async function fetchPhotoSourceWithRetry(url,options={},attempts=3){
  }
  throw new Error(lastError?.name==='AbortError'?'Koneksi katalog timeout setelah 15 detik':(lastError?.message||'Katalog foto tidak merespons'));
 }
+async function syncAllProductPhotos(limit=null){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return alert('Login ke SeaMart terlebih dahulu.');
  const button=document.getElementById('bulkPhotoButton'),testButton=document.getElementById('bulkPhotoTestButton'),panel=document.getElementById('bulkPhotoPanel'),status=document.getElementById('bulkPhotoStatus'),bar=document.getElementById('bulkPhotoBar'),pct=document.getElementById('bulkPhotoPct'),summaryEl=document.getElementById('bulkPhotoSummary');
@@ -1638,8 +1639,7 @@ async function fetchPhotoSourceWithRetry(url,options={},attempts=3){
    await Promise.all(batch.map(async row=>{
     try{
      const barcode=String(row.barcode).trim();
-     const api=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,image_front_url,selected_images');
-     if(!api.ok)throw new Error('Katalog foto tidak merespons');
+     const api=await fetchPhotoSourceWithRetry('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields=code,product_name,image_front_url,selected_images');
      const data=await api.json(),product=data.product||{};
      if(data.status!==1||!product.product_name)throw new Error('Barcode tidak ditemukan di katalog');
      const sourceName=String(product.product_name||'').toLowerCase();
