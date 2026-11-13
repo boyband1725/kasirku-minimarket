@@ -1,0 +1,56 @@
+name: Siapkan Foto Batch 02 SeaMart
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/siapkan-foto-batch-02.yml"
+jobs:
+  build-photo-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unduh foto produk dari sumber terverifikasi
+        run: |
+          set -euo pipefail
+          mkdir -p photos
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/95/MTA-3541784/sosro_sosro-fruitea-petblacuren-minuman--500ml-_full02.jpg" -o photos/8996006856074.jpg
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://res.cloudinary.com/dk0z4ums3/image/upload/v1714982143/attached_image/bear-brand.jpg" -o photos/8992696404441.jpg
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://arti-assets.sgp1.cdn.digitaloceanspaces.com/renyswalayanku/products/c968bf20-cbf8-47ab-b8ed-831e382dd507.jpg" -o photos/8998866202893.jpg
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://yoline.co.id/media/products/ProductFotoproduk_eZUw9qi.jpg" -o photos/8996001600269.jpg
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://yoline.co.id/media/products/ProductPocarisweat_350ml.png" -o photos/8997035563544.png
+          curl -fLsS --retry 3 -A "Mozilla/5.0" "https://www.coca-cola.com/content/dam/onexp/id/id/brands/fanta/asp-brandexpression-fanta-strawberry-pet-390ml_1100x1100.png" -o photos/8992761002039.png
+      - name: Validasi foto dan rapikan Le Minerale
+        run: |
+          python -m pip install --quiet pillow
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          files = list(Path("photos").iterdir())
+          if len(files) != 6:
+              raise SystemExit(f"Jumlah file tidak sesuai: {len(files)}")
+          for p in files:
+              if p.stat().st_size < 5000:
+                  raise SystemExit(f"File terlalu kecil: {p.name}")
+              with Image.open(p) as im:
+                  im.verify()
+              with Image.open(p) as im:
+                  if im.width < 350 or im.height < 350:
+                      raise SystemExit(f"Resolusi terlalu kecil: {p.name} {im.size}")
+                  print(f"VALID {p.name}: {im.format} {im.width}x{im.height} {p.stat().st_size} bytes")
+          # Sumber Le Minerale memuat strip teks di bawah; potong agar botol lebih dominan.
+          p = Path("photos/8996001600269.jpg")
+          with Image.open(p) as im:
+              im = im.convert("RGB")
+              w, h = im.size
+              im.crop((0, 0, w, int(h * 0.76))).save(p, quality=94)
+          PY
+      - name: Buat ZIP untuk impor SeaMart
+        run: |
+          cd photos
+          zip -9 ../SeaMart-Foto-Batch-02.zip 8996006856074.jpg 8992696404441.jpg 8998866202893.jpg 8996001600269.jpg 8997035563544.png 8992761002039.png
+      - name: Simpan ZIP sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SeaMart-Foto-Batch-02
+          path: SeaMart-Foto-Batch-02.zip
+          if-no-files-found: error
+          retention-days: 14
