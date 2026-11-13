@@ -1,0 +1,44 @@
+name: Siapkan Foto Produk SeaMart
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/siapkan-foto-produk.yml"
+jobs:
+  build-photo-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unduh dan validasi foto AQUA 600 ml
+        run: |
+          set -euo pipefail
+          mkdir -p photo-zip
+          curl --fail --location --retry 3 --user-agent "Mozilla/5.0" \
+            "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/92/MTA-23441519/aqua_aqua_air_mineral_kemasan_botol_600_ml-_1_karton-_24_pcs_full01_eg9ng5lp.jpg" \
+            --output photo-zip/8886008101053.jpg
+          file photo-zip/8886008101053.jpg
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          p = Path("photo-zip/8886008101053.jpg")
+          if not p.exists() or p.stat().st_size < 5000:
+              raise SystemExit("Foto tidak valid: file kosong atau terlalu kecil")
+          with Image.open(p) as im:
+              im.verify()
+          with Image.open(p) as im:
+              if im.format not in ("JPEG", "PNG", "WEBP"):
+                  raise SystemExit(f"Format tidak didukung: {im.format}")
+              if im.width < 350 or im.height < 350:
+                  raise SystemExit(f"Resolusi terlalu kecil: {im.size}")
+              print(f"Valid: {im.format}, {im.width}x{im.height}, {p.stat().st_size} bytes")
+          PY
+      - name: Buat ZIP untuk impor SeaMart
+        run: |
+          cd photo-zip
+          zip -9 ../SeaMart-Foto-AQUA-600ml.zip 8886008101053.jpg
+      - name: Simpan ZIP sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SeaMart-Foto-AQUA-600ml
+          path: SeaMart-Foto-AQUA-600ml.zip
+          if-no-files-found: error
+          retention-days: 14
