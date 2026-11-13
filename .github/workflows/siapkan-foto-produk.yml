@@ -12,12 +12,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p photo-zip
-          curl --fail --location --retry 3 --user-agent "Mozilla/5.0" --verbose \
-            "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/92/MTA-23441519/aqua_aqua_air_mineral_kemasan_botol_600_ml-_1_karton-_24_pcs_full01_eg9ng5lp.jpg" \
+          curl --fail --location --retry 3 --user-agent "Mozilla/5.0" \
+            "https://down-id.img.susercontent.com/file/sg-11134201-8262x-mjy1hynpo5qacb" \
             --output photo-zip/8886008101053.jpg
-          test -s photo-zip/8886008101053.jpg
           file photo-zip/8886008101053.jpg
-      - name: Validasi foto
+          test -s photo-zip/8886008101053.jpg
+      - name: Validasi format dan resolusi
         run: |
           python -m pip install --quiet pillow
           python - <<'PY'
@@ -35,7 +35,7 @@ jobs:
                   raise SystemExit(f"Resolusi terlalu kecil: {im.size}")
               print(f"VALID: {im.format} {im.width}x{im.height}, {p.stat().st_size} bytes")
           PY
-      - name: Simpan foto barcode sebagai artifact ZIP siap impor
+      - name: Simpan foto barcode sebagai artifact
         uses: actions/upload-artifact@v4
         with:
           name: SeaMart-Foto-AQUA-600ml
