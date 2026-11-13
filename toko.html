@@ -268,6 +268,11 @@ body{background:#f5f7f8;color:#27323b}
 #products>.item>.detail-btn{padding:0 8px!important;display:flex!important;align-items:center!important;justify-content:center!important}
 #products>.item>.product-qty{padding:0!important;grid-template-columns:46px minmax(0,1fr) 46px!important}
 #products>.item>.buy-now-btn{flex:0 0 46px!important;height:46px!important;min-height:46px!important;margin-top:8px!important;padding:0 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+
+/* Lotte Mart behavior: quantity stepper sits above, cart button stays below */
+#products>.item>.product-qty{flex:0 0 44px!important;height:44px!important;min-height:44px!important;margin:8px 0 8px!important}
+#products>.item>.detail-btn{flex:0 0 44px!important;height:44px!important;min-height:44px!important;margin:0!important}
+#products>.item>.product-qty+.detail-btn{margin-top:0!important}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style></head>
 <body>
@@ -324,10 +329,11 @@ function renderProducts(){
  document.getElementById('products').innerHTML=rows.length?rows.map(p=>{
   const qty=cart.get(p.id)?.qty||0;
   const photo=p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
-  const cartControl=qty>0
+  const qtyControl=qty>0
    ? '<div class="product-qty"><button type="button" aria-label="Kurangi" onclick="changeQty(\''+p.id+'\',-1)">−</button><b>'+qty+'</b><button type="button" aria-label="Tambah" '+(qty>=Number(p.stock)?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+</button></div>'
-   : '<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
-  return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div><div class="stock">Stok tersedia: '+Number(p.stock)+'</div>'+cartControl+'<button type="button" class="buy-now-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
+   : '';
+  const cartButton='<button type="button" class="detail-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="addItem(\''+p.id+'\')">+ Keranjang</button>';
+  return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div><div class="stock">Stok tersedia: '+Number(p.stock)+'</div>'+qtyControl+cartButton+'<button type="button" class="buy-now-btn" '+(Number(p.stock)<=0?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
  }).join(''):'<div class="empty">Barang tidak ditemukan.</div>';
 }
 
