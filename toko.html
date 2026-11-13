@@ -256,6 +256,18 @@ body{background:#f5f7f8;color:#27323b}
  font-size:18px!important;
  font-weight:600!important
 }
+
+/* Equal-height product cards and aligned cart / buy actions */
+#products{align-items:stretch!important}
+#products>.item{display:flex!important;flex-direction:column!important;height:100%!important;box-sizing:border-box!important}
+#products>.item .thumb{flex:0 0 150px!important}
+#products>.item .name{min-height:42px!important;height:42px!important;max-height:42px!important;overflow:hidden!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-height:21px!important;margin:10px 0 6px!important}
+#products>.item .price{min-height:25px!important;line-height:25px!important}
+#products>.item .stock{min-height:18px!important;line-height:18px!important;margin:4px 0 10px!important}
+#products>.item>.detail-btn,#products>.item>.product-qty{flex:0 0 46px!important;height:46px!important;min-height:46px!important;margin-top:auto!important;margin-bottom:0!important;box-sizing:border-box!important}
+#products>.item>.detail-btn{padding:0 8px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#products>.item>.product-qty{padding:0!important;grid-template-columns:46px minmax(0,1fr) 46px!important}
+#products>.item>.buy-now-btn{flex:0 0 46px!important;height:46px!important;min-height:46px!important;margin-top:8px!important;padding:0 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style></head>
 <body>
