@@ -1,9 +1,9 @@
-name: Siapkan Foto SeaMart Prioritas 30 - 1000 Produk
+name: Siapkan Foto SeaMart SeaMart - Prioritas 30 Produk
 on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/siapkan-foto-batch-04.yml'
+      - '.github/workflows/siapkan-foto-prioritas-30.yml'
       - 'data/SeaMart-Foto-Prioritas-30.csv'
 permissions:
   contents: read
