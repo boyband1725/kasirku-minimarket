@@ -35,14 +35,10 @@ jobs:
                   raise SystemExit(f"Resolusi terlalu kecil: {im.size}")
               print(f"VALID: {im.format} {im.width}x{im.height}, {p.stat().st_size} bytes")
           PY
-      - name: Buat ZIP untuk impor SeaMart
-        run: |
-          cd photo-zip
-          zip -9 ../SeaMart-Foto-AQUA-600ml.zip 8886008101053.jpg
-      - name: Simpan ZIP sebagai artifact
+      - name: Simpan foto barcode sebagai artifact ZIP siap impor
         uses: actions/upload-artifact@v4
         with:
           name: SeaMart-Foto-AQUA-600ml
-          path: SeaMart-Foto-AQUA-600ml.zip
+          path: photo-zip/8886008101053.jpg
           if-no-files-found: error
           retention-days: 14
