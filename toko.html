@@ -414,6 +414,13 @@ function renderProducts(){
  if(sort==='price-low')rows.sort((a,b)=>Number(a.price)-Number(b.price));
  if(sort==='price-high')rows.sort((a,b)=>Number(b.price)-Number(a.price));
  if(sort==='stock')rows.sort((a,b)=>Number(b.stock)-Number(a.stock));
+ if(sort==='recommended')rows.sort((a,b)=>{
+  const availableA=Number(a.stock)>0?1:0,availableB=Number(b.stock)>0?1:0;
+  if(availableA!==availableB)return availableB-availableA;
+  const photoA=a.image_url?1:0,photoB=b.image_url?1:0;
+  if(photoA!==photoB)return photoB-photoA;
+  return a.name.localeCompare(b.name,'id');
+ });
  document.getElementById('productCount').textContent=rows.length+' produk';
  document.getElementById('products').innerHTML=rows.length?rows.map(p=>{
   const qty=cart.get(p.id)?.qty||0;
