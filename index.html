@@ -2438,8 +2438,8 @@ function productModal(id){
      <section class="odoo-product-tab" data-product-panel="barcode">
       <div class="odoo-section-title">Identitas Barcode</div>
       <div class="odoo-form-grid">
-       <label>Barcode produk<input id="f_barcode_tab" class="field" value="${esc(p.barcode||'')}" placeholder="Scan barcode dengan scanner"></label>
-       <label>Kode internal<input id="f_kode_tab" class="field" value="${esc(p.kode||'')}" placeholder="Kode barang"></label>
+       <label>Barcode produk<input id="f_barcode_tab" class="field" value="${esc(p.barcode||'')}" placeholder="Scan barcode dengan scanner" oninput="document.getElementById('f_barcode').value=this.value"></label>
+       <label>Kode internal<input id="f_kode_tab" class="field" value="${esc(p.kode||'')}" placeholder="Kode barang" oninput="document.getElementById('f_kode').value=this.value"></label>
       </div>
       <p class="odoo-help">Scanner Bluetooth/USB dapat langsung digunakan pada kolom barcode. Nilai barcode disimpan ke data produk.</p>
      </section>
