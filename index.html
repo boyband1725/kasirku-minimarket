@@ -2621,19 +2621,37 @@ function confirmPayment(){
  if(pay==='Tunai'&&paid<total)return alert('Uang diterima belum cukup. Masukkan nominal uang dari pelanggan.');
  completeCheckout(pay,paid);
 }
-function completeCheckout(pay,paid){
+async function completeCheckout(pay,paid){
  if(!requireOpenShift()||!cart.length)return;
- for(const x of cart){if(!db.products.find(p=>p.id===x.id))return alert('Barang tidak ditemukan.');}
- const items=cart.map(x=>{const p=db.products.find(p=>p.id===x.id);return {nama:p.nama,qty:x.qty,harga:p.harga,subtotal:p.harga*x.qty}});
+ for(const x of cart){const p=db.products.find(p=>p.id===x.id);if(!p)return alert('Barang tidak ditemukan.');if(Number(p.stok||0)<Number(x.qty||0))return alert('Stok '+p.nama+' tidak cukup. Tersedia: '+Number(p.stok||0));}
+ const items=cart.map(x=>{const p=db.products.find(p=>p.id===x.id);return {nama:p.nama,qty:x.qty,harga:p.harga,subtotal:p.harga*x.qty,product_id:p.id}});
  const total=items.reduce((n,x)=>n+x.subtotal,0),change=paid-total,id='SM-'+Date.now().toString().slice(-8);
- cart.forEach(x=>{const p=db.products.find(p=>p.id===x.id);p.stok-=x.qty;db.moves.push({id:'M'+Date.now()+Math.random(),time:dateNow(),at:new Date().toISOString(),produk:p.nama,jenis:'Keluar / Terjual',qty:x.qty,delta:-x.qty,keterangan:id});});
- db.sales.push({id,time:dateNow(),at:new Date().toISOString(),cashier:currentUser?.nama||'',shiftId:currentShift()?.id||'',total,pay,paid,change,items});
- db.cashflows=db.cashflows||[];save();
- const saleCash={id:crypto.randomUUID(),at:new Date().toISOString(),date:new Date().toISOString().slice(0,10),type:'Masuk',category:'Penjualan '+pay,note:'Transaksi '+id,amount:total,source:'sale',source_ref:id};
+ if(paid<total)return alert('Pembayaran kurang.');
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ let cloudSaved=false;
+ if(sb&&store){
+  if(!items.every(x=>isUuid(x.product_id)))return alert('ID barang belum tersinkron ke cloud. Sinkronkan master barang dahulu, lalu ulangi transaksi.');
+  const cloud=await sb.rpc('seamart_complete_pos_sale',{
+   p_store_id:store,
+   p_sale_code:id,
+   p_cashier_name:currentUser?.nama||'',
+   p_shift_ref:String(currentShift()?.id||''),
+   p_payment_method:pay,
+   p_amount_paid:paid,
+   p_items:items.map(x=>({product_id:x.product_id,quantity:x.qty}))
+  });
+  if(cloud.error)return alert('Transaksi cloud gagal: '+(cloud.error.message||cloud.error)+'\nKeranjang tidak dihapus dan stok lokal tidak diubah.');
+  cloudSaved=true;
+ }
+ const stamp=new Date().toISOString();
+ cart.forEach(x=>{const p=db.products.find(p=>p.id===x.id);p.stok-=x.qty;db.moves.push({id:'M'+Date.now()+Math.random(),time:dateNow(),at:stamp,produk:p.nama,jenis:'Keluar / Terjual',qty:x.qty,delta:-x.qty,keterangan:id});});
+ db.sales.push({id,time:dateNow(),at:stamp,cashier:currentUser?.nama||'',shiftId:currentShift()?.id||'',total,pay,paid,change,items:items.map(({product_id,...x})=>x),cloudSynced:cloudSaved});
+ db.cashflows=db.cashflows||[];
+ const saleCash={id:crypto.randomUUID(),at:stamp,date:stamp.slice(0,10),type:'Masuk',category:'Penjualan '+pay,note:'Transaksi '+id,amount:total,source:'sale',source_ref:id,synced:cloudSaved};
  db.cashflows.push(saleCash);save();
- if(window.seamartCashFlowSyncReady)syncCashFlowEntry(saleCash).catch(e=>alert('Transaksi tersimpan, tetapi arus kas belum tersinkron: '+(e.message||e)));
+ if(!cloudSaved&&window.seamartCashFlowSyncReady)syncCashFlowEntry(saleCash).catch(e=>alert('Transaksi lokal tersimpan, tetapi arus kas belum tersinkron: '+(e.message||e)));
  cart=[];
- document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Metode: ${esc(pay)}</p>${pay==='Tunai'?'<div class="totalrow"><span>Uang diterima</span><b>'+rupiah(paid)+'</b></div><div class="totalrow"><span>Kembalian</span><b>'+rupiah(change)+'</b></div>':''}<div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Struk</button></div></div></div>`;
+ document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Metode: ${esc(pay)} · ${cloudSaved?'Tersinkron ke cloud':'Mode lokal'}</p>${pay==='Tunai'?'<div class="totalrow"><span>Uang diterima</span><b>'+rupiah(paid)+'</b></div><div class="totalrow"><span>Kembalian</span><b>'+rupiah(change)+'</b></div>':''}<div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Struk</button></div></div></div>`;
  renderCart();
 }
 
