@@ -1646,26 +1646,28 @@ async function finishSeaMartLogin(user){
  const cats=await sb.from('categories').select('id,name').eq('store_id',member.data.store_id);
  if(cats.error)throw cats.error;
  const catNames=new Map((cats.data||[]).map(x=>[x.id,x.name]));
- let remote=await fetchAllStoreProducts(sb,member.data.store_id);
- let syncSummary=null;
- if(db.products.length>0){
-  syncSummary=await syncAllProducts(remote.data||[]);
+ const localMasterLocked=localStorage.getItem('seamart_master_source_v1')==='local';
+ let remote={data:[]},syncSummary=null;
+ if(localMasterLocked){
+  updateSeaMartSyncProgress(100,'Master lokal dipertahankan: '+db.products.length+' barang. Sinkronisasi produk cloud dijeda agar data lama tidak menimpa master ini.',{total:0,added:0,skipped:db.products.length,failed:0,finished:true});
+ }else{
   remote=await fetchAllStoreProducts(sb,member.data.store_id);
-  if(syncSummary.failed>0){
-   alert('Sinkronisasi belum berhasil: '+syncSummary.failed+' produk gagal dikirim. '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\nContoh penyebab: '+syncSummary.errors.slice(0,3).join(' | '):''));
+  if(db.products.length>0){
+   syncSummary=await syncAllProducts(remote.data||[]);
+   remote=await fetchAllStoreProducts(sb,member.data.store_id);
+   if(syncSummary.failed>0){
+    alert('Sinkronisasi belum berhasil: '+syncSummary.failed+' produk gagal dikirim. '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\\nContoh penyebab: '+syncSummary.errors.slice(0,3).join(' | '):''));
+   }
   }
- }
- const local=[...db.products];
- const hasMatch=(a,b)=>String(a.id||'')===String(b.id||'')||(a.barcode&&b.barcode&&String(a.barcode)===String(b.barcode))||(a.kode&&b.code&&String(a.kode)===String(b.code));
- for(const p of (remote.data||[])){
-  const localMatch=local.find(x=>hasMatch(x,p));
-  if(localMatch){
-   if(!localMatch.foto&&p.image_url)localMatch.foto=p.image_url;
-   continue;
+  const local=[...db.products];
+  const hasMatch=(a,b)=>String(a.id||'')===String(b.id||'')||(a.barcode&&b.barcode&&String(a.barcode)===String(b.barcode))||(a.kode&&b.code&&String(a.kode)===String(b.code));
+  for(const p of (remote.data||[])){
+   const localMatch=local.find(x=>hasMatch(x,p));
+   if(localMatch){if(!localMatch.foto&&p.image_url)localMatch.foto=p.image_url;continue;}
+   local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false,foto:p.image_url||''});
   }
-  local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false,foto:p.image_url||''});
+  db.products=local;save();
  }
- db.products=local;save();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
  const app=document.querySelector('.app');if(app)app.style.display='';
  document.getElementById('loginroot').innerHTML='';document.getElementById('loginroot').style.display='none';
@@ -2535,6 +2537,7 @@ document.getElementById('csvfile').onchange=async e=>{
   if(replace){
    download('seamart-backup-sebelum-ganti-master.json',JSON.stringify(db,null,2));
    db.products=parsed.map(p=>{let old=previous.find(x=>(p.kode&&String(x.kode||'')===p.kode)||(p.barcode&&String(x.barcode||'')===p.barcode));return {...p,id:old?.id||'csv'+Date.now()+Math.random(),foto:old?.foto||''};});
+   localStorage.setItem('seamart_master_source_v1','local');
   }else{
    parsed.forEach(p=>{let old=db.products.find(x=>(p.kode&&String(x.kode||'')===p.kode)||(p.barcode&&String(x.barcode||'')===p.barcode));let item={...p,id:old?.id||'csv'+Date.now()+Math.random(),barcode:old?.barcode||p.barcode,foto:old?.foto||''};if(old)Object.assign(old,item);else db.products.push(item);});
   }
