@@ -2517,14 +2517,14 @@ window.seamartReplaceMode=false;
 document.getElementById('csvfile').onchange=async e=>{
  let f=e.target.files[0];if(!f)return;
  try{
-  let csvText=(await f.text()).replace(/^\\uFEFF/,''),rows=parseCSV(csvText);
+  let csvText=(await f.text()).replace(/^\uFEFF/,''),rows=parseCSV(csvText);
   if(rows.length<2)throw new Error('CSV kosong atau tidak memiliki baris barang.');
-  let head=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\\uFEFF/,'')),idx=(...names)=>head.findIndex(h=>names.includes(h));
+  let head=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\uFEFF/,'')),idx=(...names)=>head.findIndex(h=>names.includes(h));
   let ni=idx('nama','name','nama_barang'),bi=idx('barcode'),hi=idx('harga','price','harga_jual_1'),hbi=idx('harga_beli'),h2i=idx('harga_jual_2'),h3i=idx('harga_jual_3'),si=idx('stok','stock'),ki=idx('kode','kode_barang','sku'),ci=idx('kategori','category','kelompok_barang');
   if(ni<0)throw new Error('Kolom nama_barang/nama tidak ditemukan.');
   let parsed=rows.filter(r=>(r[ni]||'').trim()).map(r=>{
    let barcode=(r[bi]||'').trim(),kode=(r[ki]||'').trim();
-   let num=i=>i<0?0:Number((r[i]||'0').replace(/[^\\d.-]/g,''))||0;
+   let num=i=>i<0?0:Number((r[i]||'0').replace(/[^\d.-]/g,''))||0;
    let h1=num(hi);
    return {nama:(r[ni]||'').trim(),barcode,kode,harga:h1,harga_beli:num(hbi),harga_jual_1:h1,harga_jual_2:num(h2i),harga_jual_3:num(h3i),stok:num(si),kategori:(r[ci]||'Umum').trim()||'Umum',active:true};
   });
