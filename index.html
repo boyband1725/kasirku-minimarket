@@ -2466,7 +2466,7 @@ function productModal(id){
     <aside class="odoo-product-photo">
      <div class="odoo-photo-frame" id="foto_preview">${p.foto?'<img src="'+p.foto+'" alt="Foto produk">':'<div class="odoo-photo-empty"><span>▧</span><b>Belum ada foto</b><small>Tambahkan foto produk</small></div>'}</div>
      <label class="odoo-photo-upload">Pilih Foto Produk<input id="f_foto" type="file" accept="image/*" onchange="previewProductPhoto(this)"></label>
-     <button type="button" class="btn-light" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button>
+     <button type="button" class="btn-light" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button><button type="button" class="btn-light" data-reset-photo-id="${p.id}" onclick="resetProductPhoto(this.dataset.resetPhotoId)">Hapus Foto Produk</button>
      <div id="foto_lookup_status" class="odoo-help">Foto akan dicari berdasarkan barcode dan nama produk.</div>
     </aside>
    </div>
@@ -3401,6 +3401,15 @@ async function importProductPhotoSources(){
  finally{button.disabled=false;button.textContent='Pasang Foto dari Daftar SeaMart';}
 }
 
+async function resetProductPhoto(id){
+const p=db.products.find(x=>String(x.id)===String(id));
+if(!p)return alert('Barang tidak ditemukan.');
+if(!p.foto)return alert('Barang ini belum memiliki foto.');
+if(!confirm('Hapus foto '+p.nama+'? Data barang, barcode, harga, dan stok tetap aman.'))return;
+const old=p.foto;p.foto='';save();
+try{if(window.seamartSupabase&&window.seamartStoreId)await syncOneProduct(p);const preview=document.getElementById('foto_preview');if(preview)preview.innerHTML='<div class="odoo-photo-empty"><span>▧</span><b>Belum ada foto</b><small>Tambahkan foto produk</small></div>';if(typeof renderPosProducts==='function')renderPosProducts();alert('Foto produk berhasil dihapus.');}
+catch(e){p.foto=old;save();alert('Gagal menghapus foto dari cloud: '+e.message);}
+}
 async function resetAllProductPhotos(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!confirm('RESET SEMUA FOTO PRODUK? Foto katalog dan kasir akan dilepas dari barang di toko ini. Nama barang, barcode, harga, stok, transaksi, dan logo SeaMart tidak dihapus. Tindakan ini tidak dapat dibatalkan.'))return;
