@@ -1777,37 +1777,45 @@ async function printCashierClosing(shiftId){
  const actualInput=document.getElementById('cashierClosingActual');
  const actual=actualInput?Number(actualInput.value||0):Number(sh.actualCash??expected);
  const diff=actual-expected,fmt=n=>rupiah(Number(n)||0);
- const line=(label,value)=>({type:'text',text:label+': '+value,align:'center'});
+ const opened=new Date(sh.openedAt),closed=new Date(sh.closedAt||Date.now());
+ const stamp=d=>d.toLocaleString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+ const diffText=diff===0?'0':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff));
+ const logo=await seamartReceiptLogoBase64();
+ const rule='--------------------------------';
  const content=[
-  {type:'image',base64:await seamartReceiptLogoBase64(),align:'center',dither:false},
+  {type:'image',base64:logo,align:'center',dither:false},
   {type:'text',text:'RINGKASAN TUTUP KASIR',align:'center',bold:true},
-  {type:'text',text:'Sesi '+String(sh.id),align:'center'},
-  {type:'text',text:new Date().toLocaleString('id-ID'),align:'center'},
-  {type:'text',text:'--------------------------------',align:'center'},
-  line('Kasir',String(sh.nama||sh.username||'-')),
-  line('Jumlah transaksi',String(sales.length)),
-  {type:'text',text:'--------------------------------',align:'center'},
-  line('Bayar Tunai',fmt(cash)),
-  line('Bayar QRIS',fmt(qris)),
-  {type:'text',text:'--------------------------------',align:'center'},
-  {type:'row',left:'Total Penjualan',right:fmt(total),bold:true},
-  {type:'text',text:'--------------------------------',align:'center'},
-  line('Modal awal kas',fmt(sh.opening)),
-  line('Kas seharusnya',fmt(expected)),
-  line('Uang tunai fisik',fmt(actual)),
-  line('Selisih kas',diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff))),
-  {type:'text',text:'--------------------------------',align:'center'},
-  {type:'text',text:'Kasir: ____________________',align:'center'},
-  {type:'text',text:'Admin: ____________________',align:'center'},
+  {type:'text',text:'LAPORAN AKHIR SHIFT',align:'center'},
+  {type:'text',text:rule,align:'center'},
+  {type:'text',text:'KASIR : '+String(sh.nama||'-'),align:'left'},
+  {type:'text',text:'USER  : '+String(sh.username||'-'),align:'left'},
+  {type:'text',text:'TGL BUKA : '+stamp(opened),align:'left'},
+  {type:'text',text:'TGL TUTUP: '+stamp(closed),align:'left'},
+  {type:'text',text:rule,align:'center'},
+  {type:'text',text:'PEMBAYARAN',align:'left',bold:true},
+  {type:'row',left:'TUNAI',right:fmt(cash)},
+  {type:'row',left:'QRIS',right:fmt(qris)},
+  {type:'row',left:'TRANSAKSI',right:String(sales.length)},
+  {type:'text',text:rule,align:'center'},
+  {type:'text',text:'REKAPITULASI TUNAI',align:'left',bold:true},
+  {type:'row',left:'Saldo Awal',right:fmt(sh.opening)},
+  {type:'row',left:'Terima Tunai',right:fmt(cash)},
+  {type:'row',left:'Saldo Akhir',right:fmt(expected),bold:true},
+  {type:'row',left:'Uang Fisik',right:fmt(actual)},
+  {type:'row',left:'Selisih Tunai',right:diffText,bold:true},
+  {type:'text',text:rule,align:'center'},
+  {type:'text',text:stamp(closed),align:'right'},
   {type:'feed',lines:3}
  ];
  try{
   if(seamartWindowsSerialPort){await seamartPrintClosingWindowsSerial([
-   'Sesi: '+String(sh.id),'Kasir: '+String(sh.nama||sh.username||'-'),'Jumlah transaksi: '+sales.length,
-   'Bayar Tunai: '+fmt(cash),'Bayar QRIS: '+fmt(qris),'--------------------------------','Total Penjualan: '+fmt(total),'--------------------------------',
-   'Modal awal: '+fmt(sh.opening),'Kas seharusnya: '+fmt(expected),'Uang fisik: '+fmt(actual),
-   'Selisih: '+(diff===0?'Seimbang':(diff>0?'Lebih ':'Kurang ')+fmt(Math.abs(diff)))
-  ]);alert('Ringkasan tutup kasir berhasil dikirim ke printer PC.');return;}
+   'RINGKASAN TUTUP KASIR','LAPORAN AKHIR SHIFT',rule,
+   'KASIR : '+String(sh.nama||'-'),'USER  : '+String(sh.username||'-'),
+   'TGL BUKA : '+stamp(opened),'TGL TUTUP: '+stamp(closed),rule,
+   'PEMBAYARAN','TUNAI : '+fmt(cash),'QRIS  : '+fmt(qris),'TRANSAKSI : '+sales.length,rule,
+   'REKAPITULASI TUNAI','Saldo Awal  : '+fmt(sh.opening),'Terima Tunai: '+fmt(cash),
+   'Saldo Akhir : '+fmt(expected),'Uang Fisik : '+fmt(actual),'Selisih Tunai: '+diffText,rule,stamp(closed)
+  ]);alert('Struk tutup kasir berhasil dikirim ke printer PC.');return;}
   const health=await fetch('http://localhost:9100/health',{signal:AbortSignal.timeout(2500)});
   if(!health.ok)throw new Error('Aplikasi penghubung printer tidak merespons.');
   const status=await health.json();
@@ -1815,10 +1823,10 @@ async function printCashierClosing(shiftId){
   const response=await fetch('http://localhost:9100/print',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paperWidth:58,cut:true,reference:'Tutup kasir '+String(sh.id),content}),signal:AbortSignal.timeout(20000)});
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.fix||result.detail||result.error||'Gagal mengirim cetakan ke printer.');
-  alert('Ringkasan tutup kasir berhasil dikirim ke printer '+(status.printer?.name||'RPP02N')+'.');
+  alert('Struk tutup kasir berhasil dikirim ke printer '+(status.printer?.name||'RPP02N')+'.');
  }catch(e){
   const msg=String(e&&e.message||e);
-  if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('fetch'))alert('Printer RPP02N belum bisa diakses langsung dari browser. Pastikan Cleanter aktif dan RPP02N terpilih.');
+  if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('fetch'))alert('Printer belum bisa diakses. Pastikan Cleanter aktif dan printer sudah terhubung.');
   else alert('Cetak gagal: '+msg);
  }
 }
