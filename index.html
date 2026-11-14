@@ -1688,6 +1688,28 @@ async function finishSeaMartLogin(user){
  if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');
  window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;
  const loginRoot=document.getElementById('loginroot');if(loginRoot){loginRoot.style.display='block';loginRoot.innerHTML='<div class="login-screen"><div class="login-card" style="max-width:440px"><div class="login-brand" aria-label="Logo SeaMart"><svg viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlowLogin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlowLogin)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlowLogin)"/><text x="8" y="55" font-size="51" font-weight="800" fill="#087b43">Sea</text><text x="102" y="55" font-size="51" font-weight="800" fill="#075b36">Mart</text></svg></div><h2 style="margin:8px 0 4px">Login berhasil!</h2><p style="color:#64748b;font-size:13px;margin:0">Menyiapkan data toko sebelum masuk kasir</p><div id="seamartSyncProgress"></div></div></div>';}
+async function syncSeaMartLegacySales(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return {uploaded:0,failed:0,errors:[]};
+ const pending=(db.sales||[]).filter(s=>!s.cloudSynced&&s.id&&Array.isArray(s.items)&&s.items.length);
+ const result={uploaded:0,failed:0,errors:[]};
+ for(const sale of pending){
+  try{
+   const items=sale.items.map(x=>({nama:x.nama||x.name||'Barang',barcode:x.barcode||'',qty:Number(x.qty||x.quantity||0),harga:Number(x.harga??x.price??0),subtotal:Number(x.subtotal??(Number(x.harga??x.price??0)*Number(x.qty||x.quantity||0)))}));
+   const total=Number(sale.total||items.reduce((a,x)=>a+x.subtotal,0));
+   const paid=Number(sale.paid??total),change=Number(sale.change??Math.max(0,paid-total));
+   const {data,error}=await sb.rpc('seamart_import_legacy_pos_sale',{
+    p_store_id:store,p_sale_code:String(sale.id),p_cashier_name:sale.cashier||'',
+    p_shift_ref:String(sale.shiftId||''),p_payment_method:String(sale.pay||'Tunai'),
+    p_total:total,p_amount_paid:paid,p_change_amount:change,
+    p_created_at:sale.at||null,p_items:items
+   });
+   if(error)throw error;
+   sale.cloudSynced=true;result.uploaded++;save();
+  }catch(e){result.failed++;if(result.errors.length<5)result.errors.push(String(sale.id)+': '+(e.message||String(e)));}
+ }
+ return result;
+}
 async function refreshSeaMartCloudSales(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return 0;
@@ -1709,6 +1731,8 @@ async function refreshSeaMartCloudSales(){
  save();
  return merged;
 }
+ const legacySalesSync=await syncSeaMartLegacySales();
+ if(legacySalesSync.failed)console.warn('Sebagian riwayat lokal belum masuk cloud:',legacySalesSync.errors);
  try{await refreshSeaMartCloudSales();}catch(e){console.warn('Riwayat penjualan cloud belum berhasil dimuat:',e.message||e);}
  const cloudFlows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',member.data.store_id).order('transaction_date',{ascending:false});
  if(!cloudFlows.error){db.cashflows=(cloudFlows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;save();}
