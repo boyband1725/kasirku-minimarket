@@ -1633,6 +1633,52 @@ async function fetchAllStoreProducts(sb,store){
  }
  return {data:all,error:null};
 }
+function applySeaMartCloudStock(rows){
+ let changed=0;
+ for(const row of (rows||[])){
+  let p=db.products.find(x=>String(x.id||'')===String(row.id||''));
+  if(!p&&row.code){
+   const matches=db.products.filter(x=>String(x.kode||'').trim()===String(row.code).trim());
+   if(matches.length===1)p=matches[0];
+  }
+  if(!p&&row.barcode){
+   const matches=db.products.filter(x=>String(x.barcode||'').trim()===String(row.barcode).trim());
+   if(matches.length===1)p=matches[0];
+  }
+  if(p&&Number(p.stok)!==Number(row.stock)){p.stok=Number(row.stock||0);changed++;}
+ }
+ if(changed){
+  save();
+  if(typeof renderPosProducts==='function'&&document.getElementById('posProductGrid'))renderPosProducts();
+  if(typeof renderCart==='function'&&document.getElementById('cartItems'))renderCart();
+  document.dispatchEvent(new CustomEvent('seamart:stock-updated',{detail:{changed}}));
+ }
+ return changed;
+}
+async function refreshSeaMartCloudStock(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return 0;
+ const result=await sb.from('products').select('id,code,barcode,stock').eq('store_id',store);
+ if(result.error)throw result.error;
+ return applySeaMartCloudStock(result.data||[]);
+}
+function startSeaMartStockRealtime(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return;
+ if(window.seamartStockChannel){try{sb.removeChannel(window.seamartStockChannel)}catch(e){}}
+ if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);
+ window.seamartStockChannel=sb.channel('seamart-stock-'+store)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'products',filter:'store_id=eq.'+store},payload=>{
+   if(payload.new)applySeaMartCloudStock([payload.new]);
+  }).subscribe((status)=>{window.seamartStockRealtimeStatus=status;});
+ window.seamartStockPollTimer=setInterval(()=>{
+  if(document.visibilityState==='visible')refreshSeaMartCloudStock().catch(e=>console.warn('Penyegaran stok SeaMart gagal:',e.message||e));
+ },30000);
+ if(!window.seamartStockVisibilityHandler){
+  window.seamartStockVisibilityHandler=()=>{if(document.visibilityState==='visible')refreshSeaMartCloudStock().catch(e=>console.warn('Penyegaran stok SeaMart gagal:',e.message||e));};
+  document.addEventListener('visibilitychange',window.seamartStockVisibilityHandler);
+ }
+}
 async function finishSeaMartLogin(user){
  const sb=getSeaMartAuthClient();
  const member=await sb.from('store_members').select('store_id,role').eq('user_id',user.id).limit(1).maybeSingle();
@@ -1668,6 +1714,8 @@ async function finishSeaMartLogin(user){
   }
   db.products=local;save();
  }
+ try{await refreshSeaMartCloudStock();}catch(e){console.warn('Stok cloud awal belum berhasil dimuat:',e.message||e);}
+ startSeaMartStockRealtime();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
  const app=document.querySelector('.app');if(app)app.style.display='';
  document.getElementById('loginroot').innerHTML='';document.getElementById('loginroot').style.display='none';
@@ -1678,7 +1726,7 @@ async function finishSeaMartLogin(user){
 }
 async function doLogin(){const email=normalizeLoginEmail(document.getElementById('loginUser').value),password=document.getElementById('loginPass').value,err=document.getElementById('cloudLoginError'),btn=document.getElementById('cloudLoginBtn');btn.disabled=true;btn.textContent='Menghubungkan…';err.textContent='';try{const sb=getSeaMartAuthClient();const auth=await sb.auth.signInWithPassword({email,password});if(auth.error)throw auth.error;await finishSeaMartLogin(auth.data.user);}catch(e){err.textContent=e.message||'Login Supabase gagal';}finally{btn.disabled=false;btn.textContent='Masuk';}}
 async function restoreSeaMartSession(){try{const sb=getSeaMartAuthClient();const {data,error}=await sb.auth.getSession();if(error)throw error;if(data.session?.user)await finishSeaMartLogin(data.session.user);}catch(e){console.warn('Pemulihan sesi SeaMart:',e);}}
-function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
+function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}if(window.seamartStockChannel&&window.seamartSupabase){try{window.seamartSupabase.removeChannel(window.seamartStockChannel)}catch(e){}}if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);window.seamartStockChannel=null;window.seamartStockPollTimer=null;currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
 function showPasswordRecoveryForm(sb){
  const root=document.getElementById('loginroot');
  root.style.cssText='display:block!important;position:fixed!important;inset:0!important;z-index:99999!important;visibility:visible!important;opacity:1!important';
