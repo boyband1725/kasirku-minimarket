@@ -2543,7 +2543,13 @@ document.getElementById('csvfile').onchange=async e=>{
   }
   save();e.target.value='';window.seamartReplaceMode=false;
   alert((replace?'Master barang lama berhasil diganti. ':'')+parsed.length+' barang diproses. Cadangan JSON telah diunduh. Data tersimpan di browser perangkat ini.');
-  products();syncAllProducts().catch(err=>alert('Data tersimpan di perangkat, tetapi sinkronisasi cloud belum berhasil: '+err.message));
+  products();
+  if(replace){
+   updateSeaMartSyncProgress?.(100,'Master lokal dikunci: '+db.products.length+' barang. Produk cloud lama tidak diimpor atau digabung otomatis.',{total:0,added:0,skipped:db.products.length,failed:0,finished:true});
+   alert('Master lokal berhasil diganti menjadi '+db.products.length+' barang. Sinkronisasi produk cloud otomatis dijeda agar data lama tidak masuk kembali. Data lain tetap disimpan di perangkat ini.');
+  }else{
+   syncAllProducts().catch(err=>alert('Data tersimpan di perangkat, tetapi sinkronisasi cloud belum berhasil: '+err.message));
+  }
  }catch(err){e.target.value='';window.seamartReplaceMode=false;alert('Impor gagal: '+(err.message||err));}
 }
 function exportCSV(){let lines=[['kode_barang','nama_barang','barcode','harga_beli','harga_jual_1','harga_jual_2','harga_jual_3','stok','kelompok_barang'],...db.products.map(p=>[p.kode,p.nama,p.barcode,p.harga_beli||0,p.harga_jual_1??p.harga,p.harga_jual_2||0,p.harga_jual_3||0,p.stok,p.kategori])];download('seamart-master-barang.csv',lines.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
