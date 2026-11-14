@@ -2040,8 +2040,23 @@ function saveSaleEdit(id){let s=db.sales.find(x=>x.id===id),total=Number(documen
 function showClearSalesConfirm(){if(!Array.isArray(db.sales)||!db.sales.length)return alert('Belum ada riwayat transaksi.');document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Konfirmasi Hapus Riwayat</h2><p>Yakin ingin menghapus <b>${db.sales.length} transaksi</b> penjualan?</p><p class="muted">Stok barang akan dikembalikan sesuai jumlah yang terjual. Riwayat transaksi yang dihapus tidak dapat dipulihkan. Pastikan sudah ekspor CSV atau backup JSON.</p><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-danger" onclick="clearSalesHistory()">Ya, Hapus Riwayat</button></div></div></div>`}
 function clearSalesHistory(){if(!Array.isArray(db.sales)||!db.sales.length){closeModal();return alert('Belum ada riwayat transaksi.')}const ids=new Set(db.sales.map(x=>x.id));for(const sale of db.sales){for(const item of (sale.items||[])){const p=db.products.find(x=>x.nama===item.nama);if(p)p.stok=Number(p.stok||0)+Number(item.qty||0)}}db.moves=(db.moves||[]).filter(m=>!ids.has(m.keterangan));db.sales=[];save();closeModal();sales();alert('Berhasil! Semua riwayat transaksi dihapus dan stok dikembalikan.');}
 function lowStock(){let a=db.products.filter(p=>p.stok<=5).slice(0,7);return a.length?a.map(p=>`<div class="cartline"><div><b>${esc(p.nama)}</b><div class="muted">${esc(p.barcode||'-')}</div></div><span class="pill" style="background:#fff0e8;color:#b65b20">${p.stok} unit</span></div>`).join(''):'<div class="empty">Tidak ada stok menipis.</div>'}
-function categoryIcon(p){let s=((p.kategori||'')+' '+(p.nama||'')).toLowerCase();if(/minum|air|susu|kopi|teh|sirup/.test(s))return '🥤';if(/beras|sembako|mie|tepung|gula|minyak|bumbu/.test(s))return '🍚';if(/frozen|beku|es krim|ice cream/.test(s))return '🧊';if(/buah|sayur/.test(s))return '🍎';if(/sabun|shampoo|detergen|mandi|kosmetik/.test(s))return '🧴';if(/obat|vitamin|kesehatan/.test(s))return '🩹';if(/alat|perkakas|rumah tangga/.test(s))return '🧰';if(/rokok|sigaret/.test(s))return '🚬';return '📦'}
-function productPicture(p){return p.foto?'<img src="'+p.foto+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">':categoryIcon(p)}
+function categoryIcon(p){let s=((p.kategori||'')+' '+(p.nama||'')).toLowerCase();if(/minum|air|susu|kopi|teh|sirup/.test(s))return '🥤';if(/beras|sembako|mie|tepung|gula|minyak|bumbu/.test(s))return '🍚';if(/frozen|beku|es krim|ice cream/.test(s))return '🧊';if(/buah|sayur/.test(s))return '🍎';if(/sabun|shampoo|detergen|mandi|kosmetik/.test(s))return '🧴';if(/obat|vitamin|kesehatan/.test(s))return '🩹';if(/alat|perkakas|rumah tangga/.test(s))return '🧰';return '📦'}
+function knownCigarettePhoto(p){
+ const n=String(p.nama||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const matches=[
+  {test:/esse change juicy/,url:'https://coreimages.lottemart.co.id/ord/06/1098428000-a'},
+  {test:/esse berry pop/,url:'https://tpackss.globaltobaccocontrol.org/sites/default/files/styles/500x500/public/packs_images/IDN/JAK/M1/IDN_JAK_M1_01_026_0_0_3_1.jpg?itok=NHlG5N0r'},
+  {test:/esse mild/,url:'https://tpackss.globaltobaccocontrol.org/sites/default/files/styles/500x500/public/pack_images/IDN_JAK_M4_003_1.JPG?itok=BpN9drDi'},
+  {test:/djarum super mld putih|djarum mld putih/,url:'https://arti-assets.sgp1.cdn.digitaloceanspaces.com/megaswalayan/products/c4b286f9-459a-4949-9fa0-e6de68bcf643.jpg'}
+ ];
+ return matches.find(x=>x.test.test(n))?.url||'';
+}
+function productPicture(p){
+ if(p.foto)return '<img src="'+p.foto+'" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:8px;background:#fff">';
+ const cigarettePhoto=knownCigarettePhoto(p);
+ if(cigarettePhoto)return '<img src="'+cigarettePhoto+'" alt="Foto kemasan '+esc(p.nama||'produk')+'" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:contain;border-radius:8px;background:#fff">';
+ return categoryIcon(p);
+}
 /* Auto-load verified product photos for featured POS items when a real barcode is available. */
 window.seamartPosPhotoLookups=window.seamartPosPhotoLookups||new Set();
 async function hydrateFeaturedProductPhotos(items){
