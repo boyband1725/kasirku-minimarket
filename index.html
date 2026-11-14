@@ -1598,7 +1598,7 @@ window.addEventListener('error', function(e) {
 <button class="launcher-tile" onclick="openAppPage('pengaturan')"><span class="launcher-icon icon-8">⚙</span><b>Pengaturan & Data</b></button>
 </div><div class="launcher-footer">Pilih menu untuk membuka halaman SeaMart</div></section></div>
  <section class="content">
- <div class="notice">Mode pratinjau web: data tersimpan di browser perangkat ini. Login aman, database cloud multi-perangkat, dan sinkronisasi online perlu konfigurasi server sebelum dipakai untuk operasional.</div>
+ <div class="notice" id="seamartConnectionNotice" style="display:none"></div>
  <div id="view"></div>
  </section>
 </main>
@@ -1688,6 +1688,28 @@ async function finishSeaMartLogin(user){
  if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');
  window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;
  const loginRoot=document.getElementById('loginroot');if(loginRoot){loginRoot.style.display='block';loginRoot.innerHTML='<div class="login-screen"><div class="login-card" style="max-width:440px"><div class="login-brand" aria-label="Logo SeaMart"><svg viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlowLogin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlowLogin)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlowLogin)"/><text x="8" y="55" font-size="51" font-weight="800" fill="#087b43">Sea</text><text x="102" y="55" font-size="51" font-weight="800" fill="#075b36">Mart</text></svg></div><h2 style="margin:8px 0 4px">Login berhasil!</h2><p style="color:#64748b;font-size:13px;margin:0">Menyiapkan data toko sebelum masuk kasir</p><div id="seamartSyncProgress"></div></div></div>';}
+async function refreshSeaMartCloudSales(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return 0;
+ const result=await sb.from('seamart_pos_sales')
+  .select('id,sale_code,cashier_name,shift_ref,payment_method,total,amount_paid,change_amount,created_at,seamart_pos_sale_items(product_name,barcode,unit_price,quantity,line_total)')
+  .eq('store_id',store).order('created_at',{ascending:false}).range(0,9999);
+ if(result.error)throw result.error;
+ const byCode=new Map((db.sales||[]).map(s=>[String(s.id||''),s]));
+ let merged=0;
+ for(const row of (result.data||[])){
+  const code=String(row.sale_code||'');
+  const local=byCode.get(code);
+  const items=(row.seamart_pos_sale_items||[]).map(x=>({nama:x.product_name||'Barang',barcode:x.barcode||'',qty:Number(x.quantity||0),harga:Number(x.unit_price||0),subtotal:Number(x.line_total||0)}));
+  const sale={id:code||row.id,time:new Date(row.created_at).toLocaleString('id-ID'),at:row.created_at,cashier:row.cashier_name||'',shiftId:row.shift_ref||'',total:Number(row.total||0),pay:row.payment_method||'Tunai',paid:Number(row.amount_paid||0),change:Number(row.change_amount||0),items,cloudSynced:true};
+  if(local){Object.assign(local,sale);byCode.set(code,local);}else{db.sales.push(sale);byCode.set(code,sale);}
+  merged++;
+ }
+ db.sales.sort((a,b)=>new Date(b.at||b.time||0)-new Date(a.at||a.time||0));
+ save();
+ return merged;
+}
+ try{await refreshSeaMartCloudSales();}catch(e){console.warn('Riwayat penjualan cloud belum berhasil dimuat:',e.message||e);}
  const cloudFlows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',member.data.store_id).order('transaction_date',{ascending:false});
  if(!cloudFlows.error){db.cashflows=(cloudFlows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;save();}
  else{console.warn('Arus kas cloud belum tersedia:',cloudFlows.error.message);}
