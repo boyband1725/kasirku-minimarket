@@ -1499,6 +1499,20 @@ td{border-bottom-color:#e8f2ee!important}
  .content{padding:12px 9px!important}
 }
 
+
+/* Odoo-inspired Inventory workspace */
+.app.odoo-inventory .sidebar{display:none}
+.app.odoo-inventory .main{width:100%;min-width:0}
+.odoo-appnav{display:none;align-items:center;gap:0;min-height:48px;padding:0 22px;background:#fff;border-bottom:1px solid #e5e7eb;box-shadow:0 1px 2px #10182808;overflow-x:auto;white-space:nowrap}
+.app.odoo-inventory .odoo-appnav{display:flex}
+.odoo-appnav .appnav-title{font-weight:800;color:#344054;padding:0 22px 0 4px;border-right:1px solid #e5e7eb;margin-right:10px}
+.odoo-appnav button{background:transparent;color:#475467;border-radius:0;padding:15px 13px;font-size:13px;font-weight:600;border-bottom:2px solid transparent}
+.odoo-appnav button:hover,.odoo-appnav button.active{color:#714b67;background:#faf7f9;border-bottom-color:#714b67}
+.odoo-appnav button.active{font-weight:800}
+.odoo-app-launch{width:36px;height:36px;border:1px solid #e4e7ec;background:#fff;border-radius:7px;color:#344054;font-size:19px;display:inline-grid;place-items:center;flex-shrink:0}
+.odoo-app-launch:hover{background:#f2f4f7}
+.app.odoo-inventory .content{padding-top:18px}
+@media(max-width:700px){.odoo-appnav{padding:0 8px}.odoo-appnav .appnav-title{padding-right:12px}.odoo-appnav button{padding:13px 10px;font-size:12px}.app.odoo-inventory .content{padding:14px 10px}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -1533,7 +1547,7 @@ window.addEventListener('error', function(e) {
  <div class="sidefoot">SeaMart POS · Web Preview</div>
 </aside>
 <main class="main">
- <header class="topbar"><div class="topbar-left"><button class="mobile-menu-btn" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><span id="sessionUser">Belum login</span><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
+ <header class="topbar"><div class="topbar-left"><button class="odoo-app-launch" type="button" onclick="toggleAppLauncher()" aria-label="Buka aplikasi">☷</button><button class="mobile-menu-btn" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><span id="sessionUser">Belum login</span><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="odoo-appnav" id="inventoryAppNav"><span class="appnav-title">Inventory</span><button type="button" data-invnav="overview" onclick="page('dashboard')">Overview</button><button type="button" data-invnav="operations" onclick="page('stok')">Operations</button><button type="button" data-invnav="products" onclick="page('produk')">Products</button><button type="button" data-invnav="reporting" onclick="page('penjualan')">Reporting</button><button type="button" data-invnav="configuration" onclick="page('pengaturan')">Configuration</button></div><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
 <div class="launcher-heading">APLIKASI</div><div class="launcher-grid">
 <button class="launcher-tile" onclick="openAppPage('dashboard')"><span class="launcher-icon icon-0">▥</span><b>Dashboard</b></button>
 <button class="launcher-tile" onclick="openAppPage('kasir')"><span class="launcher-icon icon-1">▣</span><b>Point of Sale</b></button>
@@ -1903,7 +1917,7 @@ const dateNow=()=>new Date().toLocaleString('id-ID');
 function toggleMobileMenu(){document.body.classList.toggle('mobile-menu-open')}
 function closeMobileMenu(){document.body.classList.remove('mobile-menu-open')}
 function toggleAppLauncher(){const el=document.getElementById("appLauncherBackdrop");if(el)el.classList.toggle("open")}function closeAppLauncher(){document.getElementById("appLauncherBackdrop")?.classList.remove("open")}function openAppPage(p){const routes=["dashboard","kasir","produk","ubahbarang","stok","penjualan","akun","aruskas","pengaturan","pesanan"];if(!routes.includes(p)){alert("Menu SeaMart tidak ditemukan.");return}closeAppLauncher();page(p)}
-function page(p){if(!currentUser){showLogin();return}if(currentUser.role==='kasir'&&p!=='kasir'){alert('Akun kasir hanya dapat membuka menu Kasir.');return}if(p==='kasir'&&!requireOpenShift())return;document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent=({dashboard:'Dashboard',kasir:'Kasir / Point of Sale',produk:'Produk & Kategori',stok:'Stok & Mutasi',supplier:'Data Supplier',penjualan:'Laporan Penjualan',pengaturan:'Pengaturan & Data',akun:'Daftar Akun (COA)', aruskas:'Arus Kas',pesanan:'Pesanan Online'})[p];({dashboard:dashboard,kasir:pos,produk:products,ubahbarang:editProductsPage,stok:stock,supplier:suppliersPage,penjualan:sales,pengaturan:settings,akun:accounts, aruskas:cashFlowPage,pesanan:onlineOrdersPage}[p])()}
+function page(p){document.querySelector('.app')?.classList.toggle('odoo-inventory',['produk','stok','supplier'].includes(p));document.querySelectorAll('[data-invnav]').forEach(b=>b.classList.toggle('active',b.dataset.invnav===({dashboard:'overview',stok:'operations',produk:'products',penjualan:'reporting',pengaturan:'configuration'}[p])));if(!currentUser){showLogin();return}if(currentUser.role==='kasir'&&p!=='kasir'){alert('Akun kasir hanya dapat membuka menu Kasir.');return}if(p==='kasir'&&!requireOpenShift())return;document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent=({dashboard:'Dashboard',kasir:'Kasir / Point of Sale',produk:'Produk & Kategori',stok:'Stok & Mutasi',supplier:'Data Supplier',penjualan:'Laporan Penjualan',pengaturan:'Pengaturan & Data',akun:'Daftar Akun (COA)', aruskas:'Arus Kas',pesanan:'Pesanan Online'})[p];({dashboard:dashboard,kasir:pos,produk:products,ubahbarang:editProductsPage,stok:stock,supplier:suppliersPage,penjualan:sales,pengaturan:settings,akun:accounts, aruskas:cashFlowPage,pesanan:onlineOrdersPage}[p])()}
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{page(b.dataset.page);closeMobileMenu()});
 let seamartLastPage='dashboard';
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page!=='kasir')seamartLastPage=b.dataset.page;}));
