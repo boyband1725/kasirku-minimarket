@@ -3384,8 +3384,9 @@ async function importProductPhotoSources(){
   let done=0;
   for(const item of records){
    try{
-    const local=db.products.filter(p=>String(p.barcode||'').replace(/\D/g,'')===item.barcode);
+    const local=db.products.filter(p=>String(p.barcode||'').trim()===item.barcode);
     if(local.length!==1){stats.skip++;done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);continue;}
+    await validateProductPhoto(item.url,local[0].nama,item.name);
     const q=await sb.from('products').select('id,barcode').eq('store_id',store).eq('barcode',item.barcode);
     if(q.error)throw q.error;
     if(!q.data||q.data.length!==1){stats.skip++;done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);continue;}
