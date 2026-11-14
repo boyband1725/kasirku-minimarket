@@ -2,6 +2,49 @@
 -- Additive migration: preserves existing products, sales stored in browsers, and cash-flow rows.
 create extension if not exists pgcrypto;
 
+-- Cash-flow table required by SeaMart login sync and checkout.
+-- The current project returned "relation public.cash_flows does not exist".
+create table if not exists public.cash_flows (
+  id uuid primary key default gen_random_uuid(),
+  store_id uuid not null,
+  created_by uuid,
+  direction text not null check (direction in ('Masuk','Keluar')),
+  category text,
+  description text,
+  amount numeric(14,2) not null check (amount > 0),
+  transaction_date date not null default current_date,
+  source text not null default 'manual',
+  source_ref text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists cash_flows_store_date_idx
+  on public.cash_flows(store_id, transaction_date desc);
+
+alter table public.cash_flows enable row level security;
+drop policy if exists "SeaMart members read cash flows" on public.cash_flows;
+create policy "SeaMart members read cash flows" on public.cash_flows
+for select to authenticated using (exists (
+  select 1 from public.store_members sm
+  where sm.store_id = cash_flows.store_id and sm.user_id = auth.uid()
+));
+drop policy if exists "SeaMart members insert cash flows" on public.cash_flows;
+create policy "SeaMart members insert cash flows" on public.cash_flows
+for insert to authenticated with check (exists (
+  select 1 from public.store_members sm
+  where sm.store_id = cash_flows.store_id and sm.user_id = auth.uid()
+));
+drop policy if exists "SeaMart members update cash flows" on public.cash_flows;
+create policy "SeaMart members update cash flows" on public.cash_flows
+for update to authenticated using (exists (
+  select 1 from public.store_members sm
+  where sm.store_id = cash_flows.store_id and sm.user_id = auth.uid()
+)) with check (exists (
+  select 1 from public.store_members sm
+  where sm.store_id = cash_flows.store_id and sm.user_id = auth.uid()
+));
+grant select, insert, update on public.cash_flows to authenticated;
+
 create table if not exists public.seamart_pos_sales (
   id uuid primary key default gen_random_uuid(),
   store_id uuid not null,
