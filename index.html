@@ -1634,7 +1634,7 @@ async function fetchAllStoreProducts(sb,store){
  return {data:all,error:null};
 }
 function applySeaMartCloudStock(rows){
- let changed=0;
+ let changed=0,photosChanged=0;
  for(const row of (rows||[])){
   let p=db.products.find(x=>String(x.id||'')===String(row.id||''));
   if(!p&&row.code){
@@ -1646,19 +1646,21 @@ function applySeaMartCloudStock(rows){
    if(matches.length===1)p=matches[0];
   }
   if(p&&Number(p.stok)!==Number(row.stock)){p.stok=Number(row.stock||0);changed++;}
+  if(p&&row.image_url&&String(p.foto||'')!==String(row.image_url)){p.foto=String(row.image_url);p.image_url=String(row.image_url);photosChanged++;}
  }
- if(changed){
+ if(changed||photosChanged){
   save();
-  if(typeof renderPosProducts==='function'&&document.getElementById('posProductGrid'))renderPosProducts();
+  if(typeof renderPosProducts==='function'&&document.getElementById('posproducts'))renderPosProducts();
   if(typeof renderCart==='function'&&document.getElementById('cartItems'))renderCart();
-  document.dispatchEvent(new CustomEvent('seamart:stock-updated',{detail:{changed}}));
+  document.dispatchEvent(new CustomEvent('seamart:stock-updated',{detail:{changed,photosChanged}}));
+  if(photosChanged)document.dispatchEvent(new CustomEvent('seamart:photos-updated',{detail:{changed:photosChanged}}));
  }
- return changed;
+ return changed+photosChanged;
 }
 async function refreshSeaMartCloudStock(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
  if(!sb||!store)return 0;
- const result=await sb.from('products').select('id,code,barcode,stock').eq('store_id',store);
+ const result=await sb.from('products').select('id,code,barcode,stock,image_url').eq('store_id',store);
  if(result.error)throw result.error;
  return applySeaMartCloudStock(result.data||[]);
 }
@@ -2102,7 +2104,8 @@ function knownCigarettePhoto(p){
  return matches.find(x=>x.test.test(n))?.url||'';
 }
 function productPicture(p){
- if(p.foto)return '<img src="'+p.foto+'" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:8px;background:#fff">';
+ const sharedPhoto=p.foto||p.image_url;
+ if(sharedPhoto)return '<img src="'+esc(sharedPhoto)+'" alt="Foto kemasan '+esc(p.nama||'produk')+'" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:contain;border-radius:8px;background:#fff">';
  const cigarettePhoto=knownCigarettePhoto(p);
  if(cigarettePhoto)return '<img src="'+cigarettePhoto+'" alt="Foto kemasan '+esc(p.nama||'produk')+'" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:contain;border-radius:8px;background:#fff">';
  return categoryIcon(p);
