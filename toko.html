@@ -620,26 +620,35 @@ body{background:#f5f7f8;color:#27323b}
 
 
 <style id="seamart-pc-search-anchor">
-/* Desktop: anchor the search field on the same row as the header search icon */
+/* Desktop: keep search input compact and clear of the search, notification and cart icons */
 @media (min-width:700px){
   #searchPanel{
     position:fixed!important;
     top:51px!important;
-    right:124px!important;
+    right:184px!important;
     left:auto!important;
-    width:min(520px,calc(100vw - 170px))!important;
-    max-width:520px!important;
+    width:min(440px,calc(100vw - 230px))!important;
+    max-width:440px!important;
     margin:0!important;
     z-index:120!important;
   }
   #searchPanel .search-panel-inner{
     width:100%!important;
+    height:42px!important;
+    min-height:42px!important;
+    gap:8px!important;
+    padding-left:11px!important;
+    border-radius:9px!important;
   }
+  #searchPanel .search-panel-icon{width:18px!important;height:18px!important}
+  #searchPanel .search-panel .search{height:40px!important;font-size:13px!important}
+  #searchPanel .search-close{width:36px!important;height:40px!important;font-size:19px!important;border-radius:0 8px 8px 0!important}
   #searchPanel .search-suggest{
-    top:calc(100% + 7px)!important;
+    top:calc(100% + 6px)!important;
     left:0!important;
     right:0!important;
     width:100%!important;
+    max-height:230px!important;
   }
 }
 </style>
