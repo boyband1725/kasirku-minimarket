@@ -2162,6 +2162,90 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
  }
 }
 
+
+/* Refined SeaMart edit-product dialog: tighter, calmer and balanced */
+#modalroot .edit-product-modalback{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:20px!important;background:rgba(17,29,24,.62)!important;
+ backdrop-filter:blur(4px)!important;overflow-y:auto!important
+}
+#modalroot .edit-product-modal{
+ width:min(650px,calc(100vw - 40px))!important;max-width:650px!important;
+ max-height:min(82vh,690px)!important;overflow:auto!important;
+ padding:0!important;border:1px solid #e4ebe6!important;border-radius:16px!important;
+ background:#fff!important;box-shadow:0 24px 80px rgba(12,28,19,.28)!important
+}
+#modalroot .edit-product-modal-head{
+ position:sticky;top:0;z-index:2;align-items:center!important;
+ padding:16px 20px 13px!important;margin:0 0 15px!important;
+ background:linear-gradient(110deg,#f5fbf7,#fff)!important;
+ border-bottom:1px solid #e8eee9!important
+}
+#modalroot .edit-product-modal-head h2{font-size:17px!important;letter-spacing:-.2px!important;color:#174b36!important}
+#modalroot .edit-product-modal-sub{font-size:11px!important;color:#77847c!important}
+#modalroot .edit-product-close{width:32px!important;height:32px!important;background:#edf5ef!important;color:#285c43!important}
+#modalroot #inline_edit_form{padding:0 20px 16px!important}
+#modalroot #inline_edit_form .formgrid{
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px 12px!important
+}
+#modalroot #inline_edit_form .formgrid label{
+ gap:5px!important;font-size:11px!important;font-weight:700!important;color:#53645a!important
+}
+#modalroot #inline_edit_form .formgrid .field{
+ height:36px!important;min-height:36px!important;padding:7px 9px!important;
+ border:1px solid #dce6df!important;border-radius:8px!important;
+ background:#fbfdfb!important;color:#26362d!important;font-size:12px!important;
+ box-shadow:none!important
+}
+#modalroot #inline_edit_form .formgrid .field:focus{
+ border-color:#15945d!important;background:#fff!important;box-shadow:0 0 0 3px #15945d16!important
+}
+#modalroot .edit-product-active{
+ margin-top:13px!important;padding:9px 11px!important;border:1px solid #e3eee6!important;
+ background:#f6fbf7!important;border-radius:8px!important;font-size:11px!important
+}
+#modalroot .edit-product-photo{
+ display:grid!important;grid-template-columns:1fr auto;align-items:center!important;
+ gap:4px 12px!important;margin-top:12px!important;padding:11px 12px!important;
+ border:1px solid #e5ece7!important;border-radius:10px!important;background:#fcfdfc!important
+}
+#modalroot .edit-product-photo-title{grid-column:1/-1!important;margin:0 0 3px!important;font-size:11px!important}
+#modalroot .edit-product-photo-actions{grid-column:1!important;grid-row:2!important;align-items:center!important}
+#modalroot .edit-product-photo-actions button{
+ min-height:30px!important;padding:5px 9px!important;border-radius:7px!important;font-size:10px!important
+}
+#modalroot .edit-product-photo-preview{
+ grid-column:2!important;grid-row:2!important;justify-content:center!important;
+ min-width:68px!important;min-height:68px!important;margin:0!important
+}
+#modalroot .edit-product-photo-preview img{
+ width:66px!important;height:66px!important;object-fit:contain!important;
+ border:1px solid #e4ebe6!important;border-radius:8px!important;background:#fff!important
+}
+#modalroot #inline_photo_status,#modalroot #inline_photo_progress{grid-column:1/-1!important}
+#modalroot .edit-product-modal-actions{
+ position:sticky;bottom:0;z-index:2;margin:0!important;padding:11px 20px!important;
+ background:#fff!important;border-top:1px solid #e8eee9!important
+}
+#modalroot .edit-product-modal-actions button{
+ min-width:108px!important;min-height:34px!important;border-radius:8px!important;
+ font-size:11px!important;font-weight:700!important
+}
+@media(max-width:640px){
+ #modalroot .edit-product-modalback{padding:10px!important}
+ #modalroot .edit-product-modal{width:calc(100vw - 20px)!important;max-height:90dvh!important;border-radius:13px!important}
+ #modalroot .edit-product-modal-head{padding:13px 14px 11px!important}
+ #modalroot #inline_edit_form{padding:0 14px 13px!important}
+ #modalroot #inline_edit_form .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ #modalroot .edit-product-photo{grid-template-columns:1fr auto!important}
+ #modalroot .edit-product-modal-actions{padding:10px 14px!important}
+}
+@media(max-width:390px){
+ #modalroot #inline_edit_form .formgrid{grid-template-columns:1fr!important}
+ #modalroot .edit-product-photo{grid-template-columns:1fr!important}
+ #modalroot .edit-product-photo-preview{grid-column:1!important;grid-row:3!important;justify-content:flex-start!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
