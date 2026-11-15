@@ -1985,6 +1985,8 @@ async function refreshSeaMartCloudSalesGlobal(){
  }
  db.sales.sort((a,b)=>new Date(b.at||b.time||0)-new Date(a.at||a.time||0));save();return merged;
 }
+/* Global compatibility alias: older refresh handlers call this name. */
+async function refreshSeaMartCloudSales(){return refreshSeaMartCloudSalesGlobal();}
 async function refreshSeaMartNow(){
  const button=document.getElementById('seamartRefreshBtn'),status=document.getElementById('seamartRefreshStatus');
  if(window.seamartRefreshBusy)return;
