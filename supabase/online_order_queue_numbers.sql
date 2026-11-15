@@ -178,6 +178,7 @@ begin
     'order_code', v_order.order_code,
     'customer_name', v_order.customer_name,
     'customer_phone', v_order.customer_phone,
+    'customer_note', v_order.customer_note,
     'order_status', v_order.order_status,
     'payment_status', v_order.payment_status,
     'payment_method', v_order.payment_method,
