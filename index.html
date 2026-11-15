@@ -2009,14 +2009,18 @@ async function refreshSeaMartNow(){
     else{db.products.push({id:row.id,nama:row.name||'',kode:row.code||'',barcode:row.barcode||'',kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});}
    }
   }else{applySeaMartCloudStock(products.data||[]);}
-  await refreshSeaMartCloudSalesGlobal();
-  const flows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',store).order('transaction_date',{ascending:false});
-  if(flows.error)throw flows.error;
-  db.cashflows=(flows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;
+  const warnings=[];
+  try{await refreshSeaMartCloudSalesGlobal();}
+  catch(e){console.warn('Riwayat penjualan tidak dapat dibaca dari cloud:',e.message||e);warnings.push('Riwayat penjualan tidak dapat diakses');}
+  try{
+   const flows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',store).order('transaction_date',{ascending:false});
+   if(flows.error)throw flows.error;
+   db.cashflows=(flows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;
+  }catch(e){console.warn('Arus kas tidak dapat dibaca dari cloud:',e.message||e);warnings.push('Arus kas tidak dapat diakses');}
   save();
   if(window.seamartCurrentPage==='kasir'){renderPosProducts();renderCart();}
   else if(window.seamartCurrentPage==='dashboard'){dashboard();}
-  if(status)status.textContent='Terakhir: '+new Date().toLocaleTimeString('id-ID');
+  if(status)status.textContent=warnings.length?'Refresh sebagian · '+warnings.join(', '):'Terakhir: '+new Date().toLocaleTimeString('id-ID');
  }catch(e){console.error('Refresh SeaMart gagal:',e);if(status)status.textContent='Gagal refresh';alert('Refresh gagal: '+(e.message||String(e)));}
  finally{window.seamartRefreshBusy=false;if(button){button.disabled=false;button.textContent='↻ Refresh';}}
 }
