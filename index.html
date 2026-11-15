@@ -4477,4 +4477,44 @@ restoreSeaMartSession();
  new MutationObserver(function(records){records.forEach(function(rec){rec.addedNodes.forEach(function(n){if(n.nodeType===1)enhance(n.matches?.('input')?n.parentElement:n);});});}).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
-</body></html>
+
+<style id="seamart-alert-style">
+#smAlertOverlay{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,24,20,.58);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:smAlertFade .16s ease}
+#smAlertDialog{width:min(460px,calc(100vw - 32px));max-height:min(78vh,620px);display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,.8);border-radius:16px;box-shadow:0 22px 70px rgba(0,0,0,.28);font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;animation:smAlertPop .18s ease}
+#smAlertDialog .sm-alert-head{display:flex;align-items:center;gap:11px;padding:15px 18px;background:linear-gradient(120deg,#087b49,#075c3a);color:white}
+#smAlertDialog .sm-alert-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:rgba(255,255,255,.17);font-size:19px}
+#smAlertDialog .sm-alert-title{font-size:16px;font-weight:750;letter-spacing:.1px;flex:1}
+#smAlertDialog .sm-alert-close{border:0;background:transparent;color:white;width:32px;height:32px;border-radius:8px;font-size:23px;line-height:1;cursor:pointer}
+#smAlertDialog .sm-alert-close:hover{background:rgba(255,255,255,.16)}
+#smAlertDialog .sm-alert-content{padding:19px 20px 12px;overflow:auto;color:#25342e;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+#smAlertDialog .sm-alert-actions{display:flex;justify-content:flex-end;padding:12px 20px 18px}
+#smAlertDialog .sm-alert-ok{min-width:92px;border:0;border-radius:9px;padding:9px 20px;background:#087b49;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 5px rgba(8,123,73,.2)}
+#smAlertDialog .sm-alert-ok:hover{background:#06643c}
+@keyframes smAlertFade{from{opacity:0}to{opacity:1}}@keyframes smAlertPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:520px){#smAlertDialog{width:calc(100vw - 26px);border-radius:13px}#smAlertDialog .sm-alert-head{padding:13px 15px}#smAlertDialog .sm-alert-content{padding:16px;font-size:12px}}
+</style>
+<script>
+(function(){
+ if(window.__seamartStyledAlertInstalled)return;
+ window.__seamartStyledAlertInstalled=true;
+ window.alert=function(message){
+  const old=document.getElementById('smAlertOverlay');if(old)old.remove();
+  const overlay=document.createElement('div');overlay.id='smAlertOverlay';
+  const dialog=document.createElement('section');dialog.id='smAlertDialog';dialog.setAttribute('role','alertdialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','smAlertTitle');
+  const head=document.createElement('div');head.className='sm-alert-head';
+  const icon=document.createElement('div');icon.className='sm-alert-icon';icon.textContent='!';icon.setAttribute('aria-hidden','true');
+  const title=document.createElement('div');title.className='sm-alert-title';title.id='smAlertTitle';title.textContent='Pemberitahuan';
+  const close=document.createElement('button');close.className='sm-alert-close';close.type='button';close.textContent='×';close.setAttribute('aria-label','Tutup');
+  head.append(icon,title,close);
+  const content=document.createElement('div');content.className='sm-alert-content';content.textContent=String(message??'');
+  const actions=document.createElement('div');actions.className='sm-alert-actions';
+  const ok=document.createElement('button');ok.className='sm-alert-ok';ok.type='button';ok.textContent='Mengerti';
+  actions.append(ok);dialog.append(head,content,actions);overlay.append(dialog);document.body.append(overlay);
+  const done=()=>{overlay.remove();document.removeEventListener('keydown',keyHandler)};
+  const keyHandler=e=>{if(e.key==='Escape'){e.preventDefault();done()}};
+  ok.addEventListener('click',done);close.addEventListener('click',done);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)done()});
+  document.addEventListener('keydown',keyHandler);ok.focus();
+ };
+})();
+</script></body></html>
