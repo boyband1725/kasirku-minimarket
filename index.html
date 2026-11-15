@@ -2167,7 +2167,7 @@ async function refreshSeaMartNow(){
     if(localStorage.getItem('seamart_master_source_v1')==='local'){
      p.stok=Number(row.stock??p.stok);
      if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
-     else if(/^data:image\\//i.test(String(p.foto||''))){
+     else if(/^data:image\//i.test(String(p.foto||''))){
       try{const url=await uploadSeaMartProductPhoto(sb,store,row.id,p.foto);const upd=await sb.from('products').update({image_url:url}).eq('id',row.id).eq('store_id',store);if(upd.error)throw upd.error;p.foto=url;p.image_url=url;}
       catch(photoError){console.warn('Foto lokal belum tersinkron untuk '+(p.nama||row.code)+':',photoError.message||photoError);warnings.push('Foto '+(p.nama||row.code)+' belum tersinkron');}
      }
