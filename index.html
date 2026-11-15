@@ -1816,6 +1816,46 @@ td{border-bottom-color:#e8f2ee!important}
  .odoo-order-head .pill{margin-left:auto!important}
 }
 
+
+/* Slim top action buttons on phone */
+@media(max-width:760px){
+ .topbar{
+  min-height:52px!important;height:auto!important;padding:6px 8px!important;
+  gap:5px!important
+ }
+ .topbar-left{gap:5px!important}
+ .topbar-left .mobile-menu-btn{
+  height:32px!important;min-height:32px!important;padding:0 9px!important;
+  border-radius:8px!important;font-size:11px!important
+ }
+ .topbar .user{gap:4px!important;flex:1 1 auto!important}
+ .topbar .user .btn-light,
+ .topbar .user #shiftAction{
+  height:32px!important;min-height:32px!important;padding:0 6px!important;
+  border-radius:8px!important;font-size:9px!important;line-height:1!important;
+  font-weight:700!important
+ }
+ .topbar .user #shiftAction{min-width:66px!important}
+ .topbar .user button[onclick="accountSettings()"]{min-width:57px!important}
+ .topbar .user button[onclick="logout()"]{min-width:42px!important}
+ .topbar .user #mobileCartTrigger{
+  width:33px!important;min-width:33px!important;flex:0 0 33px!important;
+  height:32px!important;min-height:32px!important;border-radius:8px!important
+ }
+ .topbar .user #mobileCartTrigger>span{font-size:16px!important}
+ .topbar .user #mobileCartTrigger b{min-width:15px!important;height:15px!important;font-size:8px!important}
+}
+@media(max-width:390px){
+ .topbar{padding:5px 6px!important;gap:4px!important}
+ .topbar-left .mobile-menu-btn{padding:0 7px!important;font-size:10px!important}
+ .topbar .user{gap:3px!important}
+ .topbar .user .btn-light,.topbar .user #shiftAction{padding:0 4px!important;font-size:8px!important}
+ .topbar .user #shiftAction{min-width:59px!important}
+ .topbar .user button[onclick="accountSettings()"]{min-width:51px!important}
+ .topbar .user button[onclick="logout()"]{min-width:38px!important}
+ .topbar .user #mobileCartTrigger{width:30px!important;min-width:30px!important;flex-basis:30px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
