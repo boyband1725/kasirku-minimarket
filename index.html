@@ -2814,21 +2814,29 @@ async function loadNovemberMasterRows(){
 function mergeNovemberMaster(source,current,remote){
  const local=Array.isArray(current)?current:[],cloud=Array.isArray(remote)?remote:[];
  const norm=s=>String(s??'').trim();
- const usedCloud=new Set();
- return source.map(p=>{
-  let hits=cloud.filter(x=>norm(x.code)===p.kode);
-  if(hits.length!==1){hits=p.barcode?cloud.filter(x=>norm(x.barcode)===p.barcode):[];}
-  const row=hits.length===1?hits[0]:null;
-  if(row)usedCloud.add(String(row.id));
-  let old=local.find(x=>norm(x.kode)===p.kode);
-  if(!old&&p.barcode){const m=local.filter(x=>norm(x.barcode)===p.barcode);if(m.length===1)old=m[0];}
+ const normCode=s=>norm(s).replace(/^0+(?=\\d)/,'');
+ const normName=s=>norm(s).toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+ let preservedPhotos=0;
+ const merged=source.map(p=>{
+  let cloudHits=cloud.filter(x=>norm(x.code)===p.kode);
+  if(cloudHits.length!==1)cloudHits=cloud.filter(x=>p.barcode&&norm(x.barcode)===p.barcode);
+  if(cloudHits.length!==1)cloudHits=cloud.filter(x=>normCode(x.code)===normCode(p.kode));
+  const row=cloudHits.length===1?cloudHits[0]:null;
+  let localHits=local.filter(x=>norm(x.kode)===p.kode);
+  if(localHits.length!==1)localHits=local.filter(x=>normCode(x.kode)===normCode(p.kode));
+  if(localHits.length!==1&&p.barcode)localHits=local.filter(x=>norm(x.barcode)===p.barcode);
+  if(localHits.length!==1)localHits=local.filter(x=>normName(x.nama)===normName(p.nama));
+  const old=localHits.length===1?localHits[0]:null;
+  const photo=row?.image_url||row?.foto||old?.foto||old?.image_url||'';
+  if(photo)preservedPhotos++;
   return {...p,id:row?.id||old?.id||('nov2026-'+p.kode),
    stok:row?Number(row.stock??p.stok):(old?Number(old.stok??p.stok):p.stok),
-   active:old?.active!==false,
-   foto:row?.image_url||old?.foto||old?.image_url||'',
+   active:old?.active!==false,foto:photo,
    image_url:row?.image_url||old?.image_url||old?.foto||''
   };
  });
+ merged._photoPreservedCount=preservedPhotos;
+ return merged;
 }
 async function applyNovemberMaster(){
  const button=[...document.querySelectorAll('button')].find(b=>b.getAttribute('onclick')==='applyNovemberMaster()');
@@ -2860,19 +2868,14 @@ async function applyNovemberMaster(){
   if(source.length!==138)throw new Error('Jumlah data master terbaca '+source.length+', seharusnya 138. Data tidak diubah.');
   if(new Set(source.map(p=>p.kode)).size!==138)throw new Error('Ada kode barang ganda pada file master. Data tidak diubah.');
   const current=Array.isArray(db.products)?db.products:[];
-  const norm=s=>String(s??'').trim().replace(/^0+(?=\d)/,'');
-  const next=source.map((p,i)=>{
-   let matches=current.filter(x=>String(x.kode??'').trim()===p.kode);
-   if(matches.length!==1){const byNorm=current.filter(x=>norm(x.kode)===norm(p.kode));matches=byNorm.length===1?byNorm:[];}
-   if(!matches.length&&p.barcode){const byBarcode=current.filter(x=>String(x.barcode??'').trim()===p.barcode);if(byBarcode.length===1)matches=byBarcode;}
-   const previous=matches[0];
-   return {...p,id:previous?.id||('nov2026-'+p.kode),active:previous?.active!==false,foto:previous?.foto||''};
-  });
+  const next=mergeNovemberMaster(source,current,[]);
+  const preservedPhotoCount=next._photoPreservedCount||0;
+  delete next._photoPreservedCount;
   if(!confirm('Terapkan master November 2026 sebanyak 138 barang? Master barang perangkat ini akan diganti. Backup seluruh data akan diunduh dahulu. Riwayat transaksi dan data lain tetap dipertahankan.'))return;
   download('seamart-backup-sebelum-master-november.json',JSON.stringify(db,null,2));
   db.products=next;save();localStorage.setItem('seamart_master_source_v1','local');
   products();
-  alert('Berhasil! Master November 138 barang sudah diterapkan. Kode Odoo dan nol di depan dipertahankan. Backup JSON telah diunduh. Data lain tetap disimpan.');
+  alert('Berhasil! Master November 138 barang sudah diterapkan. '+preservedPhotoCount+' foto produk berhasil dipertahankan berdasarkan kode, barcode, atau nama produk yang cocok. Kode Odoo dan nol di depan dipertahankan. Backup JSON telah diunduh. Data lain tetap disimpan.');
  }catch(error){alert('Master November gagal diterapkan: '+(error?.message||error)+'. Tidak ada perubahan master.');}
  finally{if(button){button.disabled=false;button.textContent='Terapkan Master Barang Baru';}}
 }
