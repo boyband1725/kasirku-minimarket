@@ -4026,18 +4026,22 @@ async function importProductPhotoSources(){
   for(const item of records){
    try{
     const local=db.products.filter(p=>String(p.barcode||'').trim()===item.barcode);
-    if(local.length!==1){
-     stats.skip++;skipped.push(item.barcode+' — '+(local.length===0?'barcode tidak ditemukan di master lokal':'barcode ganda di master lokal'));
+    if(local.length>1){
+     stats.skip++;skipped.push(item.barcode+' — barcode ganda di master lokal');
     }else{
-     await validateProductPhoto(item.url,local[0].nama,item.name);
-     const q=await sb.from('products').select('id,barcode').eq('store_id',store).eq('barcode',item.barcode);
+     const q=await sb.from('products').select('id,barcode,name').eq('store_id',store).eq('barcode',item.barcode);
      if(q.error)throw q.error;
      if(!q.data||q.data.length!==1){
-      stats.skip++;skipped.push(item.barcode+' — '+(!q.data||q.data.length===0?'barang tidak ditemukan di cloud':'barcode ganda di cloud'));
+      stats.skip++;skipped.push(item.barcode+' — '+(!q.data||q.data.length===0?'barcode tidak ditemukan di cloud':'barcode ganda di cloud'));
      }else{
+      const cloudName=String(q.data[0].name||'').trim();
+      const targetName=local[0]?.nama||cloudName||item.name;
+      await validateProductPhoto(item.url,targetName,item.name);
       const upd=await sb.from('products').update({image_url:item.url}).eq('id',q.data[0].id).eq('store_id',store);
       if(upd.error)throw upd.error;
-      local[0].image_url=item.url;local[0].foto=item.url;stats.ok++;
+      if(local[0]){local[0].image_url=item.url;local[0].foto=item.url;}
+      stats.ok++;
+      if(!local[0])skipped.push(item.barcode+' — foto dipasang ke cloud; produk belum ada di master lokal perangkat ini');
      }
     }
    }catch(e){stats.fail++;failed.push(item.barcode+' — '+(e.message||String(e)));console.warn('Foto '+item.barcode,e)}
