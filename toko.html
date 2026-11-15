@@ -302,6 +302,28 @@ body{background:#f5f7f8;color:#27323b}
 #shopDrawer{z-index:10000!important}
 #shopDrawer.open{pointer-events:auto!important;visibility:visible!important;opacity:1!important}
 #shopDrawer.open .shop-drawer{transform:translateX(0)!important}
+/* SeaMart catalogue popup: compact cards and a genuinely scrollable product area */
+.shop-category-modal{width:min(1120px,calc(100vw - 28px));height:min(88vh,850px);max-height:88vh;min-height:0}
+.shop-category-head{flex:0 0 auto;padding:12px 16px}
+.shop-category-products{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;align-content:start;grid-auto-rows:max-content;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;padding:12px;scrollbar-gutter:stable}
+.shop-category-products .item{height:auto;min-height:0;display:flex;flex-direction:column;padding:9px;border-radius:10px}
+.shop-category-products .thumb{height:96px;min-height:96px;max-height:96px;margin:0 0 7px;border-radius:7px}
+.shop-category-products .thumb img{width:100%;height:100%;object-fit:contain;padding:4px}
+.shop-category-products .name{font-size:12px;line-height:1.3;min-height:32px;margin:4px 0}
+.shop-category-products .price{font-size:15px;margin-top:3px}
+.shop-category-products .stock{font-size:10px;margin:3px 0 6px}
+.shop-category-products .detail-btn,.shop-category-products .buy-now-btn{font-size:11px;padding:7px 8px;margin-top:6px}
+.shop-category-products .product-qty{padding:5px 0 0;gap:6px}
+.shop-category-products .product-qty button{width:32px;height:30px;font-size:20px}
+.shop-category-picker{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start}
+@media(max-width:600px){
+ .shop-category-overlay{padding:7px}
+ .shop-category-modal{width:100%;height:92dvh;max-height:92dvh;border-radius:13px}
+ .shop-category-head{padding:10px 12px}
+ .shop-category-head h2{font-size:16px}
+ .shop-category-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px}
+ .shop-category-products .thumb{height:90px;min-height:90px;max-height:90px}
+}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style><style id="seamart-slim-product-buttons">
 @media(max-width:599px){
