@@ -367,7 +367,13 @@ body{background:#f5f7f8;color:#27323b}
 .shop-category-close{width:38px;height:38px;flex:none;border:0;border-radius:50%;background:#edf2f5;color:#344454;font-size:26px;line-height:1}
 .shop-category-products{padding:17px;overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
 .shop-category-picker{padding:18px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.shop-category-choice{padding:17px 14px;border:1px solid #e5edf1;border-radius:12px;background:#f9fbfc;color:#263746;text-align:left;font-weight:750}
+.shop-category-choice{display:block;width:100%;min-height:58px;padding:13px 15px;border:1px solid #dce6eb;border-radius:10px;background:#f7fafb;color:#243746;text-align:left;font-size:14px;font-weight:750;cursor:pointer}
+.shop-category-choice small{display:block;margin-top:4px;color:#627480;font-size:12px;font-weight:500}
+.shop-category-picker[hidden],.shop-category-products[hidden]{display:none!important}
+.shop-category-products .item{min-width:0}
+.shop-category-products .thumb{height:145px;min-height:145px;display:flex;align-items:center;justify-content:center}
+.shop-category-products .thumb img{max-width:100%;max-height:100%;object-fit:contain}
+@media(min-width:700px){.shop-category-products{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
 .shop-category-choice:hover{border-color:#2787c4;background:#eff8fd}
 .shop-category-choice small{display:block;margin-top:5px;color:#74828c;font-weight:500}
 .shop-tracking-modal{width:min(420px,calc(100vw - 28px));max-height:min(82vh,680px);padding:0 0 10px;display:flex;flex-direction:column;overflow:hidden}
@@ -524,23 +530,23 @@ function openCategoryPopup(name){
  closeShopMenu();
  const overlay=document.getElementById('shopCategoryPopup');
  const picker=document.getElementById('shopCategoryPicker'),grid=document.getElementById('shopCategoryProducts');
- const matches=categoryMatches(name);
- if(matches.length===1){
-  overlay.dataset.category=matches[0];document.getElementById('shopCategoryTitle').textContent=matches[0];
-  picker.hidden=true;grid.hidden=false;renderCategoryPopup();
- }else{
-  overlay.dataset.category='';document.getElementById('shopCategoryTitle').textContent=matches.length?'Pilih kategori: '+name:'Kategori tersedia';
-  grid.hidden=true;picker.hidden=false;
-  const options=matches.length?matches:[...new Set(products.map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
-  picker.innerHTML=options.length?options.map(n=>'<button type="button" class="shop-category-choice" data-category-choice="'+esc(n)+'">'+esc(n)+'<small>'+products.filter(p=>p.category===n).length+' produk</small></button>').join(''):'<div class="empty">Kategori belum tersedia. Produk belum berhasil dimuat.</div>';
-  picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
- }
+ const allNames=[...new Set(products.map(p=>p.category).filter(Boolean))];
+ const matches=name==='__ALL__'?allNames:categoryMatches(name);
+ // A menu category opens its products immediately, even when it maps to several database categories.
+ // If no category label matches, show the full catalogue instead of an empty category-picker grid.
+ const selected=matches.length?matches:allNames;
+ overlay.dataset.categories=JSON.stringify(selected);
+ overlay.dataset.category=name;
+ document.getElementById('shopCategoryTitle').textContent=name==='__ALL__'?'Semua Produk':(matches.length?name+' • Katalog Barang':'Katalog Barang');
+ picker.hidden=true;grid.hidden=false;
+ renderCategoryPopup();
  overlay.classList.add('open');document.body.style.overflow='hidden';
 }
 function renderCategoryPopup(){
  const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
- const name=overlay.dataset.category,q=(document.getElementById('search')?.value||'').toLowerCase().trim();
- const rows=products.filter(p=>(name==='__ALL__'||p.category===name)&&(!q||p.name.toLowerCase().includes(q)||String(p.barcode||'').includes(q)));
+ const selected=(()=>{try{return JSON.parse(overlay.dataset.categories||'[]')}catch(_){return []}})();
+ const q=(document.getElementById('search')?.value||'').toLowerCase().trim();
+ const rows=products.filter(p=>(!selected.length||selected.includes(p.category))&&(!q||p.name.toLowerCase().includes(q)||String(p.barcode||'').includes(q)));
  const root=document.getElementById('shopCategoryProducts');
  root.innerHTML=rows.length?rows.map(p=>{
   const photo=p.image_url?'<img class="product-photo" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
@@ -551,9 +557,9 @@ function renderCategoryPopup(){
 function openAllCategoriesPopup(){
  closeShopMenu();const overlay=document.getElementById('shopCategoryPopup');
  const picker=document.getElementById('shopCategoryPicker'),grid=document.getElementById('shopCategoryProducts');
- document.getElementById('shopCategoryTitle').textContent='Semua Kategori';grid.hidden=true;picker.hidden=false;
- const names=[...new Set(products.map(p=>p.category))].sort((a,b)=>a.localeCompare(b,'id'));
- picker.innerHTML='<button class="shop-category-choice" data-category-choice="__ALL__">Semua Produk<small>'+products.length+' produk tersedia</small></button>'+names.map(n=>'<button class="shop-category-choice" data-category-choice="'+esc(n)+'">'+esc(n)+'<small>'+products.filter(p=>p.category===n).length+' produk</small></button>').join('');
+ document.getElementById('shopCategoryTitle').textContent='Pilih Kategori Barang';grid.hidden=true;picker.hidden=false;
+ const names=[...new Set(products.map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
+ picker.innerHTML='<button type="button" class="shop-category-choice" data-category-choice="__ALL__">Semua Produk<small>'+products.length+' produk tersedia</small></button>'+names.map(n=>'<button type="button" class="shop-category-choice" data-category-choice="'+esc(n)+'">'+esc(n)+'<small>'+products.filter(p=>p.category===n).length+' produk</small></button>').join('')||'<div class="empty">Produk belum berhasil dimuat.</div>';
  picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
  overlay.classList.add('open');document.body.style.overflow='hidden';
 }
