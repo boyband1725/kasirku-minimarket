@@ -18,6 +18,9 @@ create table if not exists public.seamart_order_counters (
   last_number bigint not null default 0
 );
 
+alter table public.seamart_order_counters enable row level security;
+revoke all on table public.seamart_order_counters from anon, authenticated;
+
 insert into public.seamart_order_counters(store_id,last_number)
 select store_id, coalesce(max(queue_number),0)
 from public.online_orders
@@ -125,6 +128,8 @@ $$;
 
 revoke all on function public.seamart_create_online_order(uuid,text,text,text,text,text,jsonb) from public;
 grant execute on function public.seamart_create_online_order(uuid,text,text,text,text,text,jsonb) to anon, authenticated;
+
+drop function if exists public.seamart_track_online_order(text,text);
 
 create or replace function public.seamart_track_online_order(
   p_queue_number text,
