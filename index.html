@@ -1959,6 +1959,15 @@ td{border-bottom-color:#e8f2ee!important}
  #ptable .tablewrap td:nth-child(6){align-items:center}
  #ptable .product-category-select{max-width:58%;font-size:10px!important}
 }
+/* Compact product search toolbar */
+#productListSection .toolbar{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:nowrap!important;margin:10px 0 14px!important}
+#productListSection #psearch{flex:0 1 520px!important;width:520px!important;max-width:58%!important;min-width:220px!important;height:38px!important;min-height:38px!important;padding:8px 12px!important;font-size:13px!important}
+#productListSection #pstatus{flex:0 0 170px!important;width:170px!important;max-width:30%!important;height:38px!important;min-height:38px!important;padding:7px 10px!important;font-size:12px!important}
+@media(max-width:760px){
+ #productListSection .toolbar{gap:7px!important}
+ #productListSection #psearch{flex:1 1 auto!important;width:auto!important;max-width:none!important;min-width:0!important;height:40px!important}
+ #productListSection #pstatus{flex:0 0 135px!important;width:135px!important;max-width:42%!important;height:40px!important}
+}
 html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
 #seamartRefreshBtn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;min-height:36px;white-space:nowrap}#seamartRefreshBtn:disabled{opacity:.65;cursor:wait}#seamartRefreshStatus{font-size:10px;color:var(--muted);white-space:nowrap}@media(max-width:900px){.topbar{gap:6px;padding:0 8px}.topbar .user{gap:5px}#seamartRefreshStatus{display:none}#seamartRefreshBtn{padding:7px 9px;font-size:12px}.topbar .user #shiftAction,.topbar .user button[onclick="accountSettings()"]{display:none}}
 </style>
