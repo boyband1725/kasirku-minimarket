@@ -654,11 +654,25 @@ body{background:#f5f7f8;color:#27323b}
 </style>
 
 <style id="seamart-search-fixed-position">
-/* Keep search and its suggestion panel fixed while the catalogue scrolls */
-#searchPanel{position:fixed!important;top:clamp(72px,12vh,118px)!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(860px,calc(100vw - 32px))!important;max-width:none!important;margin:0!important;z-index:10050!important;animation:none!important}
+/* Compact fixed search: anchored beside the header search icon, not stretched across the page */
+#searchPanel{position:fixed!important;top:63px!important;left:auto!important;right:184px!important;transform:none!important;width:min(440px,calc(100vw - 230px))!important;max-width:440px!important;margin:0!important;z-index:120!important;animation:none!important}
 #searchPanel.search-panel-open{animation:none!important}
-#searchPanel .search-suggest{position:absolute!important;top:calc(100% + 8px)!important;left:0!important;right:0!important;max-height:min(52vh,430px)!important;overflow-y:auto!important;overscroll-behavior:contain}
-@media(max-width:640px){#searchPanel{top:58px!important;width:calc(100vw - 24px)!important}#searchPanel .search-panel-inner{height:46px!important;min-height:46px!important}#searchPanel .search{height:44px!important;font-size:14px!important}#searchPanel .search-close{height:44px!important;width:44px!important}}
+#searchPanel .search-panel-inner{width:100%!important;height:42px!important;min-height:42px!important;gap:8px!important;padding-left:11px!important;border-radius:9px!important}
+#searchPanel .search-panel-icon{width:18px!important;height:18px!important}
+#searchPanel .search{height:40px!important;font-size:13px!important}
+#searchPanel .search-close{width:36px!important;height:40px!important;font-size:19px!important;border-radius:0 8px 8px 0!important}
+#searchPanel .search-suggest{position:absolute!important;top:calc(100% + 6px)!important;left:0!important;right:0!important;width:100%!important;max-height:230px!important;overflow-y:auto!important;overscroll-behavior:contain;padding:10px 9px!important;border-radius:11px!important}
+#searchPanel .suggest-col{padding:0 8px 0 5px!important}
+#searchPanel .suggest-col+.suggest-col{padding:0 4px 0 10px!important}
+#searchPanel .suggest-col h3{font-size:12px!important;margin:0 0 7px!important}
+#searchPanel .suggest-row{min-height:30px!important;padding:4px 1px!important;font-size:11px!important;gap:5px!important}
+@media(max-width:699px){
+ #searchPanel{top:58px!important;left:12px!important;right:12px!important;transform:none!important;width:auto!important;max-width:none!important}
+ #searchPanel .search-panel-inner{height:44px!important;min-height:44px!important}
+ #searchPanel .search{height:42px!important;font-size:14px!important}
+ #searchPanel .search-close{height:42px!important;width:40px!important}
+ #searchPanel .search-suggest{max-height:42vh!important}
+}
 </style></head>
 <body>
 <div class="promo-strip" aria-label="Promosi SeaMart"><div class="promo-marquee"><span>Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span><span>Temukan harga spesial setiap hari • Penuhi kebutuhan Anda tanpa batas!</span><span aria-hidden="true">Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span></div></div>
