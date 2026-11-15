@@ -514,7 +514,7 @@ function dedupeCatalogProducts(list){
   const barcode=String(p.barcode||'').replace(/\\.0$/,'').replace(/\\D/g,'');
   const name=normName(p.name),price=Number(p.price)||0;
   // Require matching barcode, name and price; never merge different products or add their stock.
-  const key=barcode?barcode+'|'+name+'|'+price:'NO-BARCODE|'+name+'|'+price;
+  const key=barcode?barcode+'|'+name+'|'+price:'NO-BARCODE|'+String(p.id);
   const old=map.get(key);
   if(!old){map.set(key,p);continue;}
   const score=x=>(Number(x.stock)>0?1000000:0)+(x.image_url?10000:0)+Math.max(0,Number(x.stock)||0);
