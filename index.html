@@ -2272,6 +2272,10 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
  #modalroot .edit-product-modal-actions{padding:8px 12px!important}
 }
 
+/* Draggable edit-product window */
+#modalroot .edit-product-modal-head{cursor:grab!important;user-select:none!important;touch-action:none!important}
+#modalroot .edit-product-modal-head:active{cursor:grabbing!important}
+#modalroot .edit-product-modal{will-change:left,top}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -3249,6 +3253,31 @@ function selectProductForEdit(id){
  <label class="edit-product-active"><input id="f_active" type="checkbox" ${p.active!==false?"checked":""}> Tampilkan di Kasir dan Toko Online</label>
  <div class="edit-product-photo"><div class="edit-product-photo-title">Foto Produk</div><input id="if_foto_file" type="file" accept="image/*" class="hidden" onchange="previewInlineProductPhoto(this)"><div class="edit-product-photo-actions"><button type="button" class="btn-light" onclick="document.getElementById('if_foto_file').click()">Ganti Foto</button><button type="button" class="btn-danger" onclick="clearInlineProductPhoto()">Hapus Foto</button><button type="button" class="btn-light" onclick="lookupInlineProductPhoto()">Cari Foto Otomatis</button></div><div id="inline_photo_preview" class="edit-product-photo-preview">${p.foto?'<img src="'+esc(p.foto)+'" alt="Foto produk">':'<span class="emptyhint">Belum ada foto produk.</span>'}</div><div id="inline_photo_status" class="emptyhint">Foto dicocokkan dengan nama dan barcode barang.</div><div id="inline_photo_progress" style="display:none;margin-top:8px"><div style="display:flex;justify-content:space-between"><span id="inline_photo_progress_text">Menyiapkan…</span><span id="inline_photo_progress_pct">0%</span></div><div style="height:7px;background:#e5eee9;border-radius:99px;overflow:hidden;margin-top:5px"><div id="inline_photo_progress_bar" style="height:100%;width:0%;background:#15945d"></div></div></div></div>
  <div class="edit-product-modal-actions"><button type="button" class="btn-light" onclick="closeEditProductModal()">Batal</button><button type="button" class="btn-primary" onclick="saveInlineProduct()">Simpan Perubahan</button></div></div></section></div>`;
+ const modal=root.querySelector('.edit-product-modal');
+ const dragBar=root.querySelector('.edit-product-modal-head');
+ if(modal&&dragBar){
+  dragBar.style.cursor='grab';dragBar.style.userSelect='none';dragBar.style.touchAction='none';
+  dragBar.title='Klik dan tahan untuk menggeser jendela';
+  let dragging=false,startX=0,startY=0,baseLeft=0,baseTop=0;
+  dragBar.addEventListener('pointerdown',function(ev){
+   if(ev.button!==0||ev.target.closest('button,input,select,textarea,a'))return;
+   const rect=modal.getBoundingClientRect();
+   dragging=true;startX=ev.clientX;startY=ev.clientY;baseLeft=rect.left;baseTop=rect.top;
+   modal.style.position='fixed';modal.style.left=baseLeft+'px';modal.style.top=baseTop+'px';
+   modal.style.margin='0';modal.style.transform='none';
+   dragBar.style.cursor='grabbing';ev.preventDefault();
+   try{dragBar.setPointerCapture(ev.pointerId)}catch(err){}
+  });
+  dragBar.addEventListener('pointermove',function(ev){
+   if(!dragging)return;
+   const maxLeft=Math.max(0,window.innerWidth-modal.offsetWidth);
+   const maxTop=Math.max(0,window.innerHeight-70);
+   modal.style.left=Math.min(maxLeft,Math.max(0,baseLeft+ev.clientX-startX))+'px';
+   modal.style.top=Math.min(maxTop,Math.max(0,baseTop+ev.clientY-startY))+'px';
+  });
+  const stopDrag=function(){if(!dragging)return;dragging=false;dragBar.style.cursor='grab'};
+  dragBar.addEventListener('pointerup',stopDrag);dragBar.addEventListener('pointercancel',stopDrag);
+ }
 }
 
 async function validateProductPhoto(url,targetName,sourceName){
