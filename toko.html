@@ -370,13 +370,25 @@ body{background:#f5f7f8;color:#27323b}
 .shop-category-choice{padding:17px 14px;border:1px solid #e5edf1;border-radius:12px;background:#f9fbfc;color:#263746;text-align:left;font-weight:750}
 .shop-category-choice:hover{border-color:#2787c4;background:#eff8fd}
 .shop-category-choice small{display:block;margin-top:5px;color:#74828c;font-weight:500}
-.shop-tracking-modal{width:min(460px,100%);padding-bottom:18px}
-.shop-tracking-modal>p,.shop-tracking-modal>form,.shop-tracking-modal>#popupTrackingResult{margin-left:20px;margin-right:20px}
-.shop-tracking-modal>p{margin-top:17px}
-.shop-tracking-modal form{display:grid;gap:9px}
-.shop-tracking-modal form label{font-size:12px;font-weight:700;color:#53616b}
-.shop-tracking-modal form .field{width:100%;min-width:0}
-.shop-tracking-modal form .primary{width:100%;margin-top:5px}
+.shop-tracking-modal{width:min(420px,calc(100vw - 28px));max-height:min(82vh,680px);padding:0 0 10px;display:flex;flex-direction:column;overflow:hidden}
+.shop-tracking-modal .shop-category-head{padding:11px 15px;flex:none}
+.shop-tracking-modal .shop-category-head h2{font-size:18px}
+.shop-tracking-modal>p,.shop-tracking-modal>form,.shop-tracking-modal>#popupTrackingResult{margin-left:17px;margin-right:17px}
+.shop-tracking-modal>p{margin-top:10px;margin-bottom:9px;font-size:13px;line-height:1.4}
+.shop-tracking-modal form{display:grid;gap:6px;flex:none}
+.shop-tracking-modal form label{font-size:12px;font-weight:700;color:#53616b;margin-top:2px}
+.shop-tracking-modal form .field{width:100%;min-width:0;height:40px;padding:9px 11px;font-size:14px;border-radius:9px}
+.shop-tracking-modal form .primary{width:100%;min-height:40px;margin-top:3px;padding:9px 12px;font-size:14px;border-radius:9px}
+.shop-tracking-modal>#popupTrackingResult{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 0 5px}
+.shop-tracking-modal #popupTrackingResult:empty{display:none}
+.shop-tracking-modal #popupTrackingResult .msg{padding:9px 11px;margin:7px 0;font-size:13px;line-height:1.4}
+.shop-tracking-modal #popupTrackingResult .msg>div:first-child{padding:3px!important}
+.shop-tracking-modal #popupTrackingResult .msg>div:first-child>div:last-child{font-size:26px!important}
+.shop-tracking-modal #popupTrackingResult [style*="display:grid"]{gap:5px!important;margin:8px 0!important;font-size:13px}
+.shop-tracking-modal #popupTrackingResult .cartline{padding:8px 0;font-size:13px}
+.shop-tracking-modal #popupTrackingResult .total{padding:8px 0;font-size:15px}
+.shop-tracking-modal #popupTrackingResult h3{font-size:15px;margin:10px 0 5px}
+.shop-tracking-modal #popupTrackingResult .primary{width:100%;min-height:38px;padding:8px 12px;font-size:13px;margin-top:8px!important}
 @media(max-width:560px){.shop-category-overlay{padding:9px}.shop-category-modal{max-height:92vh;border-radius:14px}.shop-category-head{padding:13px 15px}.shop-category-head h2{font-size:17px}.shop-category-products{padding:11px;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.shop-category-products .item{padding:9px}.shop-category-picker{padding:12px;grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -583,8 +595,8 @@ document.getElementById('orderForm').addEventListener('submit',async e=>{e.preve
 
 const orderStatusLabels={new:'Pesanan diterima',confirmed:'Pesanan dikonfirmasi',processing:'Sedang disiapkan',ready:'Siap diambil / dikirim',completed:'Pesanan selesai',cancelled:'Pesanan dibatalkan'};
 const paymentLabels={unpaid:'Belum dibayar',pending_verification:'Menunggu verifikasi pembayaran',paid:'Sudah dibayar',failed:'Pembayaran gagal'};
-async function trackOnlineOrder(code,phone){
- const root=document.getElementById('trackingResult');root.innerHTML='<div class="msg">Memeriksa pesanan...</div>';
+async function trackOnlineOrder(code,phone,targetId='trackingResult'){
+ const root=document.getElementById(targetId);if(!root)return;root.innerHTML='<div class="msg">Memeriksa pesanan...</div>';
  const {data,error}=await sb.rpc('seamart_track_online_order',{p_queue_number:code,p_customer_phone:phone});
  if(error){root.innerHTML='<div class="msg err">'+esc(error.message)+'</div>';return;}
  const o=data,steps=[['new','Pesanan diterima'],['confirmed','Dikonfirmasi'],['processing','Sedang disiapkan'],['ready','Siap diambil / dikirim'],['completed','Selesai']];
@@ -592,15 +604,15 @@ async function trackOnlineOrder(code,phone){
  const idx=steps.findIndex(x=>x[0]===o.order_status);
  root.innerHTML='<div class="msg"><div style="text-align:center;padding:8px"><div style="font-size:12px;font-weight:800;color:#087b43;letter-spacing:1px">NOMOR ANTREAN</div><div style="font-size:32px;font-weight:900;color:#087b43">A-'+String(o.queue_number).padStart(3,'0')+'</div></div><b>'+esc(orderStatusLabels[o.order_status]||o.order_status)+'</b><br><span class="muted">Diperbarui: '+new Date(o.updated_at).toLocaleString('id-ID')+'</span></div>'+
  (cancelled?'<div class="msg err">Pesanan ini dibatalkan oleh toko.</div>':'<div style="display:grid;gap:8px;margin:12px 0">'+steps.map((s,i)=>'<div style="display:flex;gap:9px;align-items:center;color:'+(i<=idx?'#087b43':'#94a3b8')+'"><b style="font-size:18px">'+(i<=idx?'●':'○')+'</b><span style="font-weight:'+(i===idx?'800':'500')+'">'+s[1]+'</span></div>').join('')+'</div>')+
- '<div class="cartline"><span>Status pembayaran</span><b>'+esc(paymentLabels[o.payment_status]||o.payment_status)+'</b></div><div class="cartline"><span>Metode pembayaran</span><b>'+esc(o.payment_method.toUpperCase())+'</b></div><div class="total"><span>Total pesanan</span><span>'+rupiah(o.subtotal)+'</span></div><h3>Rincian barang</h3>'+((o.items||[]).map(x=>'<div class="cartline"><span>'+esc(x.name)+' × '+x.quantity+'</span><b>'+rupiah(x.line_total)+'</b></div>').join('')||'<p class="muted">Tidak ada rincian barang.</p>')+'<button class="primary" type="button" style="margin-top:12px" onclick="trackOnlineOrder(document.querySelector(\'[name=code]\').value,document.querySelector(\'[name=phone]\').value)">Perbarui Status</button>';
+ '<div class="cartline"><span>Status pembayaran</span><b>'+esc(paymentLabels[o.payment_status]||o.payment_status)+'</b></div><div class="cartline"><span>Metode pembayaran</span><b>'+esc(o.payment_method.toUpperCase())+'</b></div><div class="total"><span>Total pesanan</span><span>'+rupiah(o.subtotal)+'</span></div><h3>Rincian barang</h3>'+((o.items||[]).map(x=>'<div class="cartline"><span>'+esc(x.name)+' × '+x.quantity+'</span><b>'+rupiah(x.line_total)+'</b></div>').join('')||'<p class="muted">Tidak ada rincian barang.</p>')+'<button class="primary" type="button" style="margin-top:12px" onclick="trackOnlineOrder(document.querySelector('#popupTrackForm [name=code]')?.value||document.querySelector('#trackForm [name=code]')?.value,document.querySelector('#popupTrackForm [name=phone]')?.value||document.querySelector('#trackForm [name=phone]')?.value,'popupTrackingResult')">Perbarui Status</button>';
 }
 document.getElementById('popupTrackForm').addEventListener('submit',async e=>{
  e.preventDefault();
- const original=document.getElementById('trackForm');
- original.elements.code.value=e.currentTarget.elements.code.value.trim();
- original.elements.phone.value=e.currentTarget.elements.phone.value.trim();
- original.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
- setTimeout(()=>{const result=document.getElementById('trackingResult');document.getElementById('popupTrackingResult').innerHTML=result?result.innerHTML:'';},700);
+ const form=e.currentTarget,button=form.querySelector('button[type="submit"]'),code=form.elements.code.value.trim(),phone=form.elements.phone.value.trim();
+ button.disabled=true;button.textContent='Memeriksa...';
+ try{await trackOnlineOrder(code,phone,'popupTrackingResult');}
+ catch(err){document.getElementById('popupTrackingResult').innerHTML='<div class="msg err">'+esc(err.message||'Gagal memeriksa pesanan.')+'</div>';}
+ finally{button.disabled=false;button.textContent='Lacak Pesanan';}
 });
 document.getElementById('trackForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.currentTarget),b=document.getElementById('trackBtn');b.disabled=true;b.textContent='Memeriksa...';try{await trackOnlineOrder(String(f.get('code')).trim(),String(f.get('phone')).trim());}finally{b.disabled=false;b.textContent='Lacak Pesanan';}});
 
