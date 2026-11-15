@@ -1810,7 +1810,17 @@ async function restoreSeaMartSession(){
   const status=document.getElementById('cloudLoginError');if(status)status.textContent=e?.message||'Sesi tidak valid. Silakan login kembali.';
  }
 }
-function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}if(window.seamartStockChannel&&window.seamartSupabase){try{window.seamartSupabase.removeChannel(window.seamartStockChannel)}catch(e){}}if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);window.seamartStockChannel=null;window.seamartStockPollTimer=null;currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
+async function logout(){
+ if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}
+ try{
+  const sb=window.seamartSupabase||getSeaMartAuthClient();
+  const {error}=await sb.auth.signOut();if(error)throw error;
+ }catch(e){alert('Belum berhasil keluar dari akun: '+(e.message||String(e))+'. Coba lagi.');return;}
+ if(window.seamartStockChannel&&window.seamartSupabase){try{window.seamartSupabase.removeChannel(window.seamartStockChannel)}catch(e){}}
+ if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);
+ window.seamartStockChannel=null;window.seamartStockPollTimer=null;window.seamartSupabase=null;window.seamartStoreId=null;window.seamartUserId=null;currentUser=null;cart=[];
+ document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();
+}
 function showPasswordRecoveryForm(sb){
  const root=document.getElementById('loginroot');
  root.style.cssText='display:block!important;position:fixed!important;inset:0!important;z-index:99999!important;visibility:visible!important;opacity:1!important';
