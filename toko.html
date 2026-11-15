@@ -687,6 +687,22 @@ body{background:#f5f7f8;color:#27323b}
 }
 </style>
 
+<style id="seamart-search-in-sticky-header">
+@media(min-width:700px){
+ header.top{position:sticky!important;top:0!important;z-index:150!important;overflow:visible!important}
+ header.top #searchPanel{
+  position:absolute!important;top:50%!important;right:184px!important;left:auto!important;bottom:auto!important;
+  width:300px!important;min-width:300px!important;max-width:300px!important;
+  margin:0!important;transform:translateY(-50%)!important;z-index:999!important;animation:none!important;
+ }
+ header.top #searchPanel.search-panel-open{animation:none!important}
+ header.top #searchPanel .search-suggest{
+  position:absolute!important;top:calc(100% + 6px)!important;left:0!important;right:auto!important;
+  width:300px!important;min-width:300px!important;max-width:300px!important;
+  margin:0!important;transform:none!important;box-sizing:border-box!important;
+ }
+}
+</style>
 <header class="top" style="background:#ffffff!important;background-color:#ffffff!important;box-shadow:0 2px 12px rgba(25,45,60,.10)!important;border-bottom:1px solid #e8edf0!important"><div class="brand"><div class="brand-left"><button class="menu-trigger" id="shopMenuButton" type="button" aria-label="Buka menu" onclick="var d=document.getElementById('shopDrawer');if(d){d.classList.add('open');d.style.pointerEvents='auto';document.body.style.overflow='hidden';}">☰</button><div><svg class="brandmark" viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlow)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlow)"/><text x="8" y="55" font-size="51" class="sea">Sea<tspan class="mart">Mart</tspan></text></svg><div class="tag">Belanja mudah, dekat, dan hemat</div></div></div><div class="header-actions"><button class="header-icon" type="button" aria-label="Cari produk" onclick="focusShopSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button><button class="header-icon" type="button" aria-label="Notifikasi" onclick="showShopNotifications()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></button><button class="header-cart" type="button" aria-label="Buka keranjang" onclick="openCartDrawer()">🛒<span class="header-cart-count" id="headerCartCount">0</span></button></div></div></header>
 
 
@@ -800,7 +816,7 @@ function renderProducts(){
 function buyNow(id){const p=products.find(x=>x.id===id);if(!p)return;if(Number(p.stock)<=0){alert('Stok barang sedang kosong.');return}addItem(id);closeProductDetail();closeCartDrawer();openCheckout()}
 function showProductDetail(id){const p=products.find(x=>x.id===id);if(!p)return;document.getElementById('detailContent').innerHTML='<div class="detail-photo">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'">':'<div class="no-photo">Foto belum tersedia</div>')+'</div><div class="detail-title">'+esc(p.name)+'</div><div class="price" style="font-size:22px">'+rupiah(p.price)+'</div><div class="detail-meta">Kategori: '+esc(p.category||'Lainnya')+'<br>Barcode: '+esc(p.barcode||'-')+'<br>Stok tersedia: '+Number(p.stock)+'</div><button class="primary" style="margin-top:14px" type="button" onclick="addItem(\''+p.id+'\');closeProductDetail()">Tambah ke Keranjang</button>';document.getElementById('productDetail').classList.add('show')}
 function closeProductDetail(){document.getElementById('productDetail').classList.remove('show')}
-function focusShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search');if(!panel||!e)return;if(window.innerWidth>=700&&panel.parentElement!==document.body){document.body.appendChild(panel)}panel.classList.remove('hide');panel.classList.add('search-panel-open');setTimeout(()=>{e.focus({preventScroll:true});renderSearchSuggestions()},120)}
+function focusShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search'),header=document.querySelector('header.top');if(!panel||!e)return;if(window.innerWidth>=700&&header&&panel.parentElement!==header){header.appendChild(panel)}panel.classList.remove('hide');panel.classList.add('search-panel-open');setTimeout(()=>{e.focus({preventScroll:true});renderSearchSuggestions()},120)}
 function clearShopSearch(){const e=document.getElementById('search'),suggest=document.getElementById('searchSuggest'),list=document.getElementById('searchSuggestions'),top=document.getElementById('searchTop');if(!e)return;e.value='';e.dispatchEvent(new Event('input',{bubbles:true}));renderProducts();suggest?.classList.add('hide');list?.replaceChildren();top?.replaceChildren();e.focus({preventScroll:true});}
 function closeShopSearch(){const panel=document.getElementById('searchPanel'),e=document.getElementById('search'),suggest=document.getElementById('searchSuggest');if(!panel||!e)return;e.value='';renderProducts();suggest?.classList.add('hide');panel.classList.add('hide');panel.classList.remove('search-panel-open');}
 function searchWordStats(){const stop=new Set(['dan','atau','untuk','dari','isi','pcs','pack','pck','ml','gr','kg','liter','l','botol','sachet','bungkus','kemasan']);const counts={};products.forEach(p=>String(p.name||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).forEach(w=>{if(w.length>2&&!/^\d+$/.test(w)&&!stop.has(w))counts[w]=(counts[w]||0)+1}));return Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5).map(x=>x[0]);}
