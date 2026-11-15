@@ -1856,6 +1856,21 @@ td{border-bottom-color:#e8f2ee!important}
  .topbar .user #mobileCartTrigger{width:30px!important;min-width:30px!important;flex-basis:30px!important}
 }
 
+/* Keep Refresh button and status from shifting neighboring header controls */
+@media (min-width:1101px){
+ .topbar .user{flex-wrap:nowrap!important;justify-content:flex-end!important}
+ .topbar .user #seamartRefreshBtn{
+  box-sizing:border-box!important;width:86px!important;min-width:86px!important;max-width:86px!important;
+  flex:0 0 86px!important;justify-content:center!important;text-align:center!important;
+  overflow:hidden!important
+ }
+ .topbar .user #seamartRefreshStatus{
+  display:inline-block!important;box-sizing:border-box!important;
+  width:112px!important;min-width:112px!important;max-width:112px!important;
+  flex:0 0 112px!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  white-space:nowrap!important;text-align:left!important
+ }
+}
 /* SeaMart desktop topbar compact controls */
 @media (min-width:1101px){
  .topbar{height:54px!important;min-height:54px!important;padding:0 18px!important;gap:10px!important}
