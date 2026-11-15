@@ -559,14 +559,18 @@ function openCategoryPopup(name){
 function renderCategoryPopup(){
  const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
  const selected=(()=>{try{return JSON.parse(overlay.dataset.categories||'[]')}catch(_){return []}})();
- const q=(document.getElementById('search')?.value||'').toLowerCase().trim();
- const rows=products.filter(p=>(!selected.length||selected.includes(p.category))&&(!q||String(p.name||'').toLowerCase().includes(q)||String(p.barcode||'').includes(q)));
+ const selectedKeys=selected.map(categoryKey);
  const root=document.getElementById('shopCategoryProducts');
+ if(!root)return;
+ // Popup katalog berdiri sendiri: jangan ikut memakai kata pencarian halaman utama.
+ let rows=products.filter(p=>!selectedKeys.length||selectedKeys.includes(categoryKey(p.category)));
+ // Jika label kategori tidak cocok dengan kategori produk, tetap tampilkan katalog agar popup tidak kosong.
+ if(!rows.length&&products.length)rows=products;
  root.innerHTML=rows.length?rows.map(p=>{
-  const photo=p.image_url?'<img class="product-photo" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
+  const photo=p.image_url?'<img class="product-photo" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\\'none\\';this.parentElement.textContent=\\'🛒\\'">':'🛒';
   const stock=Math.max(0,Number(p.stock)||0),qty=cart.get(p.id)?.qty||0;
-  return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div>'+(stock?'<div class="stock stock-available">Stok tersedia: <b>'+stock+'</b></div>':'<div class="stock stock-empty">Stok habis</div>')+(qty?'<div class="product-qty"><button type="button" onclick="changeQty(\''+p.id+'\',-1);renderCategoryPopup()">−</button><b>'+qty+'</b><button type="button" '+(qty>=stock?'disabled':'')+' onclick="addItem(\''+p.id+'\');renderCategoryPopup()">+</button></div>':'')+'<button type="button" class="detail-btn" '+(!stock?'disabled':'')+' onclick="addItem(\''+p.id+'\');renderCategoryPopup()">+ Keranjang</button><button type="button" class="buy-now-btn" '+(!stock?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
- }).join(''):'<div class="empty">Belum ada barang pada kategori ini.</div>';
+  return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div>'+(stock?'<div class="stock stock-available">Stok tersedia: <b>'+stock+'</b></div>':'<div class="stock stock-empty">Stok habis</div>')+(qty?'<div class="product-qty"><button type="button" onclick="changeQty(\\''+p.id+'\\',-1);renderCategoryPopup()">−</button><b>'+qty+'</b><button type="button" '+(qty>=stock?'disabled':'')+' onclick="addItem(\\''+p.id+'\\');renderCategoryPopup()">+</button></div>':'')+'<button type="button" class="detail-btn" '+(!stock?'disabled':'')+' onclick="addItem(\\''+p.id+'\\');renderCategoryPopup()">+ Keranjang</button><button type="button" class="buy-now-btn" '+(!stock?'disabled':'')+' onclick="buyNow(\\''+p.id+'\\')">Beli Sekarang →</button></article>';
+ }).join(''):'<div class="empty">Belum ada produk aktif di toko ini.</div>';
 }
 function openAllCategoriesPopup(){
  closeShopMenu();const overlay=document.getElementById('shopCategoryPopup');
