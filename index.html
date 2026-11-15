@@ -2566,16 +2566,51 @@ async function hydrateFeaturedProductPhotos(items){
   }catch(err){console.info('Foto tidak dipasang karena barcode/varian belum terverifikasi: '+p.nama,err)}
  }
 }
-const SEAMART_NOVEMBER_MASTER_CODES=new Set('18040005,18040009,18040013,18040022,2010007,2010008,2017526,2017546,23020008,16070153,16070154,16070155,16070190,16114446,9170001,7010034,7010072,7010108,7010112,7010179,7019870,7019873,7019897,7019907,3020222,3029824,7030011,3051126,3010109,17014497,17014498,17014504,17014505,17014506,17014507,1020194,1020216,8020014,11010912,11010913,11010914,5120012,5120013,5120039,5120778,5120780,5120781,5120783,5120788,2080006,2080018,2070003,2070013,2070018,2070019,2030037,2030066,2090003,2090025,2090031,2090035,2050006,2050008,2050016,2050028,2050034,2050063,2050064,2050067,2020025,2020030,2020041,2020043,2060007,2060013,2060035,2040001,2040037,2040049,2040827,2040828,2100025,5050201,9200005,16014442,7000037,17000014,17000016,8000003,10040021,9010022,9030005,9020009,9020093,9040013,3030126,3037266,12017593,6010041,6010055,6010090,12023034,8010028,8010032,8010049,8010052,8010076,8010078,8010097,8019690,8019728,8019730,8019754,8019760,7060038,7070008,7070064,7075092,7075123,7040013,7040017,7040056,7040129,7040143,7040157,7050006,26010009,26010013,1090001,14040078,14040079,14050001,7020033,7020105,7027757,18010001,18010051,18010066'.split(','));
-function applyNovemberMaster(){
- const current=Array.isArray(db.products)?db.products:[];
- const keep=current.filter(p=>SEAMART_NOVEMBER_MASTER_CODES.has(String(p.kode??'').trim().replace(/\.0$/,'')));
- if(keep.length!==138){alert('Master November belum bisa diterapkan. Kode yang cocok hanya '+keep.length+' dari 138. Tidak ada data yang diubah.');return;}
- if(!confirm('Ganti daftar master barang PC dari '+current.length+' menjadi 138 barang November 2026? Cadangan seluruh data akan diunduh terlebih dahulu. Riwayat penjualan, pembelian, stok opname, kas/bank, akun, dan pengaturan tetap dipertahankan.'))return;
- download('seamart-backup-sebelum-master-november.json',JSON.stringify(db,null,2));
- db.products=keep;save();localStorage.setItem('seamart_master_source_v1','local');
- alert('Master barang PC sekarang 138 barang. Data lain tetap dipertahankan dan backup JSON sudah diunduh.');
- products();
+async function applyNovemberMaster(){
+ const button=[...document.querySelectorAll('button')].find(b=>b.getAttribute('onclick')==='applyNovemberMaster()');
+ if(button){button.disabled=true;button.textContent='Memuat Master November…';}
+ try{
+  const response=await fetch('./SeaMart_Master_Barang_November_2026_Siap_Impor.csv',{cache:'no-store'});
+  if(!response.ok)throw new Error('File master November tidak dapat dimuat (HTTP '+response.status+').');
+  const csvText=(await response.text()).replace(/^\uFEFF/,'');
+  const rows=parseCSV(csvText);
+  if(rows.length<2)throw new Error('File master kosong atau tidak lengkap.');
+  const head=rows.shift().map(x=>x.trim().toLowerCase());
+  const col=name=>head.indexOf(name);
+  const required=['kode_barang','nama_barang','barcode','harga_beli','harga_jual_1','harga_jual_2','harga_jual_3','stok','kelompok_barang'];
+  const missing=required.filter(x=>col(x)<0);
+  if(missing.length)throw new Error('Kolom master tidak lengkap: '+missing.join(', '));
+  const number=v=>{const n=Number(String(v??'').trim().replace(/,/g,''));return Number.isFinite(n)?n:0;};
+  const source=rows.filter(r=>String(r[col('kode_barang')]??'').trim()).map(r=>({
+   kode:normalizeProductIdentifier(r[col('kode_barang')]),
+   nama:String(r[col('nama_barang')]??'').trim(),
+   barcode:normalizeProductIdentifier(r[col('barcode')]),
+   harga_beli:number(r[col('harga_beli')]),
+   harga_jual_1:number(r[col('harga_jual_1')]),
+   harga_jual_2:number(r[col('harga_jual_2')]),
+   harga_jual_3:number(r[col('harga_jual_3')]),
+   harga:number(r[col('harga_jual_1')]),
+   stok:number(r[col('stok')]),
+   kategori:String(r[col('kelompok_barang')]??'').trim()||'Umum'
+  }));
+  if(source.length!==138)throw new Error('Jumlah data master terbaca '+source.length+', seharusnya 138. Data tidak diubah.');
+  if(new Set(source.map(p=>p.kode)).size!==138)throw new Error('Ada kode barang ganda pada file master. Data tidak diubah.');
+  const current=Array.isArray(db.products)?db.products:[];
+  const norm=s=>String(s??'').trim().replace(/^0+(?=\\d)/,'');
+  const next=source.map((p,i)=>{
+   let matches=current.filter(x=>String(x.kode??'').trim()===p.kode);
+   if(matches.length!==1){const byNorm=current.filter(x=>norm(x.kode)===norm(p.kode));matches=byNorm.length===1?byNorm:[];}
+   if(!matches.length&&p.barcode){const byBarcode=current.filter(x=>String(x.barcode??'').trim()===p.barcode);if(byBarcode.length===1)matches=byBarcode;}
+   const previous=matches[0];
+   return {...p,id:previous?.id||('nov2026-'+p.kode),active:previous?.active!==false,foto:previous?.foto||''};
+  });
+  if(!confirm('Terapkan master November 2026 sebanyak 138 barang? Master barang perangkat ini akan diganti. Backup seluruh data akan diunduh dahulu. Riwayat transaksi dan data lain tetap dipertahankan.'))return;
+  download('seamart-backup-sebelum-master-november.json',JSON.stringify(db,null,2));
+  db.products=next;save();localStorage.setItem('seamart_master_source_v1','local');
+  products();
+  alert('Berhasil! Master November 138 barang sudah diterapkan. Kode Odoo dan nol di depan dipertahankan. Backup JSON telah diunduh. Data lain tetap disimpan.');
+ }catch(error){alert('Master November gagal diterapkan: '+(error?.message||error)+'. Tidak ada perubahan master.');}
+ finally{if(button){button.disabled=false;button.textContent='Terapkan Master Barang Baru';}}
 }
 function products(){
  window.selectedProductCategory='';
