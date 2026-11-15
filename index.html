@@ -2167,9 +2167,25 @@ async function requestPasswordReset(){const email=normalizeLoginEmail(document.g
 async function fetchAllStoreProducts(sb,store){
  const all=[],pageSize=500;
  for(let from=0;from<10000;from+=pageSize){
-  const result=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active,image_url').eq('store_id',store).range(from,from+pageSize-1);
-  if(result.error)throw result.error;
-  const pageRows=result.data||[];all.push(...pageRows);
+  let result=null,lastError=null;
+  for(let attempt=1;attempt<=3;attempt++){
+   try{
+    result=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active,image_url').eq('store_id',store).range(from,from+pageSize-1);
+    if(result.error)throw result.error;
+    lastError=null;break;
+   }catch(error){
+    lastError=error;
+    if(attempt<3)await new Promise(resolve=>setTimeout(resolve,700*attempt));
+   }
+  }
+  if(lastError){
+   const message=String(lastError.message||lastError);
+   if(/failed to fetch|network|load failed|fetch failed/i.test(message)){
+    throw new Error('Tidak dapat terhubung ke Supabase untuk mengambil master barang. Periksa internet/akses Supabase, lalu tekan Refresh lagi. Data lokal tidak dihapus.');
+   }
+   throw lastError;
+  }
+  const pageRows=result?.data||[];all.push(...pageRows);
   if(pageRows.length<pageSize)break;
  }
  return {data:all,error:null};
@@ -2282,7 +2298,7 @@ async function refreshSeaMartNow(){
   if(window.seamartCurrentPage==='kasir'){renderPosProducts();renderCart();}
   else if(window.seamartCurrentPage==='dashboard'){dashboard();}
   if(status)status.textContent=warnings.length?'Refresh sebagian · '+warnings.join(', '):'Terakhir: '+new Date().toLocaleTimeString('id-ID');
- }catch(e){console.error('Refresh SeaMart gagal pada tahap '+refreshPhase+':',e);if(status)status.textContent='Gagal: '+refreshPhase;const detail=(e&&e.stack)?String(e.stack).split('\\n').slice(0,5).join('\\n'):(e.message||String(e));alert('Refresh gagal pada tahap: '+refreshPhase+'\\n'+(e.message||String(e))+'\\n\\nDetail: '+detail);}
+ }catch(e){console.error('Refresh SeaMart gagal pada tahap '+refreshPhase+':',e);if(status)status.textContent='Gagal: '+refreshPhase;const message=e?.message||String(e);if(refreshPhase==='mengambil master barang'&&/Supabase|fetch|network/i.test(message)){alert('Refresh belum berhasil mengambil master barang dari cloud.\\n\\nPeriksa koneksi internet dan akses Supabase, kemudian tekan Refresh lagi. Data lokal, foto, dan transaksi tidak dihapus.');}else{const detail=(e&&e.stack)?String(e.stack).split('\\n').slice(0,5).join('\\n'):message;alert('Refresh gagal pada tahap: '+refreshPhase+'\\n'+message+'\\n\\nDetail: '+detail);}}
  finally{window.seamartRefreshBusy=false;if(button){button.disabled=false;button.textContent='↻ Refresh';}}
 }
 async function refreshSeaMartCloudStock(){
