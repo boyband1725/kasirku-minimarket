@@ -2049,7 +2049,7 @@ function startSeaMartStockRealtime(){
   if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi penuh SeaMart gagal:',e.message||e));
  },30000);
  if(!window.seamartStockVisibilityHandler){
-  window.seamartStockVisibilityHandler=()=>{if(document.visibilityState==='visible')refreshSeaMartCloudStock().catch(e=>console.warn('Penyegaran stok SeaMart gagal:',e.message||e));};
+  window.seamartStockVisibilityHandler=()=>{if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Penyegaran penuh SeaMart gagal:',e.message||e));};
   document.addEventListener('visibilitychange',window.seamartStockVisibilityHandler);
  }
 }
