@@ -601,6 +601,7 @@ function categoryMatches(name){
 }
 function openCategoryPopup(name){
  closeShopMenu();
+ const search=document.getElementById('categoryPopupSearch');if(search)search.value='';
  const overlay=document.getElementById('shopCategoryPopup');
  const picker=document.getElementById('shopCategoryPicker'),grid=document.getElementById('shopCategoryProducts');
  const allNames=[...new Set(products.map(p=>p.category).filter(Boolean))];
@@ -643,7 +644,7 @@ function openAllCategoriesPopup(){
  picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
  overlay.classList.add('open');document.body.style.overflow='hidden';
 }
-function clearCategoryPopupSearch(){const input=document.getElementById('categoryPopupSearch');if(input){input.value='';input.focus();}if(!document.getElementById('shopCategoryPicker').hidden)renderCategoryPicker();else renderCategoryPopup();}
+function clearCategoryPopupSearch(){const input=document.getElementById('categoryPopupSearch');if(input){input.value='';input.focus();}if(document.getElementById('shopCategoryPicker').hidden)renderCategoryPopup();}
 function closeCategoryPopup(){document.getElementById('shopCategoryPopup').classList.remove('open');document.body.style.overflow='';}
 function openTrackingPopup(){closeShopMenu();document.getElementById('shopTrackingPopup').classList.add('open');document.body.style.overflow='hidden';}
 function closeTrackingPopup(){document.getElementById('shopTrackingPopup').classList.remove('open');document.body.style.overflow='';}
