@@ -1630,6 +1630,59 @@ td{border-bottom-color:#e8f2ee!important}
  .odoo-order-head .pill{font-size:11px}
 }
 
+
+/* SeaMart mobile topbar button alignment */
+@media(max-width:760px){
+ .topbar{
+  height:auto!important;min-height:58px!important;padding:8px 9px!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:7px!important;overflow:visible!important
+ }
+ .topbar>.menu-left,.topbar>.nav-left,.topbar>.left-actions{flex:0 0 auto}
+ .topbar .user{
+  display:flex!important;flex:1 1 auto!important;min-width:0!important;
+  align-items:center!important;justify-content:flex-end!important;gap:5px!important;
+  flex-wrap:nowrap!important
+ }
+ .topbar .user button,
+ .topbar .user #shiftAction{
+  display:inline-flex!important;flex:0 1 auto!important;align-items:center!important;
+  justify-content:center!important;white-space:nowrap!important;
+  height:38px!important;min-height:38px!important;padding:0 8px!important;
+  margin:0!important;border-radius:9px!important;font-size:11px!important;
+  line-height:1!important;font-weight:700!important
+ }
+ .topbar .user #shiftAction{
+  background:#087b50!important;color:#fff!important;border:1px solid #087b50!important;
+  min-width:76px!important
+ }
+ .topbar .user #mobileCartTrigger{
+  display:inline-flex!important;flex:0 0 38px!important;width:38px!important;
+  min-width:38px!important;height:38px!important;min-height:38px!important;
+  padding:0!important;margin:0!important;position:relative!important;
+  align-items:center!important;justify-content:center!important;border-radius:9px!important;
+  background:#eaf5ef!important;color:#087b50!important;border:1px solid #cfe5d8!important;
+  box-shadow:none!important
+ }
+ .topbar .user #mobileCartTrigger>span{font-size:18px!important;line-height:1}
+ .topbar .user #mobileCartTrigger b{
+  position:absolute!important;right:-4px!important;top:-6px!important;
+  display:grid!important;place-items:center!important;min-width:17px!important;height:17px!important;
+  margin:0!important;padding:0 3px!important;border:1px solid #fff!important;
+  border-radius:20px!important;background:#dc4545!important;color:#fff!important;font-size:9px!important
+ }
+ .topbar .user button[onclick="accountSettings()"],
+ .topbar .user button[onclick="logout()"]{min-width:0!important}
+ .topbar .user #sessionAvatar{display:none!important}
+}
+@media(max-width:390px){
+ .topbar{padding:7px 6px!important;gap:5px!important}
+ .topbar .user{gap:4px!important}
+ .topbar .user button,.topbar .user #shiftAction{padding:0 6px!important;font-size:10px!important}
+ .topbar .user #shiftAction{min-width:68px!important}
+ .topbar .user #mobileCartTrigger{flex-basis:34px!important;width:34px!important;min-width:34px!important;height:36px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
