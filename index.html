@@ -2814,8 +2814,8 @@ async function loadNovemberMasterRows(){
 function mergeNovemberMaster(source,current,remote){
  const local=Array.isArray(current)?current:[],cloud=Array.isArray(remote)?remote:[];
  const norm=s=>String(s??'').trim();
- const normCode=s=>norm(s).replace(/^0+(?=\\d)/,'');
- const normName=s=>norm(s).toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+ const normCode=s=>norm(s).replace(/^0+(?=\d)/,'');
+ const normName=s=>norm(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
  let preservedPhotos=0;
  const merged=source.map(p=>{
   let cloudHits=cloud.filter(x=>norm(x.code)===p.kode);
