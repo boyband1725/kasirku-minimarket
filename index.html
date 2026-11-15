@@ -2007,7 +2007,7 @@ async function refreshSeaMartNow(){
     else{db.products.push({id:row.id,nama:row.name||'',kode:row.code||'',barcode:row.barcode||'',kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});}
    }
   }else{applySeaMartCloudStock(products.data||[]);}
-  await refreshSeaMartCloudSales();
+  await refreshSeaMartCloudSalesGlobal();
   const flows=await sb.from('cash_flows').select('id,created_at,direction,category,description,amount,transaction_date,source,source_ref').eq('store_id',store).order('transaction_date',{ascending:false});
   if(flows.error)throw flows.error;
   db.cashflows=(flows.data||[]).map(mapCloudCashFlow);window.seamartCashFlowSyncReady=true;
