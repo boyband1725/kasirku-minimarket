@@ -3,6 +3,15 @@
 -- seamart_pos_checkout.sql, and seamart_online_stock_on_completed.sql.
 -- All writes below are transactional and idempotent per online order.
 
+alter table public.online_orders
+  add column if not exists stock_deducted boolean not null default false;
+
+alter table public.seamart_stock_movements
+  add column if not exists online_order_id uuid references public.online_orders(id) on delete set null;
+
+create index if not exists seamart_stock_moves_online_order_idx
+  on public.seamart_stock_movements(online_order_id);
+
 alter table public.seamart_pos_sales
   add column if not exists online_order_id uuid references public.online_orders(id) on delete set null,
   add column if not exists source text not null default 'pos',
