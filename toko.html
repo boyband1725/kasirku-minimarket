@@ -653,7 +653,13 @@ body{background:#f5f7f8;color:#27323b}
 }
 </style>
 
-</head>
+<style id="seamart-search-fixed-position">
+/* Keep search and its suggestion panel fixed while the catalogue scrolls */
+#searchPanel{position:fixed!important;top:clamp(72px,12vh,118px)!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(860px,calc(100vw - 32px))!important;max-width:none!important;margin:0!important;z-index:10050!important;animation:none!important}
+#searchPanel.search-panel-open{animation:none!important}
+#searchPanel .search-suggest{position:absolute!important;top:calc(100% + 8px)!important;left:0!important;right:0!important;max-height:min(52vh,430px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+@media(max-width:640px){#searchPanel{top:58px!important;width:calc(100vw - 24px)!important}#searchPanel .search-panel-inner{height:46px!important;min-height:46px!important}#searchPanel .search{height:44px!important;font-size:14px!important}#searchPanel .search-close{height:44px!important;width:44px!important}}
+</style></head>
 <body>
 <div class="promo-strip" aria-label="Promosi SeaMart"><div class="promo-marquee"><span>Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span><span>Temukan harga spesial setiap hari • Penuhi kebutuhan Anda tanpa batas!</span><span aria-hidden="true">Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span></div></div>
 <div class="search-panel hide" id="searchPanel"><div class="search-panel-inner"><svg class="search-panel-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><input id="search" class="search" placeholder="Cari produk apa?" autocomplete="off" aria-label="Cari nama barang atau barcode"><button class="search-close" type="button" onclick="closeShopSearch()" aria-label="Tutup pencarian">×</button></div><div class="search-suggest hide" id="searchSuggest" aria-live="polite"><div class="suggest-col"><h3>SARAN</h3><div id="searchSuggestions"></div></div><div class="suggest-col suggest-top"><h3><span>ϟ</span> TOP</h3><div id="searchTop"></div></div></div></div>
