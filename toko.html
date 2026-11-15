@@ -618,6 +618,32 @@ body{background:#f5f7f8;color:#27323b}
 }
 </style>
 
+
+<style id="seamart-pc-search-anchor">
+/* Desktop: anchor the search field on the same row as the header search icon */
+@media (min-width:700px){
+  #searchPanel{
+    position:fixed!important;
+    top:51px!important;
+    right:124px!important;
+    left:auto!important;
+    width:min(520px,calc(100vw - 170px))!important;
+    max-width:520px!important;
+    margin:0!important;
+    z-index:120!important;
+  }
+  #searchPanel .search-panel-inner{
+    width:100%!important;
+  }
+  #searchPanel .search-suggest{
+    top:calc(100% + 7px)!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="promo-strip" aria-label="Promosi SeaMart"><div class="promo-marquee"><span>Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span><span>Temukan harga spesial setiap hari • Penuhi kebutuhan Anda tanpa batas!</span><span aria-hidden="true">Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span></div></div>
