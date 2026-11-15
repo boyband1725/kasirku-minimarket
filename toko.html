@@ -563,9 +563,10 @@ function openCategoryPopup(name){
  document.getElementById('shopCategoryTitle').textContent=name==='__ALL__'?'Semua Produk':(matches.length?name+' • Katalog Barang':'Katalog Barang');
  picker.hidden=true;grid.hidden=false;
  overlay.classList.add('open');document.body.style.overflow='hidden';
- if(!products.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;padding:28px;text-align:center">Memuat data barang dari SeaMart…</div>';loadProducts().then(()=>{if(overlay.classList.contains('open'))renderCategoryPopup();});return;}
+ if(!products.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;padding:28px;text-align:center"><div style="font-size:24px;margin-bottom:8px">⏳</div><b>Memuat katalog SeaMart…</b><p style="font-size:12px;color:#687782">Menghubungkan ke data barang toko</p></div>';loadProducts().then(()=>{if(!overlay.classList.contains('open'))return;if(products.length){renderCategoryPopup();}else if(!grid.querySelector('.msg.err')){grid.innerHTML='<div class="empty" style="grid-column:1/-1;padding:28px;text-align:center"><b>Produk belum berhasil ditampilkan</b><p>Periksa koneksi lalu coba muat ulang katalog.</p><button type="button" class="primary" onclick="retryCategoryLoad()">Coba Muat Ulang</button></div>';}});return;}
  renderCategoryPopup();
 }
+async function retryCategoryLoad(){const root=document.getElementById('shopCategoryProducts');if(root)root.innerHTML='<div class="empty" style="padding:28px;text-align:center">Menghubungkan ulang ke SeaMart…</div>';products=[];await loadProducts();if(overlayIsOpen()&&products.length)renderCategoryPopup();}
 function renderCategoryPopup(){
  const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
  const selected=(()=>{try{return JSON.parse(overlay.dataset.categories||'[]')}catch(_){return []}})();
