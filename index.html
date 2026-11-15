@@ -2278,28 +2278,16 @@ async function refreshSeaMartCloudSales(){
  const cats=await sb.from('categories').select('id,name').eq('store_id',member.data.store_id);
  if(cats.error)throw cats.error;
  const catNames=new Map((cats.data||[]).map(x=>[x.id,x.name]));
- const localMasterLocked=localStorage.getItem('seamart_master_source_v1')==='local';
- let remote={data:[]},syncSummary=null;
- if(localMasterLocked){
-  updateSeaMartSyncProgress(100,'Master lokal dipertahankan: '+db.products.length+' barang. Sinkronisasi produk cloud dijeda agar data lama tidak menimpa master ini.',{total:0,added:0,skipped:db.products.length,failed:0,finished:true});
- }else{
-  remote=await fetchAllStoreProducts(sb,member.data.store_id);
-  if(db.products.length>0){
-   syncSummary=await syncAllProducts(remote.data||[]);
-   remote=await fetchAllStoreProducts(sb,member.data.store_id);
-   if(syncSummary.failed>0){
-    alert('Sinkronisasi belum berhasil: '+syncSummary.failed+' produk gagal dikirim. '+syncSummary.added+' produk baru terkirim, '+syncSummary.skipped+' sudah ada. Data lokal tetap dipertahankan.'+(syncSummary.errors?.length?'\\nContoh penyebab: '+syncSummary.errors.slice(0,3).join(' | '):''));
-   }
-  }
-  const local=[...db.products];
-  const hasMatch=(a,b)=>String(a.id||'')===String(b.id||'')||(a.barcode&&b.barcode&&String(a.barcode)===String(b.barcode))||(a.kode&&b.code&&String(a.kode)===String(b.code));
-  for(const p of (remote.data||[])){
-   const localMatch=local.find(x=>hasMatch(x,p));
-   if(localMatch){if(!localMatch.foto&&p.image_url)localMatch.foto=p.image_url;continue;}
-   local.push({id:p.id,nama:p.name||'',kode:p.code||'',barcode:p.barcode||'',kategori:catNames.get(p.category_id)||'Umum',harga:Number(p.price||0),harga_jual_1:Number(p.price||0),harga_beli:0,harga_jual_2:0,harga_jual_3:0,stok:Number(p.stock||0),active:p.active!==false,foto:p.image_url||''});
-  }
-  db.products=local;save();
- }
+ let remote=await fetchAllStoreProducts(sb,member.data.store_id);
+ const officialMaster=await loadNovemberMasterRows();
+ db.products=mergeNovemberMaster(officialMaster,db.products,remote.data||[]);
+ save();localStorage.setItem('seamart_master_source_v1','local');
+ const syncSummary=await syncAllProducts(remote.data||[]);
+ if(syncSummary.failed>0)console.warn('Sebagian produk master 138 belum tersinkron:',syncSummary.errors);
+ remote=await fetchAllStoreProducts(sb,member.data.store_id);
+ db.products=mergeNovemberMaster(officialMaster,db.products,remote.data||[]);
+ save();
+ updateSeaMartSyncProgress(100,'Master resmi 138 barang aktif. Produk cloud di luar master disembunyikan; stok dan foto yang cocok tetap disinkronkan.',{total:138,added:syncSummary.added,skipped:syncSummary.skipped,failed:syncSummary.failed,finished:true});
  try{await refreshSeaMartCloudStock();}catch(e){console.warn('Stok cloud awal belum berhasil dimuat:',e.message||e);}
  startSeaMartStockRealtime();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
@@ -2795,6 +2783,45 @@ async function hydrateFeaturedProductPhotos(items){
    if(tile)tile.innerHTML=productPicture(p);
   }catch(err){console.info('Foto tidak dipasang karena barcode/varian belum terverifikasi: '+p.nama,err)}
  }
+}
+async function loadNovemberMasterRows(){
+ const response=await fetch('./SeaMart_Master_Barang_November_2026_Siap_Impor.csv',{cache:'no-store'});
+ if(!response.ok)throw new Error('File master resmi 138 barang tidak dapat dimuat (HTTP '+response.status+').');
+ const rows=parseCSV((await response.text()).replace(/^\\uFEFF/,''));
+ if(rows.length<2)throw new Error('File master resmi kosong.');
+ const head=rows.shift().map(x=>x.trim().toLowerCase()),col=n=>head.indexOf(n);
+ const required=['kode_barang','nama_barang','barcode','harga_beli','harga_jual_1','harga_jual_2','harga_jual_3','stok','kelompok_barang'];
+ const missing=required.filter(n=>col(n)<0);if(missing.length)throw new Error('Kolom master resmi kurang: '+missing.join(', '));
+ const number=v=>{const n=Number(String(v??'').trim().replace(/,/g,''));return Number.isFinite(n)?n:0;};
+ const source=rows.filter(r=>String(r[col('kode_barang')]??'').trim()).map(r=>({
+  kode:normalizeProductIdentifier(r[col('kode_barang')]),nama:String(r[col('nama_barang')]??'').trim(),
+  barcode:normalizeProductIdentifier(r[col('barcode')]),harga_beli:number(r[col('harga_beli')]),
+  harga_jual_1:number(r[col('harga_jual_1')]),harga_jual_2:number(r[col('harga_jual_2')]),
+  harga_jual_3:number(r[col('harga_jual_3')]),harga:number(r[col('harga_jual_1')]),
+  stok:number(r[col('stok')]),kategori:String(r[col('kelompok_barang')]??'').trim()||'Umum'
+ }));
+ if(source.length!==138)throw new Error('Master resmi berisi '+source.length+' barang, bukan 138. Master tidak diterapkan.');
+ if(new Set(source.map(p=>p.kode)).size!==138)throw new Error('Kode barang master resmi tidak unik. Master tidak diterapkan.');
+ return source;
+}
+function mergeNovemberMaster(source,current,remote){
+ const local=Array.isArray(current)?current:[],cloud=Array.isArray(remote)?remote:[];
+ const norm=s=>String(s??'').trim();
+ const usedCloud=new Set();
+ return source.map(p=>{
+  let hits=cloud.filter(x=>norm(x.code)===p.kode);
+  if(hits.length!==1){hits=p.barcode?cloud.filter(x=>norm(x.barcode)===p.barcode):[];}
+  const row=hits.length===1?hits[0]:null;
+  if(row)usedCloud.add(String(row.id));
+  let old=local.find(x=>norm(x.kode)===p.kode);
+  if(!old&&p.barcode){const m=local.filter(x=>norm(x.barcode)===p.barcode);if(m.length===1)old=m[0];}
+  return {...p,id:row?.id||old?.id||('nov2026-'+p.kode),
+   stok:row?Number(row.stock??p.stok):(old?Number(old.stok??p.stok):p.stok),
+   active:old?.active!==false,
+   foto:row?.image_url||old?.foto||old?.image_url||'',
+   image_url:row?.image_url||old?.image_url||old?.foto||''
+  };
+ });
 }
 async function applyNovemberMaster(){
  const button=[...document.querySelectorAll('button')].find(b=>b.getAttribute('onclick')==='applyNovemberMaster()');
