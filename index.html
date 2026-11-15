@@ -2246,6 +2246,32 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
  #modalroot .edit-product-photo-preview{grid-column:1!important;grid-row:3!important;justify-content:flex-start!important}
 }
 
+
+/* Extra-compact product edit popup */
+#modalroot .edit-product-modal{width:min(610px,calc(100vw - 36px))!important;max-height:78vh!important}
+#modalroot .edit-product-modal-head{padding:11px 16px 9px!important;margin-bottom:9px!important}
+#modalroot .edit-product-modal-head h2{font-size:15px!important;margin-bottom:2px!important}
+#modalroot .edit-product-modal-sub{font-size:10px!important}
+#modalroot #inline_edit_form{padding:0 16px 10px!important}
+#modalroot #inline_edit_form .formgrid{gap:7px 9px!important}
+#modalroot #inline_edit_form .formgrid label{font-size:10px!important;gap:3px!important}
+#modalroot #inline_edit_form .formgrid .field{height:31px!important;min-height:31px!important;padding:5px 8px!important;font-size:11px!important}
+#modalroot .edit-product-active{margin-top:8px!important;padding:6px 9px!important;font-size:10px!important}
+#modalroot .edit-product-photo{margin-top:8px!important;padding:7px 9px!important;gap:3px 8px!important}
+#modalroot .edit-product-photo-title{font-size:10px!important}
+#modalroot .edit-product-photo-actions{gap:4px!important}
+#modalroot .edit-product-photo-actions button{min-height:26px!important;padding:4px 7px!important;font-size:9px!important}
+#modalroot .edit-product-photo-preview{min-height:48px!important;min-width:50px!important}
+#modalroot .edit-product-photo-preview img{width:46px!important;height:46px!important}
+#modalroot .edit-product-modal-actions{padding:8px 16px!important;margin-top:8px!important}
+#modalroot .edit-product-modal-actions button{min-width:92px!important;min-height:30px!important;padding:5px 9px!important;font-size:10px!important}
+@media(max-width:640px){
+ #modalroot .edit-product-modal{max-height:86dvh!important}
+ #modalroot #inline_edit_form{padding:0 12px 9px!important}
+ #modalroot .edit-product-modal-head{padding:10px 12px 8px!important}
+ #modalroot .edit-product-modal-actions{padding:8px 12px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
