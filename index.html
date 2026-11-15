@@ -1871,6 +1871,18 @@ td{border-bottom-color:#e8f2ee!important}
   white-space:nowrap!important;text-align:left!important
  }
 }
+/* Desktop: Refresh stays immediately after Menu */
+@media(min-width:1101px){
+ .topbar-left{flex:0 0 auto!important;gap:9px!important}
+ .topbar-left #seamartRefreshBtn{display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  order:0!important;position:static!important;transform:none!important;margin:0 2px 0 0!important;
+  width:92px!important;min-width:92px!important;height:30px!important;min-height:30px!important;
+  padding:0 8px!important;font-size:11px!important;white-space:nowrap!important}
+ .topbar-left #seamartRefreshStatus{display:inline-block!important;position:static!important;
+  max-width:100px!important;overflow:hidden!important;text-overflow:ellipsis!important;font-size:9px!important}
+ .topbar-left .crumb{margin-left:4px!important}
+ .topbar .user{margin-left:auto!important}
+}
 /* SeaMart desktop topbar compact controls */
 @media (min-width:1101px){
  .topbar{height:54px!important;min-height:54px!important;padding:0 18px!important;gap:10px!important}
@@ -4260,6 +4272,24 @@ function settings(){document.getElementById('view').innerHTML=`<div class="pageh
 document.getElementById('shiftAction').style.display='none';showLogin();try{page('dashboard')}catch(err){console.error('SeaMart render error:',err);document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum dapat dimuat</h3><p class="muted">Data lokal sedang diperiksa. Muat ulang halaman. Jika masih muncul, ekspor cadangan data dari menu Pengaturan & Data lalu kirimkan tangkapan layar ini.</p><button class="btn-primary" onclick="location.reload()">Muat Ulang</button></div>';}
 if(!document.getElementById('view').innerHTML.trim()){document.getElementById('view').innerHTML='<div class="panel"><h3>Dashboard belum tampil</h3><p class="muted">Aplikasi berhasil dibuka, tetapi isi dashboard belum dirender. Silakan kirim screenshot pesan ini.</p></div>';}
 
+// Place Refresh directly beside Menu on desktop; restore original mobile layout.
+(function(){
+ function placeSeaMartRefresh(){
+  const left=document.querySelector('.topbar-left'),user=document.querySelector('.topbar .user');
+  const menu=left?.querySelector('.mobile-menu-btn'),crumb=left?.querySelector('.crumb');
+  const refresh=document.getElementById('seamartRefreshBtn'),status=document.getElementById('seamartRefreshStatus');
+  if(!left||!user||!menu||!refresh||!status)return;
+  if(window.matchMedia('(min-width:1101px)').matches){
+   left.insertBefore(refresh,crumb||null);
+   left.insertBefore(status,crumb||null);
+  }else{
+   user.insertBefore(refresh,document.getElementById('sessionUser')||null);
+   user.insertBefore(status,document.getElementById('sessionUser')||null);
+  }
+ }
+ placeSeaMartRefresh();
+ window.addEventListener('resize',placeSeaMartRefresh);
+})();
 restoreSeaMartSession();
 </script>
 </body></html>
