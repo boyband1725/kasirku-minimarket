@@ -4154,6 +4154,7 @@ function ensureSeaMartOrderRealtime(sb,store){
   .subscribe(status=>{window.seamartOrderRealtimeStatus=status;});
 }
 
+.btn-wa{margin-top:7px;background:#16845b;color:#fff;border:0;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:750;white-space:nowrap}.btn-wa:disabled{background:#e9eef0;color:#8a969e;cursor:not-allowed}
 async function onlineOrdersPage(){
  const view=document.getElementById('view');
  if(currentUser.role!=='admin'){view.innerHTML='<div class="notice">Menu khusus pemilik/admin.</div>';return}
@@ -4169,11 +4170,56 @@ async function onlineOrdersPage(){
  if(res.error){root.innerHTML='<div class="notice">Tabel pesanan belum tersedia. Jalankan SQL dari folder supabase di GitHub. '+String(res.error.message).replace(/[&<>]/g,'')+'</div>';return}
  const rows=res.data||[];window.seamartOnlineOrders=rows;
  if(!rows.length){root.innerHTML='<div class="empty">Belum ada pesanan online.</div>';return}
- root.innerHTML='<div class="tablewrap online-orders-wrap"><table class="online-orders-table"><thead><tr><th>Antrean / Pesanan</th><th>Pelanggan</th><th>Catatan</th><th>Bayar</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+rows.map(o=>{const locked=['completed','cancelled'].includes(String(o.order_status||''));return '<tr><td><b style="color:#087b43;font-size:16px">A-'+String(o.queue_number||0).padStart(3,'0')+'</b><br><small>'+String(o.order_code||'').replace(/[&<>"]/g,'')+'</small><br><small>'+new Date(o.created_at).toLocaleString('id-ID')+'</small></td><td>'+String(o.customer_name||'').replace(/[&<>"]/g,'')+'<br>'+String(o.customer_phone||'').replace(/[&<>"]/g,'')+'<br><small>'+String(o.customer_address||'').replace(/[&<>"]/g,'')+'</small></td><td style="min-width:180px;white-space:normal">'+(o.customer_note?String(o.customer_note).replace(/[&<>"]/g,''):'<span class="muted">Tidak ada catatan</span>')+'</td><td>'+String(o.payment_method||'').replace(/[&<>"]/g,'')+'<br>'+String(o.payment_status||'').replace(/[&<>"]/g,'')+'</td><td>'+Number(o.subtotal||0).toLocaleString('id-ID')+'</td><td><select class="field" id="os-'+o.id+'" '+(locked?'disabled':'')+'><option value="new">Baru</option><option value="confirmed">Dikonfirmasi</option><option value="processing">Diproses</option><option value="ready">Siap</option><option value="completed">Selesai</option><option value="cancelled">Dibatalkan</option></select>'+(locked?'<br><small class="muted">Status final · dikunci</small>':'')+'</td><td>'+(locked?'<button class="btn-light" disabled>Terkunci</button>':'<button class="btn-light" data-save="'+o.id+'">Simpan</button>')+' <button class="btn-light" data-detail="'+o.id+'">Detail</button> <button class="btn-primary" data-print-order="'+o.id+'">Cetak Struk</button></td></tr>';}).join('')+'</tbody></table></div>';
+ root.innerHTML='<div class="tablewrap online-orders-wrap"><table class="online-orders-table"><thead><tr><th>Antrean / Pesanan</th><th>Pelanggan</th><th>Catatan</th><th>Bayar</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+rows.map(o=>{const locked=['completed','cancelled'].includes(String(o.order_status||''));const isReady=String(o.order_status||'')==='ready';return '<tr><td><b style="color:#087b43;font-size:16px">A-'+String(o.queue_number||0).padStart(3,'0')+'</b><br><small>'+String(o.order_code||'').replace(/[&<>"]/g,'')+'</small><br><small>'+new Date(o.created_at).toLocaleString('id-ID')+'</small></td><td>'+String(o.customer_name||'').replace(/[&<>"]/g,'')+'<br>'+String(o.customer_phone||'').replace(/[&<>"]/g,'')+'<br><small>'+String(o.customer_address||'').replace(/[&<>"]/g,'')+'</small></td><td style="min-width:180px;white-space:normal">'+(o.customer_note?String(o.customer_note).replace(/[&<>"]/g,''):'<span class="muted">Tidak ada catatan</span>')+'</td><td>'+String(o.payment_method||'').replace(/[&<>"]/g,'')+'<br>'+String(o.payment_status||'').replace(/[&<>"]/g,'')+'</td><td>'+Number(o.subtotal||0).toLocaleString('id-ID')+'</td><td><select class="field" id="os-'+o.id+'" '+(locked?'disabled':'')+'><option value="new">Baru</option><option value="confirmed">Dikonfirmasi</option><option value="processing">Diproses</option><option value="ready">Siap</option><option value="completed">Selesai</option><option value="cancelled">Dibatalkan</option></select>'+(locked?'<br><small class="muted">Status final · dikunci</small>':'')+'</td><td>'+(locked?'<button class="btn-light" disabled>Terkunci</button>':'<button class="btn-light" data-save="'+o.id+'">Simpan</button>')+' <button class="btn-light" data-detail="'+o.id+'">Detail</button> <button class="btn-primary" data-print-order="'+o.id+'">Cetak Struk</button><br><button class="btn-wa" data-whatsapp-order="'+o.id+'" '+(isReady?'':'disabled title="Aktif setelah status pesanan diubah menjadi Siap"')+'>'+(isReady?'☏ WhatsApp pelanggan':'WhatsApp saat Siap')+'</button></td></tr>';}).join('')+'</tbody></table></div>';
  rows.forEach(o=>{const el=document.getElementById('os-'+o.id);if(el)el.value=o.order_status});
  root.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>saveOnlineOrderStatus(b.dataset.save));
  root.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>showOnlineOrderItems(b.dataset.detail));
  root.querySelectorAll('[data-print-order]').forEach(b=>b.onclick=()=>printOnlineOrder(b.dataset.printOrder));
+ root.querySelectorAll('[data-whatsapp-order]').forEach(b=>b.onclick=()=>sendOnlineOrderWhatsApp(b.dataset.whatsappOrder));
+}
+async function sendOnlineOrderWhatsApp(id){
+ const order=(window.seamartOnlineOrders||[]).find(x=>String(x.id)===String(id));
+ if(!order)return alert('Pesanan tidak ditemukan.');
+ if(String(order.order_status||'')!=='ready')return alert('Ubah dan simpan status pesanan menjadi Siap terlebih dahulu.');
+ let phone=String(order.customer_phone||'').replace(/[^0-9]/g,'');
+ if(phone.startsWith('0'))phone='62'+phone.slice(1);else if(phone.startsWith('8'))phone='62'+phone;
+ if(phone.length<10)return alert('Nomor WhatsApp pelanggan belum valid. Periksa nomor HP pada pesanan.');
+ const waWindow=window.open('about:blank','_blank');
+ if(!waWindow)return alert('Popup diblokir browser. Izinkan popup untuk halaman SeaMart lalu coba lagi.');
+ waWindow.opener=null;
+ waWindow.document.title='Menyiapkan pesan WhatsApp SeaMart...';
+ waWindow.document.body.innerHTML='<p style="font:16px system-ui;padding:24px">Menyiapkan rincian pesanan...</p>';
+ try{
+  const r=await window.seamartSupabase.from('online_order_items').select('product_name,quantity,unit_price,line_total').eq('order_id',id);
+  if(r.error)throw r.error;
+  const queue='A-'+String(order.queue_number||0).padStart(3,'0');
+  const items=(r.data||[]).map((x,i)=>(i+1)+'. '+x.product_name+' × '+x.quantity+' = Rp'+Number(x.line_total||0).toLocaleString('id-ID'));
+  const payment=({cod:'COD / Bayar saat diterima atau diambil',qris:'QRIS',bank_transfer:'Transfer bank',store:'Bayar di toko'})[order.payment_method]||order.payment_method||'-';
+  const message=[
+   'Halo '+(order.customer_name||'Pelanggan')+' 👋',
+   '',
+   'Pesanan Anda di SeaMart sudah SIAP DIAMBIL / DIKIRIM.',
+   '',
+   'Nomor antrean: '+queue,
+   'Nomor pesanan: '+(order.order_code||'-'),
+   '',
+   'RINCIAN PESANAN',
+   ...(items.length?items:['Rincian barang tidak tersedia.']),
+   '',
+   'Total pesanan: Rp'+Number(order.subtotal||0).toLocaleString('id-ID'),
+   'Pembayaran: '+payment,
+   'Status pembayaran: '+(order.payment_status||'unpaid'),
+   ...(order.customer_address?['Alamat: '+order.customer_address]:[]),
+   ...(order.customer_note?['Catatan: '+order.customer_note]:[]),
+   '',
+   'Silakan datang ke toko / tunggu kurir sesuai pilihan pengantaran.',
+   'Terima kasih telah berbelanja di SeaMart 🙏'
+  ].join('\n');
+  waWindow.location.href='https://wa.me/'+phone+'?text='+encodeURIComponent(message);
+ }catch(e){
+  try{waWindow.close()}catch(_){}
+  alert('Tidak dapat menyiapkan pesan WhatsApp: '+(e.message||e));
+ }
 }
 async function saveOnlineOrderStatus(id){const order=(window.seamartOnlineOrders||[]).find(x=>x.id===id);if(!order)return;if(['completed','cancelled'].includes(String(order.order_status||''))){alert('Status pesanan sudah final dan dikunci. Perubahan hanya dapat dilakukan melalui persetujuan admin.');return;}const status=document.getElementById('os-'+id)?.value;if(!status)return;const r=await window.seamartSupabase.rpc('seamart_update_online_order_status',{p_order_id:id,p_status:status});if(r.error){alert('Gagal menyimpan status/pembaruan stok: '+r.error.message+'\\nStatus tidak diubah.');return}const result=r.data||{};alert('Status pesanan tersimpan: '+status+(result.stock_deducted?'\\nStok sudah dikurangi di cloud setelah pesanan selesai.':status==='cancelled'?'\\nPesanan dibatalkan. Stok tidak berubah.':'\\nStok belum dipotong. Stok hanya dikurangi saat status diubah menjadi Selesai oleh admin.'));onlineOrdersPage()}
 async function showOnlineOrderItems(id){const r=await window.seamartSupabase.from('online_order_items').select('product_name,quantity,unit_price,line_total').eq('order_id',id);if(r.error){alert(r.error.message);return}const o=(window.seamartOnlineOrders||[]).find(x=>x.id===id);const lines=(r.data||[]).map(x=>x.product_name+' x '+x.quantity+' = '+Number(x.line_total).toLocaleString('id-ID')).join('\n');alert('Nomor antrean: A-'+String(o?.queue_number||0).padStart(3,'0')+'\n'+(o?.order_code||'Pesanan')+'\nPelanggan: '+(o?.customer_name||'')+'\nTelepon: '+(o?.customer_phone||'')+'\nAlamat: '+(o?.customer_address||'-')+'\nCatatan: '+(o?.customer_note||'-')+'\n\n'+lines)}
