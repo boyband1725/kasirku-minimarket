@@ -546,6 +546,35 @@ body{background:#f5f7f8;color:#27323b}
  .drawer-tracking{font-size:11px!important}
 }
 
+
+/* SeaMart home refinement: compact desktop hero, announcement and catalog spacing */
+@media(min-width:900px){
+  main{padding-top:14px!important}
+  .announcement{min-height:38px!important;padding:6px 12px!important;margin:0 0 10px!important;gap:8px!important;font-size:12px!important;border-radius:8px!important}
+  .announcement .ann-icon{width:22px!important;height:22px!important;font-size:12px!important}
+  .announcement button{font-size:17px!important}
+  .home-banners{grid-template-columns:minmax(0,1.55fr) minmax(210px,.85fr)!important;grid-template-rows:76px 76px!important;gap:9px!important;margin:0 0 14px!important}
+  .home-main-banner{grid-column:1!important;grid-row:1/3!important;min-height:160px!important;padding:17px 22px!important;border-radius:11px!important}
+  .home-main-banner h1{font-size:clamp(23px,2vw,29px)!important;line-height:1.08!important;max-width:72%!important;margin:7px 0 5px!important}
+  .home-main-banner p{font-size:12px!important;line-height:1.35!important;max-width:68%!important}
+  .banner-kicker{font-size:10px!important;letter-spacing:.7px!important}
+  .banner-art{font-size:60px!important;right:16px!important;bottom:8px!important}
+  .home-promo-tile{min-height:0!important;padding:10px 13px!important;border-radius:9px!important}
+  .home-promo-tile strong{font-size:13px!important;line-height:1.1!important}
+  .home-promo-tile span{font-size:10px!important;margin-top:3px!important}
+  .home-promo-tile i{font-size:27px!important;right:8px!important;bottom:4px!important}
+  .home-section-title{font-size:19px!important;margin:0 0 7px!important}
+  .desktop-category-toggle{margin:0 0 8px!important}
+  .desktop-category-toggle button{padding:7px 11px!important}
+  .shop-tools{margin-bottom:8px!important}
+  .home-catalog-heading{margin:10px 2px 10px!important;padding-bottom:8px!important}
+  .home-catalog-heading h2{font-size:20px!important}
+  #products.grid{gap:13px!important}
+}
+@media(min-width:900px) and (max-width:1100px){
+  .home-main-banner h1{font-size:23px!important}
+  .home-main-banner{padding:15px 17px!important}
+}
 </style>
 </head>
 <body>
