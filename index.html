@@ -2089,6 +2089,63 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
 @media(max-width:640px){.edit-product-modal{padding:14px!important;max-height:90vh!important}#inline_edit_form .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}}
 @media(max-width:420px){#inline_edit_form .formgrid{grid-template-columns:1fr!important}.edit-product-modal-actions button{flex:1}}
 
+
+/* SeaMart Products — compact, aligned desktop layout */
+.pagehead:has(.product-admin-actions){
+ display:flex!important;flex-direction:row!important;align-items:flex-start!important;
+ justify-content:space-between!important;gap:18px!important;margin-bottom:14px!important
+}
+.pagehead:has(.product-admin-actions)>div:first-child{flex:0 0 auto!important;min-width:190px!important}
+.pagehead:has(.product-admin-actions) h1{font-size:22px!important;margin:0 0 4px!important}
+.product-admin-actions{
+ display:grid!important;grid-template-columns:repeat(3,minmax(145px,1fr))!important;
+ gap:6px!important;width:min(100%,570px)!important;max-width:570px!important;
+ margin:0!important;align-self:flex-start!important
+}
+.product-admin-actions button{
+ width:100%!important;min-width:0!important;height:32px!important;min-height:32px!important;
+ padding:5px 8px!important;border-radius:7px!important;font-size:10.5px!important;
+ font-weight:650!important;line-height:1.1!important;white-space:nowrap!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;box-shadow:none!important
+}
+#productListSection .product-list-heading{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;margin:10px 0 8px!important}
+#productListSection .product-list-heading h2{font-size:16px!important;margin:0!important;flex:1 1 170px!important}
+#productListSection .product-search-toolbar{
+ display:grid!important;grid-template-columns:minmax(220px,1fr) 145px 116px!important;
+ align-items:center!important;gap:7px!important;width:100%!important;margin:8px 0 10px!important;
+ padding:8px!important;background:#fff!important;border:1px solid #e2e9e5!important;
+ border-radius:9px!important;box-shadow:none!important
+}
+#productListSection .product-search-toolbar #psearch,
+#productListSection .product-search-toolbar #pstatus,
+#productListSection .product-search-toolbar #bulkPhotoButton{
+ width:100%!important;min-width:0!important;height:36px!important;min-height:36px!important;
+ margin:0!important;border-radius:7px!important;font-size:11px!important
+}
+#productListSection .product-search-toolbar #psearch{padding:7px 10px!important;font-size:12px!important}
+#productListSection .product-search-toolbar #pstatus{padding:5px 8px!important}
+#productListSection .product-search-toolbar #bulkPhotoButton{padding:0 8px!important;white-space:nowrap!important}
+#productListSection .brand-category-grid{gap:8px!important;margin:0 0 10px!important}
+.product-category-grid{gap:9px!important;margin:8px 0 16px!important}
+.product-category-card{min-height:96px!important;padding:11px 8px!important;gap:5px!important;border-radius:10px!important}
+.product-category-icon{width:32px!important;height:32px!important;font-size:19px!important;border-radius:9px!important}
+.product-category-card b{font-size:12px!important}
+.product-category-card small{font-size:10px!important;padding:3px 8px!important}
+@media(max-width:900px){
+ .pagehead:has(.product-admin-actions){flex-direction:column!important;align-items:stretch!important;gap:9px!important}
+ .pagehead:has(.product-admin-actions)>div:first-child{min-width:0!important}
+ .product-admin-actions{width:100%!important;max-width:570px!important}
+}
+@media(max-width:620px){
+ .product-admin-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ .product-admin-actions button{height:33px!important;min-height:33px!important;font-size:10px!important}
+ #productListSection .product-search-toolbar{grid-template-columns:minmax(0,1fr) 116px!important;gap:6px!important;padding:7px!important}
+ #productListSection .product-search-toolbar #psearch{grid-column:1/-1!important}
+ #productListSection .product-search-toolbar #pstatus{grid-column:1!important}
+ #productListSection .product-search-toolbar #bulkPhotoButton{grid-column:2!important}
+ .product-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
