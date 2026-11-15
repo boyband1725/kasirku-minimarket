@@ -1996,19 +1996,17 @@ async function refreshSeaMartNow(){
  try{
   const sb=window.seamartSupabase,store=window.seamartStoreId;
   const products=await fetchAllStoreProducts(sb,store);
-  const locked=localStorage.getItem('seamart_master_source_v1')==='local';
-  if(!locked){
-   const categories=await sb.from('categories').select('id,name').eq('store_id',store);
-   if(categories.error)throw categories.error;
-   const catNames=new Map((categories.data||[]).map(x=>[x.id,x.name]));
-   for(const row of (products.data||[])){
-    let p=db.products.find(x=>String(x.id||'')===String(row.id||''));
-    if(!p&&row.barcode){const matches=db.products.filter(x=>String(x.barcode||'').trim()===String(row.barcode).trim());if(matches.length===1)p=matches[0];}
-    if(!p&&row.code){const matches=db.products.filter(x=>String(x.kode||'').trim()===String(row.code).trim());if(matches.length===1)p=matches[0];}
-    if(p){p.nama=row.name||p.nama;p.kode=row.code||p.kode;p.barcode=row.barcode||p.barcode;p.harga=Number(row.price??p.harga);p.harga_jual_1=Number(row.price??p.harga_jual_1??p.harga);p.stok=Number(row.stock??p.stok);p.active=row.active!==false;if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}p.kategori=catNames.get(row.category_id)||p.kategori||'Umum';}
-    else{db.products.push({id:row.id,nama:row.name||'',kode:row.code||'',barcode:row.barcode||'',kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});}
-   }
-  }else{applySeaMartCloudStock(products.data||[]);}
+  // Cloud is the shared source of truth for every device.
+  const categories=await sb.from('categories').select('id,name').eq('store_id',store);
+  if(categories.error)throw categories.error;
+  const catNames=new Map((categories.data||[]).map(x=>[x.id,x.name]));
+  for(const row of (products.data||[])){
+   let p=db.products.find(x=>String(x.id||'')===String(row.id||''));
+   if(!p&&row.barcode){const matches=db.products.filter(x=>String(x.barcode||'').trim()===String(row.barcode).trim());if(matches.length===1)p=matches[0];}
+   if(!p&&row.code){const matches=db.products.filter(x=>String(x.kode||'').trim()===String(row.code).trim());if(matches.length===1)p=matches[0];}
+   if(p){p.id=row.id;p.nama=row.name||p.nama;p.kode=row.code??p.kode;p.barcode=row.barcode??p.barcode;p.harga=Number(row.price??p.harga);p.harga_jual_1=Number(row.price??p.harga_jual_1??p.harga);p.stok=Number(row.stock??p.stok);p.active=row.active!==false;if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}p.kategori=catNames.get(row.category_id)||p.kategori||'Umum';}
+   else{db.products.push({id:row.id,nama:row.name||'',kode:row.code||'',barcode:row.barcode||'',kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});}
+  }
   const warnings=[];
   try{await refreshSeaMartCloudSalesGlobal();}
   catch(e){console.warn('Riwayat penjualan tidak dapat dibaca dari cloud:',e.message||e);warnings.push('Riwayat penjualan tidak dapat diakses');}
@@ -2036,12 +2034,19 @@ function startSeaMartStockRealtime(){
  if(!sb||!store)return;
  if(window.seamartStockChannel){try{sb.removeChannel(window.seamartStockChannel)}catch(e){}}
  if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);
- window.seamartStockChannel=sb.channel('seamart-stock-'+store)
-  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'products',filter:'store_id=eq.'+store},payload=>{
+ window.seamartStockChannel=sb.channel('seamart-store-'+store)
+  .on('postgres_changes',{event:'*',schema:'public',table:'products',filter:'store_id=eq.'+store},payload=>{
    if(payload.new)applySeaMartCloudStock([payload.new]);
+   if(payload.eventType==='DELETE'&&payload.old?.id){db.products=db.products.filter(p=>String(p.id)!==String(payload.old.id));save();}
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'seamart_pos_sales',filter:'store_id=eq.'+store},()=>{
+   if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi penjualan realtime gagal:',e.message||e));
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'cash_flows',filter:'store_id=eq.'+store},()=>{
+   if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi arus kas realtime gagal:',e.message||e));
   }).subscribe((status)=>{window.seamartStockRealtimeStatus=status;});
  window.seamartStockPollTimer=setInterval(()=>{
-  if(document.visibilityState==='visible')refreshSeaMartCloudStock().catch(e=>console.warn('Penyegaran stok SeaMart gagal:',e.message||e));
+  if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi penuh SeaMart gagal:',e.message||e));
  },30000);
  if(!window.seamartStockVisibilityHandler){
   window.seamartStockVisibilityHandler=()=>{if(document.visibilityState==='visible')refreshSeaMartCloudStock().catch(e=>console.warn('Penyegaran stok SeaMart gagal:',e.message||e));};
