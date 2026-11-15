@@ -507,9 +507,24 @@ function loadPhotoManifest(){const map={};PRODUCT_PHOTO_MANIFEST.forEach(([barco
 async function loadProducts(){try{let all=[];for(let from=0;from<5000;from+=500){const r=await sb.from('products').select('id,code,name,barcode,price,stock,active,category_id,image_url').eq('store_id',STORE_ID).eq('active',true).order('name').range(from,from+499);if(r.error)throw r.error;all.push(...(r.data||[]));if((r.data||[]).length<500)break;}const photoMap=await loadPhotoManifest();const source=all;products=source.map(p=>({...p,code:String(p.code??''),barcode:String(p.barcode??'').replace(/\.0$/,''),name:String(p.name||'Barang tanpa nama'),category:'Lainnya',image_url:p.image_url||photoMap[normalizeMasterCode(String(p.barcode??'').replace(/\.0$/,''))]||photoMap[normalizeMasterCode(p.code)]||null}));const ids=[...new Set(all.map(p=>p.category_id).filter(Boolean))];let names={};if(ids.length){const c=await sb.from('categories').select('id,name').in('id',ids);if(!c.error)(c.data||[]).forEach(x=>names[x.id]=x.name);}products=products.map(p=>({...p,category:names[p.category_id]||'Lainnya'}));products.sort((a,b)=>a.name.localeCompare(b.name,'id'));renderCats();renderProducts();if(document.getElementById('shopCategoryPopup')?.classList.contains('open'))renderCategoryPopup();const withPhotos=products.filter(p=>p.image_url).length;say(products.length+' produk tersedia • '+withPhotos+' foto produk tersedia di SeaMart.');if(!products.length){const root=document.getElementById('shopCategoryProducts');if(root&&overlayIsOpen())root.innerHTML='<div class="empty" style="grid-column:1/-1;padding:24px;text-align:center">Belum ada barang aktif untuk toko ini.<br><small>STORE ID yang sedang dibaca: '+esc(STORE_ID)+'</small><br><small>Pastikan ID ini sama dengan store_id di akun SeaMart dan barang berstatus aktif.</small></div>';}}catch(e){const message='Katalog gagal dimuat: '+(e?.message||String(e));say(message+'. Periksa koneksi, izin baca produk publik, dan STORE_ID toko.',true);const root=document.getElementById('shopCategoryProducts');if(root)root.innerHTML='<div class="empty" style="grid-column:1/-1;padding:24px;text-align:center;color:#b42318"><b>Data barang gagal dimuat</b><p style="margin:8px 0">'+esc(e?.message||String(e))+'</p><small>Periksa koneksi Supabase dan ID toko pada halaman toko online.</small></div>';const picker=document.getElementById('shopCategoryPicker');if(picker&&overlayIsOpen())picker.innerHTML='<div class="empty" style="grid-column:1/-1;padding:24px;text-align:center;color:#b42318">Data kategori gagal dimuat: '+esc(e?.message||String(e))+'</div>';}}
 function overlayIsOpen(){return !!document.getElementById('shopCategoryPopup')?.classList.contains('open');}
 function renderCats(){const names=['Semua',...new Set(products.map(p=>p.category))];document.getElementById('cats').innerHTML=names.map(n=>'<button class="cat '+((category===(n==='Semua'?'':n))?'active':'')+'" data-cat="'+esc(n==='Semua'?'':n)+'">'+esc(n)+'</button>').join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderProducts()})}
+function dedupeCatalogProducts(list){
+ const map=new Map();
+ const normName=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\\s+/g,' ');
+ for(const p of list){
+  const barcode=String(p.barcode||'').replace(/\\.0$/,'').replace(/\\D/g,'');
+  const name=normName(p.name),price=Number(p.price)||0;
+  // Require matching barcode, name and price; never merge different products or add their stock.
+  const key=barcode?barcode+'|'+name+'|'+price:'NO-BARCODE|'+name+'|'+price;
+  const old=map.get(key);
+  if(!old){map.set(key,p);continue;}
+  const score=x=>(Number(x.stock)>0?1000000:0)+(x.image_url?10000:0)+Math.max(0,Number(x.stock)||0);
+  if(score(p)>score(old))map.set(key,p);
+ }
+ return [...map.values()];
+}
 function renderProducts(){
  const q=document.getElementById('search').value.toLowerCase().trim();
- let rows=products.filter(p=>(!category||p.category===category)&&(!q||p.name.toLowerCase().includes(q)||String(p.barcode||'').includes(q)));
+ let rows=dedupeCatalogProducts(products.filter(p=>(!category||p.category===category)&&(!q||p.name.toLowerCase().includes(q)||String(p.barcode||'').includes(q))));
  const sort=document.getElementById('sortProducts')?.value||'recommended';
  if(sort==='name')rows.sort((a,b)=>a.name.localeCompare(b.name,'id'));
  if(sort==='price-low')rows.sort((a,b)=>Number(a.price)-Number(b.price));
@@ -596,7 +611,7 @@ function renderCategoryPopup(){
  const root=document.getElementById('shopCategoryProducts');
  if(!root)return;
  // Popup katalog berdiri sendiri: jangan ikut memakai kata pencarian halaman utama.
- let rows=products.filter(p=>!selectedKeys.length||selectedKeys.includes(categoryKey(p.category)));
+ let rows=dedupeCatalogProducts(products.filter(p=>!selectedKeys.length||selectedKeys.includes(categoryKey(p.category))));
  // Jika label kategori tidak cocok dengan kategori produk, tetap tampilkan katalog agar popup tidak kosong.
  if(!rows.length&&products.length)rows=products;
  root.innerHTML=rows.length?rows.map(p=>{
