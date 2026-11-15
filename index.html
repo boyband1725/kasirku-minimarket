@@ -1967,6 +1967,24 @@ function applySeaMartCloudStock(rows){
  }
  return changed+photosChanged;
 }
+async function refreshSeaMartCloudSalesGlobal(){
+ const sb=window.seamartSupabase,store=window.seamartStoreId;
+ if(!sb||!store)return 0;
+ const result=await sb.from('seamart_pos_sales')
+  .select('id,sale_code,cashier_name,shift_ref,payment_method,total,amount_paid,change_amount,created_at,seamart_pos_sale_items(product_name,barcode,unit_price,quantity,line_total)')
+  .eq('store_id',store).order('created_at',{ascending:false}).range(0,9999);
+ if(result.error)throw result.error;
+ const byCode=new Map((db.sales||[]).map(x=>[String(x.id||''),x]));
+ let merged=0;
+ for(const row of (result.data||[])){
+  const code=String(row.sale_code||''),local=byCode.get(code);
+  const items=(row.seamart_pos_sale_items||[]).map(x=>({nama:x.product_name||'Barang',barcode:x.barcode||'',qty:Number(x.quantity||0),harga:Number(x.unit_price||0),subtotal:Number(x.line_total||0)}));
+  const sale={id:code||row.id,time:new Date(row.created_at).toLocaleString('id-ID'),at:row.created_at,cashier:row.cashier_name||'',shiftId:row.shift_ref||'',total:Number(row.total||0),pay:row.payment_method||'Tunai',paid:Number(row.amount_paid||0),change:Number(row.change_amount||0),items,cloudSynced:true};
+  if(local){Object.assign(local,sale);}else{db.sales.push(sale);byCode.set(code,sale);}
+  merged++;
+ }
+ db.sales.sort((a,b)=>new Date(b.at||b.time||0)-new Date(a.at||a.time||0));save();return merged;
+}
 async function refreshSeaMartNow(){
  const button=document.getElementById('seamartRefreshBtn'),status=document.getElementById('seamartRefreshStatus');
  if(window.seamartRefreshBusy)return;
