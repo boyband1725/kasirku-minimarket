@@ -2146,6 +2146,22 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
  .product-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+/* Compact product search field */
+#productListSection .product-search-toolbar{
+ grid-template-columns:minmax(220px,360px) 145px 116px!important;
+ justify-content:start!important;
+}
+#productListSection .product-search-toolbar #psearch{
+ width:100%!important;max-width:360px!important;
+}
+@media(max-width:620px){
+ #productListSection .product-search-toolbar #psearch{
+  grid-column:1/-1!important;width:min(100%,360px)!important;
+  max-width:360px!important;justify-self:start!important;
+ }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
