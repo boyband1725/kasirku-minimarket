@@ -4009,7 +4009,7 @@ async function importProductPhotoSources(){
  if(!Array.isArray(db.products)||!db.products.length)return alert('Master barang belum dimuat.');
  button.disabled=true;button.textContent='Memasang foto…';
  const files=['product-photo-sources-batch-01.csv','product-photo-sources-batch-02.csv','product-photo-sources-batch-03.csv','product-photo-sources-batch-04.csv','product-photo-sources-batch-05.csv','product-photo-sources-batch-06.csv'];
- const stats={ok:0,skip:0,fail:0};let records=[];
+ const stats={ok:0,skip:0,fail:0};const skipped=[],failed=[];let records=[];
  try{
   for(const file of files){
    const response=await fetch('https://raw.githubusercontent.com/boyband1725/kasirku-minimarket/main/'+file,{cache:'no-store'});
@@ -4026,19 +4026,29 @@ async function importProductPhotoSources(){
   for(const item of records){
    try{
     const local=db.products.filter(p=>String(p.barcode||'').trim()===item.barcode);
-    if(local.length!==1){stats.skip++;done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);continue;}
-    await validateProductPhoto(item.url,local[0].nama,item.name);
-    const q=await sb.from('products').select('id,barcode').eq('store_id',store).eq('barcode',item.barcode);
-    if(q.error)throw q.error;
-    if(!q.data||q.data.length!==1){stats.skip++;done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);continue;}
-    const upd=await sb.from('products').update({image_url:item.url}).eq('id',q.data[0].id).eq('store_id',store);
-    if(upd.error)throw upd.error;
-    local[0].image_url=item.url;local[0].foto=item.url;stats.ok++;
-   }catch(e){stats.fail++;console.warn('Foto '+item.barcode,e)}
+    if(local.length!==1){
+     stats.skip++;skipped.push(item.barcode+' — '+(local.length===0?'barcode tidak ditemukan di master lokal':'barcode ganda di master lokal'));
+    }else{
+     await validateProductPhoto(item.url,local[0].nama,item.name);
+     const q=await sb.from('products').select('id,barcode').eq('store_id',store).eq('barcode',item.barcode);
+     if(q.error)throw q.error;
+     if(!q.data||q.data.length!==1){
+      stats.skip++;skipped.push(item.barcode+' — '+(!q.data||q.data.length===0?'barang tidak ditemukan di cloud':'barcode ganda di cloud'));
+     }else{
+      const upd=await sb.from('products').update({image_url:item.url}).eq('id',q.data[0].id).eq('store_id',store);
+      if(upd.error)throw upd.error;
+      local[0].image_url=item.url;local[0].foto=item.url;stats.ok++;
+     }
+    }
+   }catch(e){stats.fail++;failed.push(item.barcode+' — '+(e.message||String(e)));console.warn('Foto '+item.barcode,e)}
    done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);
   }
   save();const msg='Selesai. Terpasang '+stats.ok+', dilewati '+stats.skip+', gagal '+stats.fail+'.';
-  setBulkPhotoProgress(100,msg,stats);alert(msg);
+  setBulkPhotoProgress(100,msg,stats);
+  const details=[msg];
+  if(skipped.length)details.push('DILEWATI:\n'+skipped.join('\n'));
+  if(failed.length)details.push('GAGAL:\n'+failed.join('\n'));
+  alert(details.join('\n\n'));
  }catch(e){alert('Pemasangan foto gagal: '+(e.message||e))}
  finally{button.disabled=false;button.textContent='Pasang Foto dari Daftar SeaMart';}
 }
