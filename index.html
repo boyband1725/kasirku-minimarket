@@ -2794,7 +2794,7 @@ async function hydrateFeaturedProductPhotos(items){
 async function loadNovemberMasterRows(){
  const response=await fetch('./SeaMart_Master_Barang_November_2026_Siap_Impor.csv',{cache:'no-store'});
  if(!response.ok)throw new Error('File master resmi 138 barang tidak dapat dimuat (HTTP '+response.status+').');
- const rows=parseCSV((await response.text()).replace(/^\\uFEFF/,''));
+ const rows=parseCSV((await response.text()).replace(/^\uFEFF/,''));
  if(rows.length<2)throw new Error('File master resmi kosong.');
  const head=rows.shift().map(x=>x.trim().toLowerCase()),col=n=>head.indexOf(n);
  const required=['kode_barang','nama_barang','barcode','harga_beli','harga_jual_1','harga_jual_2','harga_jual_3','stok','kelompok_barang'];
