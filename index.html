@@ -1887,6 +1887,55 @@ td{border-bottom-color:#e8f2ee!important}
  .topbar .user #seamartRefreshStatus{font-size:9px!important}
  .topbar .user .avatar{width:28px!important;height:28px!important;font-size:12px!important}
 }
+/* Product master: readable without horizontal scrolling */
+#ptable .tablewrap{overflow:visible!important;width:100%!important}
+#ptable .tablewrap table{width:100%!important;table-layout:fixed!important;white-space:normal!important;font-size:10px!important}
+#ptable .tablewrap th,#ptable .tablewrap td{padding:7px 4px!important;white-space:normal!important;overflow-wrap:anywhere!important;vertical-align:middle!important}
+#ptable .tablewrap th{font-size:9px!important;line-height:1.15!important}
+#ptable .tablewrap td{font-size:10px!important;line-height:1.25!important}
+#ptable .tablewrap th:nth-child(1),#ptable .tablewrap td:nth-child(1){width:25px!important}
+#ptable .tablewrap th:nth-child(2),#ptable .tablewrap td:nth-child(2){width:38px!important}
+#ptable .tablewrap th:nth-child(3),#ptable .tablewrap td:nth-child(3){width:15%!important}
+#ptable .tablewrap th:nth-child(4),#ptable .tablewrap td:nth-child(4){width:8%!important}
+#ptable .tablewrap th:nth-child(5),#ptable .tablewrap td:nth-child(5){width:11%!important}
+#ptable .tablewrap th:nth-child(6),#ptable .tablewrap td:nth-child(6){width:10%!important}
+#ptable .tablewrap th:nth-child(7),#ptable .tablewrap td:nth-child(7),
+#ptable .tablewrap th:nth-child(8),#ptable .tablewrap td:nth-child(8),
+#ptable .tablewrap th:nth-child(9),#ptable .tablewrap td:nth-child(9),
+#ptable .tablewrap th:nth-child(10),#ptable .tablewrap td:nth-child(10){width:7%!important}
+#ptable .tablewrap th:nth-child(11),#ptable .tablewrap td:nth-child(11){width:5%!important}
+#ptable .tablewrap th:nth-child(12),#ptable .tablewrap td:nth-child(12){width:7%!important}
+#ptable .tablewrap th:nth-child(13),#ptable .tablewrap td:nth-child(13){width:12px!important}
+#ptable .product-category-select{width:100%!important;min-width:0!important;padding:4px 2px!important;font-size:9px!important}
+@media(max-width:760px){
+ #ptable .tablewrap table,#ptable .tablewrap tbody{display:block!important;width:100%!important}
+ #ptable .tablewrap thead{display:none!important}
+ #ptable .tablewrap tr{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0 10px!important;
+  padding:10px 11px!important;margin:0 0 10px!important;border:1px solid #dcebe3!important;
+  border-radius:11px!important;background:#fff!important;box-shadow:0 2px 8px #173c2810!important}
+ #ptable .tablewrap td{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;
+  gap:7px!important;width:auto!important;min-width:0!important;padding:6px 0!important;border:0!important;
+  border-bottom:1px solid #eff3f1!important;font-size:11px!important;overflow-wrap:anywhere!important}
+ #ptable .tablewrap td:before{content:attr(data-label);font-size:9px!important;font-weight:700!important;
+  color:#78877f!important;flex:0 0 42%!important;max-width:42%!important}
+ #ptable .tablewrap td:nth-child(1){grid-column:1/-1;justify-content:flex-start!important}
+ #ptable .tablewrap td:nth-child(1):before{content:"Pilih barang"}
+ #ptable .tablewrap td:nth-child(2){display:none!important}
+ #ptable .tablewrap td:nth-child(3){grid-column:1/-1;font-size:13px!important;font-weight:700!important}
+ #ptable .tablewrap td:nth-child(3):before{content:"Nama produk"}
+ #ptable .tablewrap td:nth-child(4):before{content:"Kode"}
+ #ptable .tablewrap td:nth-child(5):before{content:"Barcode"}
+ #ptable .tablewrap td:nth-child(6):before{content:"Kategori"}
+ #ptable .tablewrap td:nth-child(7):before{content:"Harga beli"}
+ #ptable .tablewrap td:nth-child(8):before{content:"Jual 1"}
+ #ptable .tablewrap td:nth-child(9):before{content:"Jual 2"}
+ #ptable .tablewrap td:nth-child(10):before{content:"Jual 3"}
+ #ptable .tablewrap td:nth-child(11):before{content:"Stok"}
+ #ptable .tablewrap td:nth-child(12):before{content:"Status"}
+ #ptable .tablewrap td:nth-child(13){display:none!important}
+ #ptable .tablewrap td:nth-child(6){align-items:center}
+ #ptable .product-category-select{max-width:58%;font-size:10px!important}
+}
 html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
 #seamartRefreshBtn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;min-height:36px;white-space:nowrap}#seamartRefreshBtn:disabled{opacity:.65;cursor:wait}#seamartRefreshStatus{font-size:10px;color:var(--muted);white-space:nowrap}@media(max-width:900px){.topbar{gap:6px;padding:0 8px}.topbar .user{gap:5px}#seamartRefreshStatus{display:none}#seamartRefreshBtn{padding:7px 9px;font-size:12px}.topbar .user #shiftAction,.topbar .user button[onclick="accountSettings()"]{display:none}}
 </style>
