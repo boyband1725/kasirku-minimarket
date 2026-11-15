@@ -3401,7 +3401,40 @@ function printPurchaseInvoice(inv){
  const w=window.open('','_blank','width=800,height=900');
  if(!w)return alert('Izinkan pop-up browser untuk mencetak faktur.');
  const rows=(inv.items||[]).map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.name)+'</td><td>'+x.qty+'</td><td>'+formatMoveAmount(x.cost)+'</td><td>'+formatMoveAmount(x.qty*x.cost)+'</td></tr>').join('');
- const html='<!doctype html><html><head><meta charset="utf-8"><title>Faktur Pembelian</title><style>body{font:14px Arial;padding:28px}h1{text-align:center;color:#087443}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #bbb;padding:9px}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:20px}</style></head><body><h1>SEAMART</h1><h2>FAKTUR PEMBELIAN</h2>No. Faktur: '+esc(inv.number)+'<br>Tanggal: '+esc(inv.date)+'<br>Supplier: <b>'+esc(inv.supplier)+'</b><table><thead><tr><th>No</th><th>Barang</th><th>Qty</th><th>Harga Beli</th><th>Subtotal</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">TOTAL: '+formatMoveAmount(inv.total)+'</div><p>Catatan: '+esc(inv.note||'-')+'</p><br><br>Supplier, ____________________<br><br><br>Penerima, ____________________</body></html>';
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>Faktur Pembelian</title><style>body{font:14px Arial;padding:28px}h1{text-align:center;color:#087443}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #bbb;padding:9px}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:20px}
+/* SeaMart PC cashier refresh: desktop-only layout */
+@media (min-width:1101px){
+ .odoo-pos-head{margin-bottom:14px}
+ .odoo-pos-head h1{font-size:26px;letter-spacing:-.4px}
+ .odoo-pos-tools{gap:10px;margin-bottom:12px}
+ .odoo-pos-tools #posbarcode{height:44px;max-width:560px}
+ .odoo-pos-layout{
+  grid-template-columns:166px minmax(420px,1fr) 390px;
+  gap:12px;align-items:start;
+ }
+ .odoo-category-panel{top:76px;max-height:calc(100vh - 92px);overflow:auto}
+ .odoo-catalog-panel{min-height:calc(100vh - 190px);padding:16px}
+ .odoo-catalog-top{position:sticky;top:0;background:#fff;padding:2px 0 10px;z-index:2}
+ .odoo-products{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+ .odoo-product{padding:10px}
+ .odoo-product-image{height:112px}
+ .odoo-order-panel{
+  position:sticky;top:76px;max-height:calc(100vh - 92px);
+  display:flex;flex-direction:column;overflow:hidden;z-index:4
+ }
+ .odoo-order-head{flex:0 0 auto;padding:14px 16px}
+ .odoo-order-body{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;padding:12px 15px}
+ .odoo-order-lines{min-height:130px;max-height:min(48vh,520px);overflow-y:auto;overscroll-behavior:contain}
+ .odoo-order-panel .totalrow{flex:0 0 auto}
+ .odoo-order-panel .odoo-checkout{min-height:48px;flex:0 0 auto}
+ .odoo-order-panel .btn-danger{flex:0 0 auto}
+}
+@media (min-width:1500px){
+ .odoo-pos-layout{grid-template-columns:180px minmax(0,1fr) 410px;gap:14px}
+ .odoo-products{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}
+ .odoo-product-image{height:122px}
+}
+</style></head><body><h1>SEAMART</h1><h2>FAKTUR PEMBELIAN</h2>No. Faktur: '+esc(inv.number)+'<br>Tanggal: '+esc(inv.date)+'<br>Supplier: <b>'+esc(inv.supplier)+'</b><table><thead><tr><th>No</th><th>Barang</th><th>Qty</th><th>Harga Beli</th><th>Subtotal</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">TOTAL: '+formatMoveAmount(inv.total)+'</div><p>Catatan: '+esc(inv.note||'-')+'</p><br><br>Supplier, ____________________<br><br><br>Penerima, ____________________</body></html>';
   w.document.open();w.document.write(html);w.document.close();
  w.onload=()=>w.print();
 }
