@@ -47,6 +47,11 @@ begin
     raise exception 'Akun tidak memiliki akses admin ke toko ini';
   end if;
 
+  -- Once an order reaches processing, its status is immutable.
+  if v_order.order_status in ('processing','ready','completed','cancelled') then
+    raise exception 'Status pesanan sudah dikunci setelah diproses';
+  end if;
+
   if p_status in ('processing','ready','completed') and not v_order.stock_deducted then
     -- Aggregate duplicate product lines and lock in product-id order.
     for v_item in
