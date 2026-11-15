@@ -1772,8 +1772,44 @@ async function refreshSeaMartCloudSales(){
  document.querySelectorAll('.nav').forEach(b=>{b.style.display=currentUser.role==='kasir'&&!['kasir'].includes(b.dataset.page)?'none':''});
  document.getElementById('shiftAction').style.display='';updateShiftButton();page(currentUser.role==='kasir'?'kasir':'dashboard');
 }
-async function doLogin(){const email=normalizeLoginEmail(document.getElementById('loginUser').value),password=document.getElementById('loginPass').value,err=document.getElementById('cloudLoginError'),btn=document.getElementById('cloudLoginBtn');btn.disabled=true;btn.textContent='Menghubungkan…';err.textContent='';try{const sb=getSeaMartAuthClient();const auth=await sb.auth.signInWithPassword({email,password});if(auth.error)throw auth.error;await finishSeaMartLogin(auth.data.user);}catch(e){err.textContent=e.message||'Login Supabase gagal';}finally{btn.disabled=false;btn.textContent='Masuk';}}
-async function restoreSeaMartSession(){try{const sb=getSeaMartAuthClient();const {data,error}=await sb.auth.getSession();if(error)throw error;if(data.session?.user)await finishSeaMartLogin(data.session.user);}catch(e){console.warn('Pemulihan sesi SeaMart:',e);}}
+let seamartLoginBusy=false;
+async function doLogin(){
+ const email=normalizeLoginEmail(document.getElementById('loginUser')?.value),password=document.getElementById('loginPass')?.value||'';
+ const btn=document.getElementById('cloudLoginBtn');
+ let sb=null;
+ if(seamartLoginBusy)return;
+ const err=document.getElementById('cloudLoginError');
+ if(!email||!password){if(err)err.textContent='Email dan password wajib diisi.';return;}
+ seamartLoginBusy=true;if(btn){btn.disabled=true;btn.textContent='Memverifikasi…';}if(err)err.textContent='';
+ try{
+  sb=getSeaMartAuthClient();
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  if(!data?.user)throw new Error('Server tidak mengembalikan akun yang terverifikasi.');
+  await finishSeaMartLogin(data.user);
+ }catch(e){
+  if(sb){try{await sb.auth.signOut();}catch(signOutError){console.warn('Gagal membersihkan sesi login:',signOutError);}}
+  window.seamartSupabase=null;window.seamartStoreId=null;window.seamartUserId=null;currentUser=null;
+  showLogin();
+  const message=e?.message||'Login gagal. Periksa email, password, dan koneksi internet.';
+  const status=document.getElementById('cloudLoginError');if(status)status.textContent=message;
+ }finally{
+  seamartLoginBusy=false;
+  const currentButton=document.getElementById('cloudLoginBtn');if(currentButton){currentButton.disabled=false;currentButton.textContent='Log In';}
+ }
+}
+async function restoreSeaMartSession(){
+ const sb=getSeaMartAuthClient();
+ try{
+  const {data,error}=await sb.auth.getSession();if(error)throw error;
+  if(data.session?.user)await finishSeaMartLogin(data.session.user);
+ }catch(e){
+  console.warn('Pemulihan sesi SeaMart gagal:',e);
+  try{await sb.auth.signOut();}catch(signOutError){console.warn('Pembersihan sesi gagal:',signOutError);}
+  window.seamartSupabase=null;window.seamartStoreId=null;window.seamartUserId=null;currentUser=null;showLogin();
+  const status=document.getElementById('cloudLoginError');if(status)status.textContent=e?.message||'Sesi tidak valid. Silakan login kembali.';
+ }
+}
 function logout(){if(currentShift()){alert('Sesi kasir masih terbuka. Selesaikan Tutup Kasir terlebih dahulu, lalu tekan Keluar.');closeCashierShift();return;}if(window.seamartStockChannel&&window.seamartSupabase){try{window.seamartSupabase.removeChannel(window.seamartStockChannel)}catch(e){}}if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);window.seamartStockChannel=null;window.seamartStockPollTimer=null;currentUser=null;cart=[];document.querySelectorAll('.nav').forEach(b=>b.style.display='');document.getElementById('sessionUser').textContent='Belum login';document.getElementById('shiftAction').style.display='none';showLogin();}
 function showPasswordRecoveryForm(sb){
  const root=document.getElementById('loginroot');
