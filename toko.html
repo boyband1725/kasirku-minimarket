@@ -496,17 +496,34 @@ function renderSearchSuggestions(){
  box.classList.remove('hide');
 }
 function showShopNotifications(){const e=document.getElementById('shopAnnouncement');if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('notification-highlight');setTimeout(()=>e.classList.remove('notification-highlight'),1600)}else{say('Belum ada notifikasi baru.')}}
+function categoryKey(value){return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' dan ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');}
+function categoryMatches(name){
+ const key=categoryKey(name),all=[...new Set(products.map(p=>p.category).filter(Boolean))];
+ const exact=all.filter(x=>categoryKey(x)===key);
+ if(exact.length)return exact;
+ const words=key.split(' ').filter(w=>w.length>2);
+ let found=all.filter(x=>{const k=categoryKey(x);return k.includes(key)||key.includes(k)||words.some(w=>k.includes(w));});
+ if(!found.length&&key.includes('makanan'))found=all.filter(x=>/makan|minum|snack|roti|sembako|frozen/i.test(x));
+ if(!found.length&&key.includes('rumah'))found=all.filter(x=>/rumah|alat|dapur|kebersihan|perlengkapan/i.test(x));
+ if(!found.length&&key.includes('ibu'))found=all.filter(x=>/ibu|anak|bayi|susu|popok/i.test(x));
+ return found;
+}
 function openCategoryPopup(name){
- const all=name==='__ALL__';
- const match=all?'__ALL__':[...new Set(products.map(p=>p.category))].find(x=>x.toLowerCase()===String(name).toLowerCase());
- if(!match){say('Kategori '+name+' belum tersedia.',true);return;}
  closeShopMenu();
  const overlay=document.getElementById('shopCategoryPopup');
- document.getElementById('shopCategoryPicker').hidden=true;
- document.getElementById('shopCategoryProducts').hidden=false;
- document.getElementById('shopCategoryTitle').textContent=all?'Semua Produk':match;
- overlay.dataset.category=match;overlay.classList.add('open');document.body.style.overflow='hidden';
- renderCategoryPopup();
+ const picker=document.getElementById('shopCategoryPicker'),grid=document.getElementById('shopCategoryProducts');
+ const matches=categoryMatches(name);
+ if(matches.length===1){
+  overlay.dataset.category=matches[0];document.getElementById('shopCategoryTitle').textContent=matches[0];
+  picker.hidden=true;grid.hidden=false;renderCategoryPopup();
+ }else{
+  overlay.dataset.category='';document.getElementById('shopCategoryTitle').textContent=matches.length?'Pilih kategori: '+name:'Kategori tersedia';
+  grid.hidden=true;picker.hidden=false;
+  const options=matches.length?matches:[...new Set(products.map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
+  picker.innerHTML=options.length?options.map(n=>'<button type="button" class="shop-category-choice" data-category-choice="'+esc(n)+'">'+esc(n)+'<small>'+products.filter(p=>p.category===n).length+' produk</small></button>').join(''):'<div class="empty">Kategori belum tersedia. Produk belum berhasil dimuat.</div>';
+  picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
+ }
+ overlay.classList.add('open');document.body.style.overflow='hidden';
 }
 function renderCategoryPopup(){
  const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
