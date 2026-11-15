@@ -357,6 +357,27 @@ body{background:#f5f7f8;color:#27323b}
  .suggest-row{min-height:40px!important;font-size:11px!important;gap:6px!important}
 }
 
+
+.shop-category-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(8,20,30,.62);backdrop-filter:blur(3px)}
+.shop-category-overlay.open{display:flex}
+.shop-category-modal{width:min(980px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 24px 80px #0004}
+.shop-category-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 20px;border-bottom:1px solid #e9eef1;background:#f9fbfc}
+.shop-category-head small{font-size:11px;color:#2787c4;font-weight:800;letter-spacing:.5px}
+.shop-category-head h2{margin:3px 0 0;font-size:20px;color:#253642}
+.shop-category-close{width:38px;height:38px;flex:none;border:0;border-radius:50%;background:#edf2f5;color:#344454;font-size:26px;line-height:1}
+.shop-category-products{padding:17px;overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+.shop-category-picker{padding:18px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.shop-category-choice{padding:17px 14px;border:1px solid #e5edf1;border-radius:12px;background:#f9fbfc;color:#263746;text-align:left;font-weight:750}
+.shop-category-choice:hover{border-color:#2787c4;background:#eff8fd}
+.shop-category-choice small{display:block;margin-top:5px;color:#74828c;font-weight:500}
+.shop-tracking-modal{width:min(460px,100%);padding-bottom:18px}
+.shop-tracking-modal>p,.shop-tracking-modal>form,.shop-tracking-modal>#popupTrackingResult{margin-left:20px;margin-right:20px}
+.shop-tracking-modal>p{margin-top:17px}
+.shop-tracking-modal form{display:grid;gap:9px}
+.shop-tracking-modal form label{font-size:12px;font-weight:700;color:#53616b}
+.shop-tracking-modal form .field{width:100%;min-width:0}
+.shop-tracking-modal form .primary{width:100%;margin-top:5px}
+@media(max-width:560px){.shop-category-overlay{padding:9px}.shop-category-modal{max-height:92vh;border-radius:14px}.shop-category-head{padding:13px 15px}.shop-category-head h2{font-size:17px}.shop-category-products{padding:11px;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.shop-category-products .item{padding:9px}.shop-category-picker{padding:12px;grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -372,13 +393,14 @@ body{background:#f5f7f8;color:#27323b}
 <button class="drawer-offer" type="button" onclick="closeShopMenu();document.getElementById('sortProducts').value='price-low';renderProducts();document.querySelector('.home-catalog-heading').scrollIntoView({behavior:'smooth'})"><span>ϟ</span>Penawaran Hari Ini</button>
 <nav class="drawer-links">
 <button class="drawer-link" onclick="closeShopMenu();window.scrollTo({top:0,behavior:'smooth'})"><span class="left"><i class="drawer-dot" style="background:#2787c4"></i>Beranda</span><span>›</span></button>
-<button class="drawer-link" onclick="closeShopMenu();document.getElementById('cats').scrollIntoView({behavior:'smooth'})"><span class="left"><i class="drawer-dot"></i>Semua Kategori</span><span>⌄</span></button>
-<button class="drawer-link" onclick="closeShopMenu();setShopCategory('Makanan & Minuman')"><span class="left"><i class="drawer-dot"></i>Makanan & Minuman</span><span>⌄</span></button>
-<button class="drawer-link" onclick="closeShopMenu();setShopCategory('Rumah Tangga')"><span class="left"><i class="drawer-dot"></i>Rumah Tangga</span><span>⌄</span></button>
-<button class="drawer-link" onclick="closeShopMenu();setShopCategory('Ibu & Anak')"><span class="left"><i class="drawer-dot"></i>Ibu & Anak</span><span>⌄</span></button>
-<button class="drawer-link" type="button" onclick="toggleDrawerTracking()"><span class="left"><i class="drawer-dot"></i>Lacak Pesanan</span><span>⌄</span></button>
+<button class="drawer-link" onclick="openAllCategoriesPopup()"><span class="left"><i class="drawer-dot"></i>Semua Kategori</span><span>⌄</span></button>
+<button class="drawer-link" onclick="openCategoryPopup('Makanan & Minuman')"><span class="left"><i class="drawer-dot"></i>Makanan & Minuman</span><span>⌄</span></button>
+<button class="drawer-link" onclick="openCategoryPopup('Rumah Tangga')"><span class="left"><i class="drawer-dot"></i>Rumah Tangga</span><span>⌄</span></button>
+<button class="drawer-link" onclick="openCategoryPopup('Ibu & Anak')"><span class="left"><i class="drawer-dot"></i>Ibu & Anak</span><span>⌄</span></button>
+<button class="drawer-link" type="button" onclick="openTrackingPopup()"><span class="left"><i class="drawer-dot"></i>Lacak Pesanan</span><span>⌄</span></button>
 <button class="drawer-link" onclick="closeShopMenu();openCheckout()"><span class="left"><i class="drawer-dot"></i>Keranjang Belanja</span><span>›</span></button>
-<div id="drawerTracking" class="drawer-tracking" hidden><section class="panel" id="trackPanel"><h2>📦 Lacak Pesanan</h2><p class="muted">Masukkan nomor antrean dan nomor HP yang digunakan saat checkout.</p><form id="trackForm"><label>Nomor antrean</label><input class="field" name="code" required placeholder="Contoh: A-001" autocomplete="off"><label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"><button class="primary" id="trackBtn" type="submit">Lacak Pesanan</button></form><div id="trackingResult" aria-live="polite"></div></section></div></nav></aside></div><div class="cart-backdrop" id="cartDrawer" onclick="if(event.target===this)closeCartDrawer()"><section class="cart-drawer" aria-label="Keranjang belanja"><div class="cart-drawer-head"><h2>🛒 Keranjang Belanja</h2><button class="cart-drawer-close" type="button" onclick="closeCartDrawer()" aria-label="Tutup">×</button></div><div class="cart-drawer-body" id="cartDrawerItems"><div class="cart-drawer-empty">Keranjang masih kosong.</div></div><div class="cart-drawer-foot"><div class="cart-drawer-total"><span>Total belanja</span><span id="cartDrawerTotal">Rp0</span></div><button class="primary" type="button" id="cartDrawerCheckout" onclick="checkoutFromDrawer()">Lanjut ke Checkout →</button><div class="cart-drawer-actions"><span id="cartDrawerCount" class="muted">0 barang</span><button type="button" onclick="clearCart()">Kosongkan keranjang</button></div></div></section></div><main>
+<div id="drawerTracking" class="drawer-tracking" hidden><section class="panel" id="trackPanel"><h2>📦 Lacak Pesanan</h2><p class="muted">Masukkan nomor antrean dan nomor HP yang digunakan saat checkout.</p><form id="trackForm"><label>Nomor antrean</label><input class="field" name="code" required placeholder="Contoh: A-001" autocomplete="off"><label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"><button class="primary" id="trackBtn" type="submit">Lacak Pesanan</button></form><div id="trackingResult" aria-live="polite"></div></section></div></nav></aside></div><div class="cart-backdrop" id="cartDrawer" onclick="if(event.target===this)closeCartDrawer()"><section class="cart-drawer" aria-label="Keranjang belanja"><div class="cart-drawer-head"><h2>🛒 Keranjang Belanja</h2><button class="cart-drawer-close" type="button" onclick="closeCartDrawer()" aria-label="Tutup">×</button></div><div class="cart-drawer-body" id="cartDrawerItems"><div class="cart-drawer-empty">Keranjang masih kosong.</div></div><div class="cart-drawer-foot"><div class="cart-drawer-total"><span>Total belanja</span><span id="cartDrawerTotal">Rp0</span></div><button class="primary" type="button" id="cartDrawerCheckout" onclick="checkoutFromDrawer()">Lanjut ke Checkout →</button><div class="cart-drawer-actions"><span id="cartDrawerCount" class="muted">0 barang</span><button type="button" onclick="clearCart()">Kosongkan keranjang</button></div></div></section></div><div class="shop-category-overlay" id="shopCategoryPopup" onclick="if(event.target===this)closeCategoryPopup()"><section class="shop-category-modal" role="dialog" aria-modal="true"><header class="shop-category-head"><div><small>SeaMart • Katalog</small><h2 id="shopCategoryTitle">Kategori</h2></div><button type="button" class="shop-category-close" onclick="closeCategoryPopup()" aria-label="Tutup">×</button></header><div id="shopCategoryPicker" class="shop-category-picker" hidden></div><div id="shopCategoryProducts" class="shop-category-products"></div></section></div>
+<div class="shop-category-overlay" id="shopTrackingPopup" onclick="if(event.target===this)closeTrackingPopup()"><section class="shop-category-modal shop-tracking-modal" role="dialog" aria-modal="true"><header class="shop-category-head"><div><small>SeaMart • Pesanan</small><h2>📦 Lacak Pesanan</h2></div><button type="button" class="shop-category-close" onclick="closeTrackingPopup()" aria-label="Tutup">×</button></header><p class="muted">Masukkan nomor antrean dan nomor HP yang digunakan saat checkout.</p><form id="popupTrackForm"><label>Nomor antrean</label><input class="field" name="code" required placeholder="Contoh: A-001" autocomplete="off"><label>Nomor WhatsApp</label><input class="field" name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"><button class="primary" type="submit">Lacak Pesanan</button></form><div id="popupTrackingResult" aria-live="polite"></div></section></div><main>
 <div class="announcement" id="shopAnnouncement"><span class="ann-icon">!</span><strong>Pengumuman SeaMart: Belanja mudah, dekat, dan hemat!</strong><button type="button" aria-label="Tutup pengumuman" onclick="document.getElementById('shopAnnouncement').remove()">×</button></div>
 <section class="home-banners" aria-label="Promo SeaMart">
 <div class="home-main-banner"><div class="banner-kicker">Selamat datang di SeaMart</div><h1>Belanja lebih mudah, hemat setiap hari!</h1><p>Penuhi kebutuhan rumah tangga langsung dari toko kami</p><div class="banner-art">🛒</div></div>
@@ -474,6 +496,41 @@ function renderSearchSuggestions(){
  box.classList.remove('hide');
 }
 function showShopNotifications(){const e=document.getElementById('shopAnnouncement');if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('notification-highlight');setTimeout(()=>e.classList.remove('notification-highlight'),1600)}else{say('Belum ada notifikasi baru.')}}
+function openCategoryPopup(name){
+ const all=name==='__ALL__';
+ const match=all?'__ALL__':[...new Set(products.map(p=>p.category))].find(x=>x.toLowerCase()===String(name).toLowerCase());
+ if(!match){say('Kategori '+name+' belum tersedia.',true);return;}
+ closeShopMenu();
+ const overlay=document.getElementById('shopCategoryPopup');
+ document.getElementById('shopCategoryPicker').hidden=true;
+ document.getElementById('shopCategoryProducts').hidden=false;
+ document.getElementById('shopCategoryTitle').textContent=all?'Semua Produk':match;
+ overlay.dataset.category=match;overlay.classList.add('open');document.body.style.overflow='hidden';
+ renderCategoryPopup();
+}
+function renderCategoryPopup(){
+ const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
+ const name=overlay.dataset.category,q=(document.getElementById('search')?.value||'').toLowerCase().trim();
+ const rows=products.filter(p=>(name==='__ALL__'||p.category===name)&&(!q||p.name.toLowerCase().includes(q)||String(p.barcode||'').includes(q)));
+ const root=document.getElementById('shopCategoryProducts');
+ root.innerHTML=rows.length?rows.map(p=>{
+  const photo=p.image_url?'<img class="product-photo" src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🛒\'">':'🛒';
+  const stock=Math.max(0,Number(p.stock)||0),qty=cart.get(p.id)?.qty||0;
+  return '<article class="item"><div class="thumb">'+photo+'</div><div class="name">'+esc(p.name)+'</div><div class="price">'+rupiah(p.price)+'</div>'+(stock?'<div class="stock stock-available">Stok tersedia: <b>'+stock+'</b></div>':'<div class="stock stock-empty">Stok habis</div>')+(qty?'<div class="product-qty"><button type="button" onclick="changeQty(\''+p.id+'\',-1);renderCategoryPopup()">−</button><b>'+qty+'</b><button type="button" '+(qty>=stock?'disabled':'')+' onclick="addItem(\''+p.id+'\');renderCategoryPopup()">+</button></div>':'')+'<button type="button" class="detail-btn" '+(!stock?'disabled':'')+' onclick="addItem(\''+p.id+'\');renderCategoryPopup()">+ Keranjang</button><button type="button" class="buy-now-btn" '+(!stock?'disabled':'')+' onclick="buyNow(\''+p.id+'\')">Beli Sekarang →</button></article>';
+ }).join(''):'<div class="empty">Belum ada barang pada kategori ini.</div>';
+}
+function openAllCategoriesPopup(){
+ closeShopMenu();const overlay=document.getElementById('shopCategoryPopup');
+ const picker=document.getElementById('shopCategoryPicker'),grid=document.getElementById('shopCategoryProducts');
+ document.getElementById('shopCategoryTitle').textContent='Semua Kategori';grid.hidden=true;picker.hidden=false;
+ const names=[...new Set(products.map(p=>p.category))].sort((a,b)=>a.localeCompare(b,'id'));
+ picker.innerHTML='<button class="shop-category-choice" data-category-choice="__ALL__">Semua Produk<small>'+products.length+' produk tersedia</small></button>'+names.map(n=>'<button class="shop-category-choice" data-category-choice="'+esc(n)+'">'+esc(n)+'<small>'+products.filter(p=>p.category===n).length+' produk</small></button>').join('');
+ picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
+ overlay.classList.add('open');document.body.style.overflow='hidden';
+}
+function closeCategoryPopup(){document.getElementById('shopCategoryPopup').classList.remove('open');document.body.style.overflow='';}
+function openTrackingPopup(){closeShopMenu();document.getElementById('shopTrackingPopup').classList.add('open');document.body.style.overflow='hidden';}
+function closeTrackingPopup(){document.getElementById('shopTrackingPopup').classList.remove('open');document.body.style.overflow='';}
 function openShopMenu(){document.getElementById('shopDrawer').classList.add('open');document.body.style.overflow='hidden'}
 function closeShopMenu(){document.getElementById('shopDrawer').classList.remove('open');document.body.style.overflow=''}
 function toggleDrawerTracking(){const panel=document.getElementById('drawerTracking');panel.hidden=!panel.hidden;if(!panel.hidden)panel.scrollIntoView({behavior:'smooth',block:'nearest'})}
@@ -520,6 +577,14 @@ async function trackOnlineOrder(code,phone){
  (cancelled?'<div class="msg err">Pesanan ini dibatalkan oleh toko.</div>':'<div style="display:grid;gap:8px;margin:12px 0">'+steps.map((s,i)=>'<div style="display:flex;gap:9px;align-items:center;color:'+(i<=idx?'#087b43':'#94a3b8')+'"><b style="font-size:18px">'+(i<=idx?'●':'○')+'</b><span style="font-weight:'+(i===idx?'800':'500')+'">'+s[1]+'</span></div>').join('')+'</div>')+
  '<div class="cartline"><span>Status pembayaran</span><b>'+esc(paymentLabels[o.payment_status]||o.payment_status)+'</b></div><div class="cartline"><span>Metode pembayaran</span><b>'+esc(o.payment_method.toUpperCase())+'</b></div><div class="total"><span>Total pesanan</span><span>'+rupiah(o.subtotal)+'</span></div><h3>Rincian barang</h3>'+((o.items||[]).map(x=>'<div class="cartline"><span>'+esc(x.name)+' × '+x.quantity+'</span><b>'+rupiah(x.line_total)+'</b></div>').join('')||'<p class="muted">Tidak ada rincian barang.</p>')+'<button class="primary" type="button" style="margin-top:12px" onclick="trackOnlineOrder(document.querySelector(\'[name=code]\').value,document.querySelector(\'[name=phone]\').value)">Perbarui Status</button>';
 }
+document.getElementById('popupTrackForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const original=document.getElementById('trackForm');
+ original.elements.code.value=e.currentTarget.elements.code.value.trim();
+ original.elements.phone.value=e.currentTarget.elements.phone.value.trim();
+ original.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+ setTimeout(()=>{const result=document.getElementById('trackingResult');document.getElementById('popupTrackingResult').innerHTML=result?result.innerHTML:'';},700);
+});
 document.getElementById('trackForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.currentTarget),b=document.getElementById('trackBtn');b.disabled=true;b.textContent='Memeriksa...';try{await trackOnlineOrder(String(f.get('code')).trim(),String(f.get('phone')).trim());}finally{b.disabled=false;b.textContent='Lacak Pesanan';}});
 
 // Reliable click binding for mobile browsers / in-app browser
