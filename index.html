@@ -4149,9 +4149,10 @@ function ensureSeaMartOrderRealtime(sb,store){
  if(window.seamartOrderChannel&&window.seamartOrderChannelStore===store)return;
  if(window.seamartOrderChannel){try{sb.removeChannel(window.seamartOrderChannel)}catch(e){}}
  window.seamartOrderChannelStore=store;
- window.seamartOrderChannel=sb.channel('seamart-orders-'+store)
-  .on('postgres_changes',{event:'INSERT',schema:'public',table:'online_orders',filter:'store_id=eq.'+store},payload=>receiveSeaMartOrderNotification(payload.new||{}))
-  .subscribe(status=>{window.seamartOrderRealtimeStatus=status;});
+ const channel=sb.channel('seamart-orders-'+store);
+ channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'online_orders',filter:'store_id=eq.'+store},function(payload){receiveSeaMartOrderNotification(payload.new||{});});
+ channel.subscribe(function(status){window.seamartOrderRealtimeStatus=status;});
+ window.seamartOrderChannel=channel;
 }
 
 async function onlineOrdersPage(){
