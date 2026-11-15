@@ -164,10 +164,14 @@ begin
   end if;
 
   update public.online_orders
-     set order_status = p_status,updated_at = now()
+     set order_status = p_status,
+         payment_status = case when p_status = 'completed' then 'paid' else payment_status end,
+         updated_at = now()
    where id = v_order.id;
 
   if p_status = 'completed' then
+    -- Pesanan selesai berarti barang sudah diterima dan pembayaran COD/ambil di toko sudah diterima.
+    v_order.payment_status := 'paid';
     v_method := case v_order.payment_method
       when 'qris' then 'QRIS'
       when 'bank_transfer' then 'Transfer Bank'
@@ -175,14 +179,14 @@ begin
       when 'store' then 'Ambil di Toko'
       else 'Pembayaran'
     end;
-    v_paid := case when v_order.payment_status = 'paid' then v_order.subtotal else 0 end;
+    v_paid := v_order.subtotal;
 
     insert into public.seamart_pos_sales(
       store_id,sale_code,cashier_name,shift_ref,payment_method,total,
       amount_paid,change_amount,created_by,online_order_id,source,payment_status
     ) values (
       v_order.store_id,'ONLINE-'||v_order.order_code,'Pesanan Online',null,
-      v_method,v_order.subtotal,v_paid,0,auth.uid(),v_order.id,'online_order',v_order.payment_status
+      v_method,v_order.subtotal,v_paid,0,auth.uid(),v_order.id,'online_order','paid'
     )
     on conflict (store_id,sale_code) do nothing;
 
@@ -242,6 +246,9 @@ begin
   if v_order.order_status = 'cancelled' then
     raise exception 'Pesanan dibatalkan; status pembayaran dikunci';
   end if;
+  if v_order.order_status = 'completed' and p_payment_status <> 'paid' then
+    raise exception 'Pesanan selesai wajib berstatus Lunas. Koreksi memerlukan persetujuan admin khusus.';
+  end if;
 
   update public.online_orders
      set payment_status = p_payment_status,updated_at = now()
@@ -266,3 +273,34 @@ revoke all on function public.seamart_update_online_order_status(uuid,text) from
 revoke all on function public.seamart_update_online_order_payment_status(uuid,text) from public,anon;
 grant execute on function public.seamart_update_online_order_status(uuid,text) to authenticated;
 grant execute on function public.seamart_update_online_order_payment_status(uuid,text) to authenticated;
+
+
+-- Koreksi transaksi lama: semua pesanan yang sudah selesai dianggap LUNAS.
+-- Cash flow memakai unique key per pesanan agar tidak tercatat ganda.
+update public.online_orders
+   set payment_status = 'paid', updated_at = now()
+ where order_status = 'completed'
+   and payment_status <> 'paid';
+
+update public.seamart_pos_sales s
+   set payment_status = 'paid',
+       amount_paid = s.total
+  from public.online_orders o
+ where s.online_order_id = o.id
+   and o.order_status = 'completed'
+   and (s.payment_status <> 'paid' or s.amount_paid <> s.total);
+
+do $$
+declare
+  r record;
+begin
+  for r in
+    select id from public.online_orders
+     where order_status = 'completed'
+  loop
+    perform public.seamart_post_online_order_cash(r.id);
+  end loop;
+end;
+$$;
+
+notify pgrst, 'reload schema';
