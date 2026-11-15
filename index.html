@@ -4154,7 +4154,6 @@ function ensureSeaMartOrderRealtime(sb,store){
   .subscribe(status=>{window.seamartOrderRealtimeStatus=status;});
 }
 
-.btn-wa{margin-top:7px;background:#16845b;color:#fff;border:0;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:750;white-space:nowrap}.btn-wa:disabled{background:#e9eef0;color:#8a969e;cursor:not-allowed}
 async function onlineOrdersPage(){
  const view=document.getElementById('view');
  if(currentUser.role!=='admin'){view.innerHTML='<div class="notice">Menu khusus pemilik/admin.</div>';return}
@@ -4583,6 +4582,7 @@ restoreSeaMartSession();
 #smAlertDialog .sm-alert-ok:hover{background:#06643c}
 @keyframes smAlertFade{from{opacity:0}to{opacity:1}}@keyframes smAlertPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:520px){#smAlertDialog{width:calc(100vw - 26px);border-radius:13px}#smAlertDialog .sm-alert-head{padding:13px 15px}#smAlertDialog .sm-alert-content{padding:16px;font-size:12px}}
+.btn-wa{margin-top:7px;background:#16845b;color:#fff;border:0;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:750;white-space:nowrap}.btn-wa:disabled{background:#e9eef0;color:#8a969e;cursor:not-allowed}
 </style>
 <script>
 (function(){
