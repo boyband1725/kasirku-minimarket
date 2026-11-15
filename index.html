@@ -3433,9 +3433,7 @@ function printPurchaseInvoice(inv){
  const w=window.open('','_blank','width=800,height=900');
  if(!w)return alert('Izinkan pop-up browser untuk mencetak faktur.');
  const rows=(inv.items||[]).map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.name)+'</td><td>'+x.qty+'</td><td>'+formatMoveAmount(x.cost)+'</td><td>'+formatMoveAmount(x.qty*x.cost)+'</td></tr>').join('');
- const html='<!doctype html><html><head><meta charset="utf-8"><title>Faktur Pembelian</title><style>body{font:14px Arial;padding:28px}h1{text-align:center;color:#087443}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #bbb;padding:9px}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:20px}
-
-</style></head><body><h1>SEAMART</h1><h2>FAKTUR PEMBELIAN</h2>No. Faktur: '+esc(inv.number)+'<br>Tanggal: '+esc(inv.date)+'<br>Supplier: <b>'+esc(inv.supplier)+'</b><table><thead><tr><th>No</th><th>Barang</th><th>Qty</th><th>Harga Beli</th><th>Subtotal</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">TOTAL: '+formatMoveAmount(inv.total)+'</div><p>Catatan: '+esc(inv.note||'-')+'</p><br><br>Supplier, ____________________<br><br><br>Penerima, ____________________</body></html>';
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>Faktur Pembelian</title><style>body{font:14px Arial;padding:28px}h1{text-align:center;color:#087443}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #bbb;padding:9px}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:20px}</style></head><body><h1>SEAMART</h1><h2>FAKTUR PEMBELIAN</h2>No. Faktur: '+esc(inv.number)+'<br>Tanggal: '+esc(inv.date)+'<br>Supplier: <b>'+esc(inv.supplier)+'</b><table><thead><tr><th>No</th><th>Barang</th><th>Qty</th><th>Harga Beli</th><th>Subtotal</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">TOTAL: '+formatMoveAmount(inv.total)+'</div><p>Catatan: '+esc(inv.note||'-')+'</p><br><br>Supplier, ____________________<br><br><br>Penerima, ____________________</body></html>';
   w.document.open();w.document.write(html);w.document.close();
  w.onload=()=>w.print();
 }
