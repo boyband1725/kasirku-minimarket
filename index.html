@@ -4258,7 +4258,7 @@ async function importProductPhotoSources(){
  if(!sb||!store)return alert('Login admin dan koneksi cloud SeaMart harus aktif.');
  if(!Array.isArray(db.products)||!db.products.length)return alert('Master barang belum dimuat.');
  if(button){button.disabled=true;button.textContent='Memasang foto…';}
- const files=['product-photo-sources-batch-01.csv','product-photo-sources-batch-02.csv','product-photo-sources-batch-03.csv','product-photo-sources-batch-04.csv','product-photo-sources-batch-05.csv','product-photo-sources-batch-06.csv'];
+ const files=['product-photo-sources-batch-01.csv','product-photo-sources-batch-02.csv','product-photo-sources-batch-03.csv','product-photo-sources-batch-04.csv','product-photo-sources-batch-05.csv','product-photo-sources-batch-06.csv','product-photo-sources-batch-07.csv'];
  const stats={ok:0,skip:0,fail:0};const skipped=[],failed=[];let records=[];
  try{
   for(const file of files){
@@ -4266,23 +4266,25 @@ async function importProductPhotoSources(){
    if(!response.ok)throw new Error('Gagal mengambil '+file);
    const lines=(await response.text()).split(/\r?\n/);
    for(const line of lines.slice(1)){
-    const m=line.match(/^(\d+),"([^"]*)","([^"]+)"/);
+    const m=line.match(/^(\d*),"([^"]*)","([^"]+)"/);
     if(m)records.push({barcode:m[1],name:m[2],url:m[3]});
    }
   }
-  const unique=new Map();records.forEach(x=>unique.set(x.barcode,x));records=[...unique.values()];
+  const unique=new Map();records.forEach(x=>unique.set(x.barcode||('name:'+x.name.trim().toLowerCase()),x));records=[...unique.values()];
   if(!records.length)throw new Error('Daftar sumber foto kosong.');
   let done=0;
   for(const item of records){
    try{
-    const local=db.products.filter(p=>String(p.barcode||'').trim()===item.barcode);
+    const normName=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+    const local=db.products.filter(p=>item.barcode?String(p.barcode||'').trim()===item.barcode:normName(p.nama)===normName(item.name));
     if(local.length>1){
-     stats.skip++;skipped.push(item.barcode+' — barcode ganda di master lokal');
+     stats.skip++;skipped.push((item.barcode||item.name)+' — data ganda di master lokal');
     }else{
-     const q=await sb.from('products').select('id,barcode,name').eq('store_id',store).eq('barcode',item.barcode);
+     const query=sb.from('products').select('id,barcode,name').eq('store_id',store);
+     const q=item.barcode?await query.eq('barcode',item.barcode):await query.eq('name',item.name);
      if(q.error)throw q.error;
      if(!q.data||q.data.length!==1){
-      stats.skip++;skipped.push(item.barcode+' — '+(!q.data||q.data.length===0?'barcode tidak ditemukan di cloud':'barcode ganda di cloud'));
+      stats.skip++;skipped.push((item.barcode||item.name)+' — '+(!q.data||q.data.length===0?'produk tidak ditemukan di cloud':'data ganda di cloud'));
      }else{
       const cloudName=String(q.data[0].name||'').trim();
       const targetName=local[0]?.nama||cloudName||item.name;
@@ -4294,7 +4296,7 @@ async function importProductPhotoSources(){
       if(!local[0])skipped.push(item.barcode+' — foto dipasang ke cloud; produk belum ada di master lokal perangkat ini');
      }
     }
-   }catch(e){stats.fail++;failed.push(item.barcode+' — '+(e.message||String(e)));console.warn('Foto '+item.barcode,e)}
+   }catch(e){stats.fail++;failed.push((item.barcode||item.name)+' — '+(e.message||String(e)));console.warn('Foto '+item.barcode,e)}
    done++;setBulkPhotoProgress(done/records.length*100,'Memasang foto '+done+'/'+records.length+'…',stats);
   }
   save();const msg='Selesai. Terpasang '+stats.ok+', dilewati '+stats.skip+', gagal '+stats.fail+'.';
