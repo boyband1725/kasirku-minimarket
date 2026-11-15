@@ -2650,7 +2650,7 @@ async function finishSeaMartLogin(user){
  const member=await sb.from('store_members').select('store_id,role').eq('user_id',user.id).limit(1).maybeSingle();
  if(member.error)throw member.error;
  if(!member.data)throw new Error('Akun belum terhubung ke toko SeaMart.');
- window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;
+ window.seamartSupabase=sb;window.seamartStoreId=member.data.store_id;window.seamartUserId=user.id;window.seamartCashFlowSyncReady=false;ensureSeaMartOrderRealtime(sb,member.data.store_id);
  const loginRoot=document.getElementById('loginroot');if(loginRoot){loginRoot.style.display='block';loginRoot.innerHTML='<div class="login-screen"><div class="login-card" style="max-width:440px"><div class="login-brand" aria-label="Logo SeaMart"><svg viewBox="0 0 250 76" role="img" aria-label="SeaMart"><defs><linearGradient id="seaGlowLogin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ff43"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M154 13 Q190 -5 225 14 Q194 10 168 29 Q178 10 154 13Z" fill="url(#seaGlowLogin)"/><path d="M8 64 Q110 48 239 65 Q160 57 8 73Z" fill="url(#seaGlowLogin)"/><text x="8" y="55" font-size="51" font-weight="800" fill="#087b43">Sea</text><text x="102" y="55" font-size="51" font-weight="800" fill="#075b36">Mart</text></svg></div><h2 style="margin:8px 0 4px">Login berhasil!</h2><p style="color:#64748b;font-size:13px;margin:0">Menyiapkan data toko sebelum masuk kasir</p><div id="seamartSyncProgress"></div></div></div>';}
 async function syncSeaMartLegacySales(){
  const sb=window.seamartSupabase,store=window.seamartStoreId;
@@ -4124,6 +4124,7 @@ function renderOrderNotifications(){
  if(items){items.innerHTML=seamartOrderNotifications.length?seamartOrderNotifications.slice(0,20).map(n=>'<button type="button" class="sm-order-notify-item '+(n.unread?'unread':'')+'" onclick="openOrderFromNotification(\''+escapeOrderNotifyText(n.id)+'\')"><strong>🛍 '+escapeOrderNotifyText(n.code||'Pesanan baru')+' · '+escapeOrderNotifyText(n.customer||'Pelanggan')+'</strong><small>'+escapeOrderNotifyText(n.total)+' · '+escapeOrderNotifyText(n.time)+'</small></button>').join(''):'<div class="sm-order-notify-empty">Belum ada pesanan baru.</div>';}
 }
 function toggleOrderNotifications(){
+ if('Notification'in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
  const panel=document.getElementById('smOrderNotifyPanel');if(!panel)return;
  panel.hidden=!panel.hidden;
  if(!panel.hidden){seamartOrderNotifications.forEach(n=>n.unread=false);seamartUnreadOrderNotifications=0;renderOrderNotifications();}
@@ -4143,6 +4144,16 @@ function receiveSeaMartOrderNotification(o){
  try{const a=new AudioContext(),osc=a.createOscillator(),gain=a.createGain();osc.connect(gain);gain.connect(a.destination);osc.frequency.value=880;gain.gain.value=.07;osc.start();osc.stop(a.currentTime+.2);osc.onended=()=>a.close();}catch(e){}
  if(document.getElementById('onlineOrdersList'))onlineOrdersPage();
 }
+function ensureSeaMartOrderRealtime(sb,store){
+ if(!sb||!store)return;
+ if(window.seamartOrderChannel&&window.seamartOrderChannelStore===store)return;
+ if(window.seamartOrderChannel){try{sb.removeChannel(window.seamartOrderChannel)}catch(e){}}
+ window.seamartOrderChannelStore=store;
+ window.seamartOrderChannel=sb.channel('seamart-orders-'+store)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'online_orders',filter:'store_id=eq.'+store},payload=>receiveSeaMartOrderNotification(payload.new||{}))
+  .subscribe(status=>{window.seamartOrderRealtimeStatus=status;});
+}
+
 async function onlineOrdersPage(){
  const view=document.getElementById('view');
  if(currentUser.role!=='admin'){view.innerHTML='<div class="notice">Menu khusus pemilik/admin.</div>';return}
@@ -4151,11 +4162,8 @@ async function onlineOrdersPage(){
  document.getElementById('reloadOnlineOrders').onclick=onlineOrdersPage;
  document.getElementById('connectOnlinePrinter').onclick=connectWindowsReceiptPrinter;
  const sb=window.seamartSupabase,store=window.seamartStoreId;
- // Realtime notification for new customer orders while admin is signed in.
- if(window.seamartOrderChannel){try{await sb.removeChannel(window.seamartOrderChannel)}catch(e){}}
- if('Notification' in window && Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}
- window.seamartOrderChannel=sb.channel('seamart-orders-'+store)
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'online_orders',filter:'store_id=eq.'+store},payload=>{receiveSeaMartOrderNotification(payload.new||{});}).subscribe();
+ // Realtime notification remains active while navigating other pages.
+ ensureSeaMartOrderRealtime(sb,store);
  const res=await sb.from('online_orders').select('id,order_code,customer_name,customer_phone,customer_address,customer_note,payment_method,payment_status,order_status,subtotal,created_at').eq('store_id',store).order('created_at',{ascending:false}).limit(100);
  const root=document.getElementById('onlineOrdersList');if(!root)return;
  if(res.error){root.innerHTML='<div class="notice">Tabel pesanan belum tersedia. Jalankan SQL dari folder supabase di GitHub. '+String(res.error.message).replace(/[&<>]/g,'')+'</div>';return}
