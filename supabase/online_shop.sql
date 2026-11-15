@@ -169,3 +169,6 @@ for select to anon, authenticated using (active = true);
 drop policy if exists "SeaMart public shop reads categories" on public.categories;
 create policy "SeaMart public shop reads categories" on public.categories
 for select to anon, authenticated using (true);
+
+-- Explicit table privileges are required in addition to RLS policies for the public catalog.
+grant select on public.products, public.categories to anon, authenticated;
