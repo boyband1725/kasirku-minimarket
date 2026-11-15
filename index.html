@@ -2318,6 +2318,10 @@ html,body{overscroll-behavior-y:contain}body{overscroll-behavior-y:none;}
  }
 }
 
+/* Clear X control for every SeaMart search field */
+input[type="search"]{-webkit-appearance:searchfield!important;appearance:auto}
+input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:searchfield-cancel-button!important;appearance:auto!important;cursor:pointer!important;width:17px!important;height:17px!important;margin-left:7px!important;opacity:.9}
+input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -3944,7 +3948,25 @@ async function printReceiptNow(id,isCopy=false){
   if(choice==='browser'){
    const paper=document.getElementById('smReceiptPaper');const w=window.open('','_blank','width=420,height=720');
    if(!w)throw new Error('Popup diblokir. Izinkan popup untuk SeaMart.');
-   w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><script>window.onload=function(){window.print()}<\\/script></body></html>');
+   w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><script>window.onload=function(){window.print()}<\\/script><script>
+/* SeaMart universal search clear */
+(function(){
+ function enhance(root){
+  (root||document).querySelectorAll('input:not([data-seamart-search])').forEach(function(el){
+   const hint=((el.placeholder||'')+' '+(el.getAttribute('aria-label')||'')+' '+el.id).toLowerCase();
+   if(!(el.type==='search'||el.classList.contains('search')||/cari|search/.test(hint)))return;
+   el.dataset.seamartSearch='1';
+   if(el.type==='text'||el.type==='')el.type='search';
+   el.addEventListener('keydown',function(ev){
+    if(ev.key==='Escape'&&el.value){el.value='';el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('search',{bubbles:true}));el.focus();ev.preventDefault();}
+   });
+  });
+ }
+ enhance(document);
+ new MutationObserver(function(records){records.forEach(function(rec){rec.addedNodes.forEach(function(n){if(n.nodeType===1)enhance(n.matches?.('input')?n.parentElement:n);});});}).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+</body></html>');
    w.document.close();const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}return;
   }
   if(choice==='windows'){
