@@ -800,6 +800,8 @@ function renderSearchSuggestions(){
  if(!input||!box)return;
  const q=input.value.trim().toLowerCase(),suggestionRoot=document.getElementById('searchSuggestions'),topRoot=document.getElementById('searchTop');
  if(!suggestionRoot||!topRoot)return;
+ /* Do not show suggestion or TOP panels until the customer types a query */
+ if(!q){box.classList.add('hide');suggestionRoot.replaceChildren();topRoot.replaceChildren();return;}
  const makeRow=(term,rank)=>{const button=document.createElement('button');button.type='button';button.className='suggest-row';const mark=document.createElement('span');mark.className=rank?'suggest-rank':'suggest-glass';mark.textContent=rank?rank+'.':'⌕';const label=document.createElement('span');label.className='suggest-label';label.textContent=term;button.append(mark,label);button.addEventListener('click',()=>chooseSearchTerm(term));return button;};
  const matches=products.filter(p=>String(p.name||'').toLowerCase().includes(q)||(q&&String(p.barcode||'').includes(q))).slice(0,6);
  suggestionRoot.replaceChildren();
