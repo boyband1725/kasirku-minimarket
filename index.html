@@ -2596,7 +2596,7 @@ async function applyNovemberMaster(){
   if(source.length!==138)throw new Error('Jumlah data master terbaca '+source.length+', seharusnya 138. Data tidak diubah.');
   if(new Set(source.map(p=>p.kode)).size!==138)throw new Error('Ada kode barang ganda pada file master. Data tidak diubah.');
   const current=Array.isArray(db.products)?db.products:[];
-  const norm=s=>String(s??'').trim().replace(/^0+(?=\\d)/,'');
+  const norm=s=>String(s??'').trim().replace(/^0+(?=\d)/,'');
   const next=source.map((p,i)=>{
    let matches=current.filter(x=>String(x.kode??'').trim()===p.kode);
    if(matches.length!==1){const byNorm=current.filter(x=>norm(x.kode)===norm(p.kode));matches=byNorm.length===1?byNorm:[];}
