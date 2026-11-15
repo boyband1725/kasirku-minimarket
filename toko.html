@@ -551,8 +551,8 @@ function openCategoryPopup(name){
  overlay.dataset.category=name;
  document.getElementById('shopCategoryTitle').textContent=name==='__ALL__'?'Semua Produk':(matches.length?name+' • Katalog Barang':'Katalog Barang');
  picker.hidden=true;grid.hidden=false;
- renderCategoryPopup();
  overlay.classList.add('open');document.body.style.overflow='hidden';
+ renderCategoryPopup();
 }
 function renderCategoryPopup(){
  const overlay=document.getElementById('shopCategoryPopup');if(!overlay?.classList.contains('open'))return;
