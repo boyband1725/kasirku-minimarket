@@ -177,6 +177,7 @@ begin
     'queue_label', 'A-' || lpad(v_order.queue_number::text,3,'0'),
     'order_code', v_order.order_code,
     'customer_name', v_order.customer_name,
+    'customer_phone', v_order.customer_phone,
     'order_status', v_order.order_status,
     'payment_status', v_order.payment_status,
     'payment_method', v_order.payment_method,
