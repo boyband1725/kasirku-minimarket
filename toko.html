@@ -919,6 +919,39 @@ document.getElementById('popupTrackForm').addEventListener('submit',async e=>{
 });
 document.getElementById('trackForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.currentTarget),b=document.getElementById('trackBtn');b.disabled=true;b.textContent='Memeriksa...';try{await trackOnlineOrder(String(f.get('code')).trim(),String(f.get('phone')).trim());}finally{b.disabled=false;b.textContent='Lacak Pesanan';}});
 
+// Keyboard navigation: Esc acts as Back/Close for the topmost storefront layer.
+document.addEventListener('keydown',function(event){
+ if(event.key!=='Escape' && event.key!=='Esc') return;
+ const visible=(el)=>!!el && !el.classList.contains('hide') && (el.classList.contains('open') || el.id==='searchPanel' || el.id==='checkout');
+ const searchPanel=document.getElementById('searchPanel');
+ const categoryPopup=document.getElementById('shopCategoryPopup');
+ const trackingPopup=document.getElementById('shopTrackingPopup');
+ const cartDrawer=document.getElementById('cartDrawer');
+ const shopDrawer=document.getElementById('shopDrawer');
+ const checkout=document.getElementById('checkout');
+ if(searchPanel && !searchPanel.classList.contains('hide')){
+   event.preventDefault(); closeShopSearch(); return;
+ }
+ if(categoryPopup && categoryPopup.classList.contains('open')){
+   event.preventDefault(); closeCategoryPopup(); return;
+ }
+ if(trackingPopup && trackingPopup.classList.contains('open')){
+   event.preventDefault(); closeTrackingPopup(); return;
+ }
+ if(cartDrawer && cartDrawer.classList.contains('open')){
+   event.preventDefault(); closeCartDrawer(); return;
+ }
+ if(shopDrawer && shopDrawer.classList.contains('open')){
+   event.preventDefault(); closeShopMenu(); return;
+ }
+ if(checkout && !checkout.classList.contains('hide')){
+   event.preventDefault(); checkout.classList.add('hide'); return;
+ }
+ if(window.history.length>1){
+   event.preventDefault(); window.history.back();
+ }
+},{capture:true});
+ 
 // Reliable click binding for mobile browsers / in-app browser
 const menuButton=document.getElementById('shopMenuButton');
 if(menuButton)menuButton.addEventListener('click',openShopMenu);
