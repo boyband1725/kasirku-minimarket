@@ -2178,6 +2178,7 @@ async function refreshSeaMartNow(){
    }else if(localStorage.getItem('seamart_master_source_v1')!=='local'){
     db.products.push({id:row.id,nama:row.name||'',kode:normalizeProductIdentifier(row.code||''),barcode:normalizeProductIdentifier(row.barcode||''),kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});
    }
+  }
   refreshPhase='mengambil riwayat penjualan';
   try{await refreshSeaMartCloudSalesGlobal();}
   catch(e){console.warn('Riwayat penjualan tidak dapat dibaca dari cloud:',e.message||e);warnings.push('Riwayat penjualan tidak dapat diakses');}
