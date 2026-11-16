@@ -2997,6 +2997,22 @@ body.seamart-pos-fullscreen .odoo-catalog-top .seamart-catalog-barcode input{
 #cartScreenKeyboard .cart-keypad-grid button{position:relative;z-index:2;cursor:pointer;pointer-events:auto!important}
 #cartScreenKeyboard .cart-key-apply{position:relative;z-index:2;cursor:pointer;pointer-events:auto!important}
 
+
+/* Match product search width to the digital clock block */
+body.seamart-pos-fullscreen .odoo-pos-head .pos-clock{
+ flex:0 0 150px!important;width:150px!important;min-width:150px!important;box-sizing:border-box!important
+}
+body.seamart-pos-fullscreen .odoo-pos-head .seamart-pos-searchbar{
+ flex:0 0 150px!important;width:150px!important;min-width:150px!important;max-width:150px!important;
+ box-sizing:border-box!important
+}
+body.seamart-pos-fullscreen .odoo-pos-head .seamart-pos-searchbar .pos-searchbox{
+ flex:1 1 auto!important;width:100%!important;min-width:0!important;max-width:100%!important
+}
+body.seamart-pos-fullscreen .odoo-pos-head .seamart-pos-searchbar .pos-searchbox input{
+ width:100%!important;min-width:0!important
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
