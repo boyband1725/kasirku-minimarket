@@ -2571,6 +2571,40 @@ window.addEventListener('error', function(e) {
  .online-order-actions .btn-wa svg{width:16px!important;height:16px!important}
  .online-order-locked{display:none!important}
 }
+</style><style id="seamart-mobile-control-alignment-fix">
+@media(max-width:900px), (hover:none) and (pointer:coarse){
+ #onlineOrdersList .online-order-card .online-order-control{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 126px!important;
+  column-gap:10px!important;
+  align-items:end!important;
+  width:100%!important;
+ }
+ #onlineOrdersList .online-order-card .online-order-control>label{
+  display:block!important;width:100%!important;min-width:0!important;
+  margin:0!important;align-self:end!important;
+ }
+ #onlineOrdersList .online-order-card .online-order-control>label select{
+  display:block!important;width:100%!important;min-width:0!important;
+  max-width:100%!important;height:42px!important;min-height:42px!important;
+  box-sizing:border-box!important;margin-top:5px!important;
+ }
+ #onlineOrdersList .online-order-card .online-order-control>button{
+  display:flex!important;flex:0 0 126px!important;
+  width:126px!important;min-width:126px!important;max-width:126px!important;
+  height:42px!important;min-height:42px!important;max-height:42px!important;
+  box-sizing:border-box!important;margin:0!important;padding:4px 5px!important;
+  align-items:center!important;justify-content:center!important;
+  border-radius:10px!important;font-size:11px!important;font-weight:800!important;
+  line-height:1.1!important;text-align:center!important;white-space:normal!important;
+ }
+ #onlineOrdersList .online-order-card .online-order-control>button[data-payment-save][disabled]{
+  width:126px!important;min-width:126px!important;max-width:126px!important;
+  height:42px!important;min-height:42px!important;
+  background:#eaf7ef!important;color:#147844!important;
+  border:1px solid #b8dfc7!important;opacity:1!important;
+ }
+}
 </style></head>
 <body>
 <div class="app">
