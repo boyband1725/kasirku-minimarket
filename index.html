@@ -3501,6 +3501,44 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  }
 }
 
+
+/* Desktop checkout column fills the available screen height */
+@media(min-width:901px){
+ #view #odooPosLayout{
+  align-items:stretch!important;
+ }
+ #view #odooPosLayout #odooOrderPanel{
+  align-self:stretch!important;
+  display:flex!important;
+  flex-direction:column!important;
+  position:sticky!important;
+  top:12px!important;
+  height:calc(100vh - 185px)!important;
+  min-height:520px!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+ }
+ #view #odooPosLayout #odooOrderPanel .odoo-order-body{
+  display:flex!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+ }
+ #view #odooPosLayout #odooOrderPanel .odoo-order-lines{
+  flex:1 1 auto!important;
+  min-height:100px!important;
+  overflow-y:auto!important;
+ }
+ #view #odooPosLayout #odooOrderPanel .totalrow,
+ #view #odooPosLayout #odooOrderPanel #checkoutBtn,
+ #view #odooPosLayout #odooOrderPanel .btn-danger,
+ #view #odooPosLayout #odooOrderPanel .odoo-scan-hint{
+  flex:0 0 auto!important;
+ }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
