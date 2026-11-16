@@ -2471,6 +2471,18 @@ window.addEventListener('error', function(e) {
  .online-order-actions button{min-height:36px!important;height:36px!important;padding:5px 4px!important;font-size:10px!important;border-radius:8px!important}
  .online-order-actions .btn-wa svg{width:16px!important;height:16px!important}
  .online-order-locked{font-size:10px!important;padding-top:7px!important}
+ /* tighter, balanced action controls for phone screens */
+ .online-order-control{grid-template-columns:minmax(0,1fr) 112px!important;align-items:center!important;gap:8px!important}
+ .online-order-control label{display:block!important;min-width:0!important}
+ .online-order-control select{width:100%!important;min-width:0!important;max-width:100%!important}
+ .online-order-control button{display:inline-flex!important;width:112px!important;min-width:0!important;max-width:112px!important;justify-content:center!important;white-space:normal!important;line-height:1.15!important;text-align:center!important}
+ .online-order-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important}
+ .online-order-actions button{display:flex!important;width:100%!important;min-width:0!important;max-width:100%!important;align-items:center!important;justify-content:center!important;line-height:1.15!important;overflow-wrap:anywhere!important}
+ .online-order-card{max-width:100%!important;box-sizing:border-box!important}
+ .online-order-card *{box-sizing:border-box!important}
+ .online-order-meta{grid-template-columns:1fr 1fr!important}
+ .online-order-code{overflow-wrap:anywhere!important}
+
  #onlineOrdersList{padding:8px!important}
  #connectOnlinePrinter,#reloadOnlineOrders{min-height:40px!important;padding:8px 10px!important;font-size:13px!important}
 }
