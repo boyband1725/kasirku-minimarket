@@ -4008,7 +4008,7 @@ async function importProductPhotosFromFiles(input){
 }
 function previewInlineProductPhoto(input){let file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/'))return alert('Pilih file gambar.');let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,500/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);window.pendingInlinePhoto=canvas.toDataURL('image/jpeg',0.76);window.pendingInlinePhotoClear=false;document.getElementById('inline_photo_preview').innerHTML='<img src="'+window.pendingInlinePhoto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px">'};img.src=reader.result};reader.readAsDataURL(file)}
 function clearInlineProductPhoto(){window.pendingInlinePhoto=null;window.pendingInlinePhotoClear=true;const input=document.getElementById('if_foto_file');if(input)input.value='';const preview=document.getElementById('inline_photo_preview');if(preview)preview.innerHTML='<span class="emptyhint">Foto akan dihapus setelah Simpan Perubahan.</span>'}
-async async function saveInlineProduct(){alert('Form lama sudah dinonaktifkan. Silakan gunakan satu Form Master Barang SeaMart.');}
+async function saveInlineProduct(){alert('Form lama sudah dinonaktifkan. Silakan gunakan satu Form Master Barang SeaMart.');}
 function productModal(id){
  window.pendingProductPhoto=null;
  const p=db.products.find(x=>x.id===id)||{id:'p'+Date.now(),nama:'',kode:'',barcode:'',kategori:'Umum',harga:0,harga_beli:0,harga_jual_1:0,harga_jual_2:0,harga_jual_3:0,stok:0,active:true,foto:''};
