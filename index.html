@@ -3721,11 +3721,14 @@ function products(){
 function suggestProductGroup(name){const n=String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');const rules=[['Mie Instan',/mie instan|mi instan|indomie|pop mie|sarimi|samyang|supermi/],['Minuman',/aqua|air mineral|teh |kopi|coffee|nescafe|sirup|soda|jus|juice|pocari|sprite|cola|fanta|ultra milk|le minerale|cleo|ades|minuman|drink/],['Snack',/snack|keripik|kerupuk|chitato|lays|qtela|taro|piattos|wafer|biskuit|oreo|roma|astor|kacang|pilus|makaroni|popcorn|ciki/],['Susu & Olahan',/susu|yogurt|yoghurt|keju|butter|mentega|margarin|krimer|kental manis|dancow|frisian|indomilk/],['Bumbu & Sembako',/beras|gula|garam|minyak goreng|tepung|terigu|kecap|saus|sambal|bumbu|masako|royco|merica|ketumbar|sarden/],['Makanan',/roti|nasi|ikan|ayam|daging|telur|sosis|nugget|bakso|rendang|sereal|oat|cokelat|coklat|permen|jelly|puding/],['Perawatan Tubuh',/sabun mandi|shampoo|sampo|odol|pasta gigi|sikat gigi|deodorant|parfum|bedak|pembalut|popok|diaper|skincare|body lotion/],['Kebersihan Rumah',/deterjen|detergen|rinso|attack|pewangi|pelembut|karbol|pembersih|wipol|porstex|sabun cuci|spons|pengharum|bayclin|pemutih|cairan pel/],['Perlengkapan Rumah',/baterai|lampu|kabel|obeng|plastik|kantong|kresek|alat tulis|pulpen|pensil|buku|kertas|sapu|ember|gayung|tisu|tissue/],['Pakaian',/pakaian|baju|kaos|kaus|kemeja|celana|rok |rok$|jaket|sweater|hoodie|seragam|jilbab|hijab|kerudung|gamis|daster|piyama|pakaian dalam|bra |bra$|kutang|singlet|kaus kaki|kaos kaki|topi|ikat pinggang/],['Frozen Food',/frozen|beku|es krim|ice cream/]];for(const [g,r] of rules)if(r.test(n))return g;return 'Lainnya'}
 async function autoGroupProducts(){const changes=[],counts={};for(const p of (db.products||[])){const g=suggestProductGroup(p.nama);if(String(p.kategori||'').trim()!==g){changes.push({p,g});counts[g]=(counts[g]||0)+1}}if(!changes.length){alert('Semua barang sudah masuk kelompok otomatis.');return}const summary=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+': '+v+' barang').join('\\n');if(!confirm('SeaMart akan mengelompokkan '+changes.length+' barang berdasarkan nama produk.\\n\\n'+summary+'\\n\\nBarang yang tidak cocok dengan aturan akan dimasukkan ke kelompok Lainnya. Lanjutkan?'))return;changes.forEach(x=>x.p.kategori=x.g);save();products();alert('Selesai! '+changes.length+' barang sudah dimasukkan ke kelompok masing-masing. Periksa kelompok Lainnya untuk barang yang perlu dikoreksi.');if(typeof syncAllProducts==='function'){try{await syncAllProducts();alert('Sinkronisasi kelompok barang selesai.')}catch(e){alert('Tersimpan di perangkat, tetapi sinkronisasi cloud gagal: '+(e.message||e))}}}
 function parentGroupForCategory(category){
- const c=String(category||'').toUpperCase();
- if(/ROKOK|TEMBAKAU/.test(c))return 'Rokok & Tembakau';
- if(/ANTI MABUK|BODY CARE|FACIAL CARE|HAIR CARE|MINYAK KAYU PUTIH|OBAT |ORAL CARE|PEMBALUT|POPOK BAYI/.test(c))return 'Perawatan & Kesehatan';
- if(/ANEKA BAHAN KARET|KOREK API|STEREOFORM|PERLENGKAPAN RUMAH|ALAT TULIS|PLASTIK/.test(c))return 'Rumah Tangga & Perlengkapan';
- if(/NON CATEGORY|LAINNYA/.test(c))return 'Lainnya';
+ const c=String(category||'').trim().toUpperCase();
+ const groups={
+  'Rokok & Tembakau':['ROKOK'],
+  'Perawatan & Kesehatan':['ANTI MABUK PERJALANAN','BODY CARE','FACIAL CARE','HAIR CARE','MINYAK KAYU PUTIH','OBAT BATUK & PILEK','OBAT MAAG','OBAT SAKIT KEPALA','OBAT TOLAK ANGIN','ORAL CARE','PEMBALUT WANITA','POPOK BAYI','SUSU PERTUMBUHAN ANAK','SUSU TULANG/KALSIUM'],
+  'Rumah Tangga & Perlengkapan':['ANEKA BAHAN KARET','KOREK API','STEREOFORM'],
+  'Lainnya':['NON CATEGORY','LAINNYA']
+ };
+ for(const [parent,items] of Object.entries(groups))if(items.includes(c))return parent;
  return 'Makanan & Minuman';
 }
 function selectProductCategory(category){
