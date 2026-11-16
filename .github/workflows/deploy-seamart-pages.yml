@@ -7,6 +7,7 @@ on:
     paths:
       - 'index.html'
       - 'toko.html'
+      - 'SeaMart_Master_Barang_November_2026_Siap_Impor.csv'
       - 'web/**'
       - '.github/workflows/deploy-seamart-pages.yml'
   workflow_dispatch:
