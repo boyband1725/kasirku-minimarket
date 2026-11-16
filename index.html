@@ -4482,7 +4482,7 @@ function speakSeaMartFemale(text){
  try{
   window.speechSynthesis.cancel();
   const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang='id-ID';utterance.rate=.92;utterance.pitch=1.12;utterance.volume=1;
+  utterance.lang='id-ID';utterance.rate=.86;utterance.pitch=1.08;utterance.volume=1;
   const voice=getSeaMartSelectedVoice()||getSeaMartIndonesianFemaleVoice();if(voice)utterance.voice=voice;
   window.speechSynthesis.speak(utterance);
   return true;
@@ -4491,8 +4491,8 @@ function speakSeaMartFemale(text){
 function testSeaMartFemaleVoice(){
  if(!('speechSynthesis'in window)){alert('Browser ini belum mendukung suara otomatis. Coba Chrome terbaru.');return;}
  const voices=window.speechSynthesis.getVoices();
- if(!voices.length){window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;speakSeaMartFemale('Halo, ini tes suara perempuan SeaMart. Notifikasi pesanan baru akan dibacakan di sini.');};}
- else speakSeaMartFemale('Halo, ini tes suara perempuan SeaMart. Notifikasi pesanan baru akan dibacakan di sini.');
+ if(!voices.length){window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;speakSeaMartFemale('Halo, ini tes suara perempuan Si-Mart. Notifikasi pesanan baru akan dibacakan di sini.');};}
+ else speakSeaMartFemale('Halo, ini tes suara perempuan Si-Mart. Notifikasi pesanan baru akan dibacakan di sini.');
 }
 async function testSeaMartOrderAlarm(){
  const ok=await unlockSeaMartOrderSound();
@@ -4511,7 +4511,7 @@ function startSeaMartOrderAlarm(order){
  },1100);
  const queue=String(order?.queue_number||order?.order_code||'pesanan baru');
  const customer=String(order?.customer_name||'pelanggan');
- speakSeaMartFemale('Perhatian. Pesanan baru masuk. Nomor antrean '+queue+'. Pelanggan '+customer+'. Silakan periksa pesanan di SeaMart.');
+ speakSeaMartFemale('Perhatian. Pesanan baru masuk. Nomor antrean '+queue+'. Pelanggan '+customer+'. Silakan periksa pesanan di Si-Mart.');
 }
 function escapeOrderNotifyText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderOrderNotifications(){
