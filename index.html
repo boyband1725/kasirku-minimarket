@@ -4521,13 +4521,18 @@ function playSeaMartAlarmTone(){
   const ctx=seamartOrderAudioContext;
   if(ctx.state==='suspended')return;
   const now=ctx.currentTime;
-  [880,1175,880].forEach((frequency,i)=>{
-   const osc=ctx.createOscillator(),gain=ctx.createGain(),start=now+i*.22;
-   osc.type='sine';osc.frequency.setValueAtTime(frequency,start);
-   gain.gain.setValueAtTime(.0001,start);
-   gain.gain.exponentialRampToValueAtTime(.16,start+.025);
-   gain.gain.exponentialRampToValueAtTime(.0001,start+.17);
-   osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(start+.18);
+  // Original soft, iPhone-style notification chime (not an extracted Apple ringtone).
+  // Two bright bell-like notes with a gentle harmonic layer.
+  [{f:784,t:0,d:.24},{f:988,t:.19,d:.34}].forEach(note=>{
+   [1,2.01].forEach((harmonic,index)=>{
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    const start=now+note.t,peak=index===0?.105:.025;
+    osc.type='sine';osc.frequency.setValueAtTime(note.f*harmonic,start);
+    gain.gain.setValueAtTime(.0001,start);
+    gain.gain.exponentialRampToValueAtTime(peak,start+.018);
+    gain.gain.exponentialRampToValueAtTime(.0001,start+note.d);
+    osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(start+note.d+.015);
+   });
   });
  }catch(e){console.warn('Alarm SeaMart:',e);}
 }
