@@ -3720,7 +3720,28 @@ function products(){
 
 function suggestProductGroup(name){const n=String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');const rules=[['Mie Instan',/mie instan|mi instan|indomie|pop mie|sarimi|samyang|supermi/],['Minuman',/aqua|air mineral|teh |kopi|coffee|nescafe|sirup|soda|jus|juice|pocari|sprite|cola|fanta|ultra milk|le minerale|cleo|ades|minuman|drink/],['Snack',/snack|keripik|kerupuk|chitato|lays|qtela|taro|piattos|wafer|biskuit|oreo|roma|astor|kacang|pilus|makaroni|popcorn|ciki/],['Susu & Olahan',/susu|yogurt|yoghurt|keju|butter|mentega|margarin|krimer|kental manis|dancow|frisian|indomilk/],['Bumbu & Sembako',/beras|gula|garam|minyak goreng|tepung|terigu|kecap|saus|sambal|bumbu|masako|royco|merica|ketumbar|sarden/],['Makanan',/roti|nasi|ikan|ayam|daging|telur|sosis|nugget|bakso|rendang|sereal|oat|cokelat|coklat|permen|jelly|puding/],['Perawatan Tubuh',/sabun mandi|shampoo|sampo|odol|pasta gigi|sikat gigi|deodorant|parfum|bedak|pembalut|popok|diaper|skincare|body lotion/],['Kebersihan Rumah',/deterjen|detergen|rinso|attack|pewangi|pelembut|karbol|pembersih|wipol|porstex|sabun cuci|spons|pengharum|bayclin|pemutih|cairan pel/],['Perlengkapan Rumah',/baterai|lampu|kabel|obeng|plastik|kantong|kresek|alat tulis|pulpen|pensil|buku|kertas|sapu|ember|gayung|tisu|tissue/],['Pakaian',/pakaian|baju|kaos|kaus|kemeja|celana|rok |rok$|jaket|sweater|hoodie|seragam|jilbab|hijab|kerudung|gamis|daster|piyama|pakaian dalam|bra |bra$|kutang|singlet|kaus kaki|kaos kaki|topi|ikat pinggang/],['Frozen Food',/frozen|beku|es krim|ice cream/]];for(const [g,r] of rules)if(r.test(n))return g;return 'Lainnya'}
 async function autoGroupProducts(){const changes=[],counts={};for(const p of (db.products||[])){const g=suggestProductGroup(p.nama);if(String(p.kategori||'').trim()!==g){changes.push({p,g});counts[g]=(counts[g]||0)+1}}if(!changes.length){alert('Semua barang sudah masuk kelompok otomatis.');return}const summary=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+': '+v+' barang').join('\\n');if(!confirm('SeaMart akan mengelompokkan '+changes.length+' barang berdasarkan nama produk.\\n\\n'+summary+'\\n\\nBarang yang tidak cocok dengan aturan akan dimasukkan ke kelompok Lainnya. Lanjutkan?'))return;changes.forEach(x=>x.p.kategori=x.g);save();products();alert('Selesai! '+changes.length+' barang sudah dimasukkan ke kelompok masing-masing. Periksa kelompok Lainnya untuk barang yang perlu dikoreksi.');if(typeof syncAllProducts==='function'){try{await syncAllProducts();alert('Sinkronisasi kelompok barang selesai.')}catch(e){alert('Tersimpan di perangkat, tetapi sinkronisasi cloud gagal: '+(e.message||e))}}}
-function selectProductCategory(category){window.selectedProductCategory=category||'';window.selectedProductBrand='';const section=document.getElementById('productListSection');if(section)section.classList.toggle('hidden',!window.selectedProductCategory);filterProducts();if(window.selectedProductCategory)document.getElementById('productListSection')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function parentGroupForCategory(category){
+ const c=String(category||'').toUpperCase();
+ if(/ROKOK|TEMBAKAU/.test(c))return 'Rokok & Tembakau';
+ if(/ANTI MABUK|BODY CARE|FACIAL CARE|HAIR CARE|MINYAK KAYU PUTIH|OBAT |ORAL CARE|PEMBALUT|POPOK BAYI/.test(c))return 'Perawatan & Kesehatan';
+ if(/ANEKA BAHAN KARET|KOREK API|STEREOFORM|PERLENGKAPAN RUMAH|ALAT TULIS|PLASTIK/.test(c))return 'Rumah Tangga & Perlengkapan';
+ if(/NON CATEGORY|LAINNYA/.test(c))return 'Lainnya';
+ return 'Makanan & Minuman';
+}
+function selectProductCategory(category){
+ window.selectedProductBrand='';
+ if(String(category||'').startsWith('@parent:')){
+  window.selectedProductParent=String(category).slice(8);
+  window.selectedProductCategory='';
+ }else{
+  window.selectedProductCategory=category||'';
+  if(!category)window.selectedProductParent='';
+ }
+ const section=document.getElementById('productListSection');
+ if(section)section.classList.toggle('hidden',!window.selectedProductCategory&&!window.selectedProductParent);
+ filterProducts();
+ if(window.selectedProductCategory||window.selectedProductParent)document.getElementById('productListSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function suggestProductBrand(name){
  const n=String(name||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[’‘`]/g,"'");
  const brands=[
@@ -3733,19 +3754,26 @@ function selectProductBrand(brand){window.selectedProductBrand=brand||'';filterP
 async function changeProductCategory(id,category){const p=db.products.find(x=>String(x.id)===String(id));if(!p)return;const next=String(category||'').trim()||'Lainnya';if((p.kategori||'Umum')===next)return;p.kategori=next;save();filterProducts();if(window.seamartSupabase&&window.seamartStoreId){try{await syncOneProduct(p,new Map())}catch(e){alert('Kategori berubah di perangkat, tetapi gagal tersinkron ke cloud: '+(e.message||e));return}}}
 function moveProductCategory(id,current){const next=prompt('Pindahkan barang ke kategori:',current||'Umum');if(next&&next.trim()&&next.trim()!==(current||'Umum'))changeProductCategory(id,next.trim());}
 function filterProducts(){
- const q=(document.getElementById('psearch')?.value||'').toLowerCase(),status=document.getElementById('pstatus')?.value||'semua',category=window.selectedProductCategory||'',brand=window.selectedProductBrand||'';
+ const q=(document.getElementById('psearch')?.value||'').toLowerCase(),status=document.getElementById('pstatus')?.value||'semua',category=window.selectedProductCategory||'',parent=window.selectedProductParent||'',brand=window.selectedProductBrand||'';
  const categories=[...new Set((db.products||[]).map(p=>String(p.kategori||'Umum').trim()||'Umum'))].sort((a,b)=>a.localeCompare(b,'id'));
  const countFor=c=>db.products.filter(p=>(String(p.kategori||'Umum').trim()||'Umum')===c).length;
+ const parentNames=['Makanan & Minuman','Perawatan & Kesehatan','Rumah Tangga & Perlengkapan','Rokok & Tembakau','Lainnya'];
  const box=document.getElementById('pcategoryButtons');
  if(box){
-  if(!category){
+  if(!category&&!parent){
    const total=db.products.length;
-   box.innerHTML='<button type="button" class="product-category-card all-category-card" onclick="selectProductCategory(\'Semua\')"><span class="product-category-icon">▦</span><b>Semua Barang</b><small>'+total+' barang</small></button>'+categories.map(c=>'<button type="button" class="product-category-card" onclick="selectProductCategory('+JSON.stringify(c).replace(/"/g,'&quot;')+')"><span class="product-category-icon">'+categoryIcon({kategori:c,nama:''})+'</span><b>'+esc(c)+'</b><small>'+countFor(c)+' barang</small></button>').join('');
+   const counts=Object.fromEntries(parentNames.map(g=>[g,db.products.filter(p=>parentGroupForCategory(p.kategori)===g).length]));
+   box.innerHTML='<button type="button" class="product-category-card all-category-card" onclick="selectProductCategory(\'Semua\')"><span class="product-category-icon">▦</span><b>Semua Barang</b><small>'+total+' barang</small></button>'+parentNames.filter(g=>counts[g]>0).map(g=>'<button type="button" class="product-category-card" onclick="selectProductCategory(\'@parent:'+g+'\')"><span class="product-category-icon">📁</span><b>'+esc(g)+'</b><small>'+counts[g]+' barang</small></button>').join('');
    box.classList.remove('hidden');return;
   }
-  box.classList.add('hidden');
+  if(!category&&parent){
+   const subs=categories.filter(c=>parentGroupForCategory(c)===parent);
+   box.innerHTML=subs.map(c=>'<button type="button" class="product-category-card" onclick="selectProductCategory('+JSON.stringify(c).replace(/"/g,'&quot;')+')"><span class="product-category-icon">'+categoryIcon({kategori:c,nama:''})+'</span><b>'+esc(c)+'</b><small>'+countFor(c)+' barang</small></button>').join('')||'<div class="empty">Belum ada subkelompok barang.</div>';
+   box.classList.remove('hidden');
+  }else box.classList.add('hidden');
  }
- const section=document.getElementById('productListSection');if(section)section.classList.remove('hidden');
+ const section=document.getElementById('productListSection');if(section)section.classList.toggle('hidden',!category&&!parent);
+ if(!category)return;
  const categoryRows=db.products.filter(p=>category==='Semua'||(String(p.kategori||'Umum').trim()||'Umum')===category);
  const eligible=categoryRows.filter(p=>(status==='semua'||(status==='aktif'?p.active!==false:p.active===false))&&[p.nama,p.barcode,p.kode,p.kategori].join(' ').toLowerCase().includes(q));
  const brandCounts={};eligible.forEach(p=>{const b=suggestProductBrand(p.nama);brandCounts[b]=(brandCounts[b]||0)+1});
