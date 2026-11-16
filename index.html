@@ -2536,6 +2536,18 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}
  #odooPosLayout .odoo-order-panel{margin-bottom:8px!important}
  #odooPosLayout .odoo-order-body{padding:11px!important}
 }
+
+/* Cart width expansion requested: prioritize the checkout workspace on desktop */
+@media(min-width:1101px){
+ #odooPosLayout{grid-template-columns:minmax(0,1fr) minmax(400px,460px)!important;gap:14px!important}
+ #odooPosLayout .odoo-order-panel{width:100%!important;min-width:0!important}
+ #odooPosLayout .odoo-order-body{padding:16px 18px!important}
+ #odooPosLayout .odoo-order-lines{min-height:210px!important}
+}
+@media(min-width:1101px) and (max-width:1250px){
+ #odooPosLayout{grid-template-columns:minmax(0,1fr) minmax(370px,42%)!important;gap:10px!important}
+ #posproducts .pos-featured-grid,#posproducts .pos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
