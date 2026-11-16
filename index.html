@@ -2814,6 +2814,101 @@ window.addEventListener('error', function(e) {
   #view #ptable .photo-placeholder{font-size:28px;color:#8ba397}
 }
 </style>
+<style>
+/* FINAL OVERRIDE — stable mobile master product card; supersedes legacy card rules */
+@media screen and (max-width:760px){
+ #ptable{width:100%!important;max-width:100%!important;overflow:visible!important}
+ #ptable .tablewrap{width:100%!important;max-width:100%!important;overflow:visible!important}
+ #ptable .tablewrap table,#ptable .tablewrap tbody{display:block!important;width:100%!important;min-width:0!important}
+ #ptable .tablewrap thead{display:none!important}
+ #ptable .tablewrap tr{
+  display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto!important;grid-auto-flow:row!important;
+  align-items:stretch!important;gap:8px 12px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;padding:12px!important;margin:0 0 12px!important;
+  border:1px solid #dfe9e3!important;border-radius:14px!important;
+  background:#fff!important;box-shadow:0 2px 9px rgba(20,60,40,.06)!important;
+ }
+ #ptable .tablewrap tr>td{
+  display:flex!important;position:static!important;float:none!important;
+  grid-column:auto!important;grid-row:auto!important;
+  width:auto!important;min-width:0!important;max-width:100%!important;height:auto!important;min-height:0!important;
+  box-sizing:border-box!important;margin:0!important;padding:0!important;
+  flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;
+  gap:4px!important;overflow:visible!important;white-space:normal!important;
+  overflow-wrap:anywhere!important;text-align:left!important;border:0!important;
+  border-radius:0!important;background:transparent!important;font-size:12px!important;line-height:1.35!important;
+ }
+ #ptable .tablewrap tr>td:before{display:none!important;content:none!important}
+ /* selection checkbox */
+ #ptable .tablewrap tr>td:nth-child(1){grid-column:1!important;grid-row:1!important;min-height:26px!important;display:flex!important;align-items:center!important;padding-left:2px!important}
+ #ptable .tablewrap tr>td:nth-child(1) input{display:block!important;position:static!important;width:19px!important;height:19px!important;margin:0!important}
+ /* photo column */
+ #ptable .tablewrap tr>td:nth-child(2){
+  grid-column:1!important;grid-row:2!important;align-self:start!important;
+  width:82px!important;min-height:92px!important;height:92px!important;
+  align-items:center!important;justify-content:center!important;
+  padding:5px!important;border-radius:10px!important;background:#f4f7f5!important;
+  overflow:hidden!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(2) img{
+  display:block!important;position:static!important;width:72px!important;height:80px!important;
+  max-width:72px!important;max-height:80px!important;object-fit:contain!important;
+  margin:0 auto!important;border:0!important;border-radius:7px!important;background:transparent!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(2) .photo-placeholder{
+  display:flex!important;width:72px!important;height:80px!important;max-width:72px!important;
+  align-items:center!important;justify-content:center!important;flex-direction:column!important;
+  padding:4px!important;border:1px dashed #cbd8d0!important;border-radius:8px!important;
+  background:#fff!important;color:#809087!important;font-size:10px!important;line-height:1.2!important;
+ }
+ /* name, code, barcode and active status */
+ #ptable .tablewrap tr>td:nth-child(3){
+  grid-column:2!important;grid-row:1 / span 2!important;min-height:92px!important;
+  display:flex!important;align-items:flex-start!important;justify-content:flex-start!important;
+  padding:2px 0!important;color:#183d2d!important;font-weight:700!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(3) b{display:block!important;font-size:13px!important;line-height:1.35!important;font-weight:850!important;overflow-wrap:anywhere!important}
+ #ptable .tablewrap tr>td:nth-child(3) small{display:block!important;margin-top:6px!important;font-size:10px!important;line-height:1.4!important;color:#69796f!important;overflow-wrap:anywhere!important}
+ #ptable .tablewrap tr>td:nth-child(3) .product-active-pill{display:inline-flex!important;align-self:flex-start!important;margin-top:7px!important;padding:4px 9px!important;border-radius:20px!important;font-size:10px!important}
+ /* hide duplicate desktop data */
+ #ptable .tablewrap tr>td:nth-child(4),#ptable .tablewrap tr>td:nth-child(5),
+ #ptable .tablewrap tr>td:nth-child(6),#ptable .tablewrap tr>td:nth-child(7),
+ #ptable .tablewrap tr>td:nth-child(9),#ptable .tablewrap tr>td:nth-child(10),
+ #ptable .tablewrap tr>td:nth-child(12){display:none!important}
+ /* price and stock */
+ #ptable .tablewrap tr>td:nth-child(8){
+  grid-column:1!important;grid-row:3!important;display:flex!important;
+  min-height:62px!important;padding:8px 10px!important;align-items:flex-start!important;
+  border-radius:9px!important;background:#f4f7f5!important;font-weight:800!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(8):after{content:"Harga Jual 1";order:-1;display:block;color:#78857e;font-size:9px;font-weight:750;margin-bottom:3px}
+ #ptable .tablewrap tr>td:nth-child(8) b{font-size:13px!important}
+ #ptable .tablewrap tr>td:nth-child(11){
+  grid-column:2!important;grid-row:3!important;display:flex!important;
+  width:fit-content!important;min-width:82px!important;min-height:62px!important;
+  padding:8px 12px!important;align-items:flex-start!important;justify-content:center!important;
+  border-radius:9px!important;background:#f4f7f5!important;color:#294638!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(11):after{content:"Stok";order:-1;display:block;color:#78857e;font-size:9px;font-weight:750;margin-bottom:3px}
+ /* actions */
+ #ptable .tablewrap tr>td:nth-child(13){
+  grid-column:1 / -1!important;grid-row:4!important;display:flex!important;
+  min-height:44px!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-end!important;padding-top:8px!important;border-top:1px solid #edf1ee!important;
+ }
+ #ptable .tablewrap tr>td:nth-child(13):before{display:block!important;content:"Aksi"!important;margin-right:auto!important;color:#78857e!important;font-size:10px!important;font-weight:750!important}
+ #ptable .product-row-actions{display:flex!important;flex-direction:row!important;gap:8px!important;width:auto!important}
+ #ptable .product-icon-action{display:flex!important;width:38px!important;height:36px!important;min-width:38px!important;min-height:36px!important;align-items:center!important;justify-content:center!important;padding:0!important;border:0!important;border-radius:8px!important;font-size:16px!important}
+}
+@media screen and (max-width:380px){
+ #ptable .tablewrap tr{grid-template-columns:74px minmax(0,1fr)!important;gap:7px 9px!important;padding:10px!important}
+ #ptable .tablewrap tr>td:nth-child(2){width:74px!important;height:88px!important;min-height:88px!important}
+ #ptable .tablewrap tr>td:nth-child(2) img,#ptable .tablewrap tr>td:nth-child(2) .photo-placeholder{width:64px!important;height:76px!important;max-width:64px!important}
+ #ptable .tablewrap tr>td:nth-child(3){min-height:88px!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5820,98 +5915,3 @@ restoreSeaMartSession();
  };
 })();
 </script></body></html>
-
-
-/* FINAL OVERRIDE — stable mobile master product card; supersedes legacy card rules */
-@media screen and (max-width:760px){
- #ptable{width:100%!important;max-width:100%!important;overflow:visible!important}
- #ptable .tablewrap{width:100%!important;max-width:100%!important;overflow:visible!important}
- #ptable .tablewrap table,#ptable .tablewrap tbody{display:block!important;width:100%!important;min-width:0!important}
- #ptable .tablewrap thead{display:none!important}
- #ptable .tablewrap tr{
-  display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;
-  grid-template-rows:auto auto auto auto!important;grid-auto-flow:row!important;
-  align-items:stretch!important;gap:8px 12px!important;
-  width:100%!important;max-width:100%!important;min-width:0!important;
-  box-sizing:border-box!important;padding:12px!important;margin:0 0 12px!important;
-  border:1px solid #dfe9e3!important;border-radius:14px!important;
-  background:#fff!important;box-shadow:0 2px 9px rgba(20,60,40,.06)!important;
- }
- #ptable .tablewrap tr>td{
-  display:flex!important;position:static!important;float:none!important;
-  grid-column:auto!important;grid-row:auto!important;
-  width:auto!important;min-width:0!important;max-width:100%!important;height:auto!important;min-height:0!important;
-  box-sizing:border-box!important;margin:0!important;padding:0!important;
-  flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;
-  gap:4px!important;overflow:visible!important;white-space:normal!important;
-  overflow-wrap:anywhere!important;text-align:left!important;border:0!important;
-  border-radius:0!important;background:transparent!important;font-size:12px!important;line-height:1.35!important;
- }
- #ptable .tablewrap tr>td:before{display:none!important;content:none!important}
- /* selection checkbox */
- #ptable .tablewrap tr>td:nth-child(1){grid-column:1!important;grid-row:1!important;min-height:26px!important;display:flex!important;align-items:center!important;padding-left:2px!important}
- #ptable .tablewrap tr>td:nth-child(1) input{display:block!important;position:static!important;width:19px!important;height:19px!important;margin:0!important}
- /* photo column */
- #ptable .tablewrap tr>td:nth-child(2){
-  grid-column:1!important;grid-row:2!important;align-self:start!important;
-  width:82px!important;min-height:92px!important;height:92px!important;
-  align-items:center!important;justify-content:center!important;
-  padding:5px!important;border-radius:10px!important;background:#f4f7f5!important;
-  overflow:hidden!important;
- }
- #ptable .tablewrap tr>td:nth-child(2) img{
-  display:block!important;position:static!important;width:72px!important;height:80px!important;
-  max-width:72px!important;max-height:80px!important;object-fit:contain!important;
-  margin:0 auto!important;border:0!important;border-radius:7px!important;background:transparent!important;
- }
- #ptable .tablewrap tr>td:nth-child(2) .photo-placeholder{
-  display:flex!important;width:72px!important;height:80px!important;max-width:72px!important;
-  align-items:center!important;justify-content:center!important;flex-direction:column!important;
-  padding:4px!important;border:1px dashed #cbd8d0!important;border-radius:8px!important;
-  background:#fff!important;color:#809087!important;font-size:10px!important;line-height:1.2!important;
- }
- /* name, code, barcode and active status */
- #ptable .tablewrap tr>td:nth-child(3){
-  grid-column:2!important;grid-row:1 / span 2!important;min-height:92px!important;
-  display:flex!important;align-items:flex-start!important;justify-content:flex-start!important;
-  padding:2px 0!important;color:#183d2d!important;font-weight:700!important;
- }
- #ptable .tablewrap tr>td:nth-child(3) b{display:block!important;font-size:13px!important;line-height:1.35!important;font-weight:850!important;overflow-wrap:anywhere!important}
- #ptable .tablewrap tr>td:nth-child(3) small{display:block!important;margin-top:6px!important;font-size:10px!important;line-height:1.4!important;color:#69796f!important;overflow-wrap:anywhere!important}
- #ptable .tablewrap tr>td:nth-child(3) .product-active-pill{display:inline-flex!important;align-self:flex-start!important;margin-top:7px!important;padding:4px 9px!important;border-radius:20px!important;font-size:10px!important}
- /* hide duplicate desktop data */
- #ptable .tablewrap tr>td:nth-child(4),#ptable .tablewrap tr>td:nth-child(5),
- #ptable .tablewrap tr>td:nth-child(6),#ptable .tablewrap tr>td:nth-child(7),
- #ptable .tablewrap tr>td:nth-child(9),#ptable .tablewrap tr>td:nth-child(10),
- #ptable .tablewrap tr>td:nth-child(12){display:none!important}
- /* price and stock */
- #ptable .tablewrap tr>td:nth-child(8){
-  grid-column:1!important;grid-row:3!important;display:flex!important;
-  min-height:62px!important;padding:8px 10px!important;align-items:flex-start!important;
-  border-radius:9px!important;background:#f4f7f5!important;font-weight:800!important;
- }
- #ptable .tablewrap tr>td:nth-child(8):after{content:"Harga Jual 1";order:-1;display:block;color:#78857e;font-size:9px;font-weight:750;margin-bottom:3px}
- #ptable .tablewrap tr>td:nth-child(8) b{font-size:13px!important}
- #ptable .tablewrap tr>td:nth-child(11){
-  grid-column:2!important;grid-row:3!important;display:flex!important;
-  width:fit-content!important;min-width:82px!important;min-height:62px!important;
-  padding:8px 12px!important;align-items:flex-start!important;justify-content:center!important;
-  border-radius:9px!important;background:#f4f7f5!important;color:#294638!important;
- }
- #ptable .tablewrap tr>td:nth-child(11):after{content:"Stok";order:-1;display:block;color:#78857e;font-size:9px;font-weight:750;margin-bottom:3px}
- /* actions */
- #ptable .tablewrap tr>td:nth-child(13){
-  grid-column:1 / -1!important;grid-row:4!important;display:flex!important;
-  min-height:44px!important;flex-direction:row!important;align-items:center!important;
-  justify-content:flex-end!important;padding-top:8px!important;border-top:1px solid #edf1ee!important;
- }
- #ptable .tablewrap tr>td:nth-child(13):before{display:block!important;content:"Aksi"!important;margin-right:auto!important;color:#78857e!important;font-size:10px!important;font-weight:750!important}
- #ptable .product-row-actions{display:flex!important;flex-direction:row!important;gap:8px!important;width:auto!important}
- #ptable .product-icon-action{display:flex!important;width:38px!important;height:36px!important;min-width:38px!important;min-height:36px!important;align-items:center!important;justify-content:center!important;padding:0!important;border:0!important;border-radius:8px!important;font-size:16px!important}
-}
-@media screen and (max-width:380px){
- #ptable .tablewrap tr{grid-template-columns:74px minmax(0,1fr)!important;gap:7px 9px!important;padding:10px!important}
- #ptable .tablewrap tr>td:nth-child(2){width:74px!important;height:88px!important;min-height:88px!important}
- #ptable .tablewrap tr>td:nth-child(2) img,#ptable .tablewrap tr>td:nth-child(2) .photo-placeholder{width:64px!important;height:76px!important;max-width:64px!important}
- #ptable .tablewrap tr>td:nth-child(3){min-height:88px!important}
-}
