@@ -7,3 +7,16 @@ alter table public.products
 
 comment on column public.products.price_2 is 'SeaMart selling price 2';
 comment on column public.products.price_3 is 'SeaMart selling price 3';
+
+-- SeaMart automatic purchase/sales VAT and cost-based margin pricing.
+-- Run this migration in Supabase SQL Editor before using cloud sync for the new fields.
+alter table public.products
+  add column if not exists purchase_price numeric not null default 0,
+  add column if not exists purchase_vat_rate numeric not null default 11,
+  add column if not exists sales_vat_rate numeric not null default 11,
+  add column if not exists margin_1 numeric not null default 50,
+  add column if not exists margin_2 numeric not null default 50,
+  add column if not exists margin_3 numeric not null default 50,
+  add column if not exists sale_base_1 numeric not null default 0,
+  add column if not exists sale_base_2 numeric not null default 0,
+  add column if not exists sale_base_3 numeric not null default 0;
