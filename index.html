@@ -2414,7 +2414,25 @@ window.addEventListener('error', function(e) {
 .sm-order-notify-item strong{display:block;font-size:12px;margin-bottom:3px}
 .sm-order-notify-item small{display:block;color:#718078;font-size:10px;line-height:1.45}
 .sm-order-notify-empty{padding:22px 14px;text-align:center;color:#84918a;font-size:12px}
-@media(max-width:700px){.sm-order-notify-btn{width:32px;height:32px;min-width:32px!important;min-height:32px!important}.sm-order-notify-panel{right:-80px}}
+@media(max-width:700px){
+ .sm-order-notify-btn{width:32px;height:32px;min-width:32px!important;min-height:32px!important}
+ .sm-order-notify-wrap{position:static!important}
+ .sm-order-notify-panel{
+  position:fixed!important;
+  left:12px!important;right:12px!important;
+  top:calc(env(safe-area-inset-top,0px) + 74px)!important;
+  width:auto!important;max-width:none!important;
+  max-height:calc(100dvh - 100px)!important;
+  overflow-y:auto!important;overscroll-behavior:contain!important;
+  box-sizing:border-box!important;
+  z-index:2147483000!important;
+ }
+ .sm-order-notify-head{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:9px!important}
+ .sm-order-notify-head>strong{font-size:14px!important}
+ .sm-order-notify-tools{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:6px!important}
+ .sm-order-notify-tools button{min-height:34px!important;padding:7px 9px!important;font-size:11px!important}
+ .sm-order-notify-items{max-height:calc(100dvh - 210px)!important;overflow-y:auto!important}
+}
 </style><style id="seamart-mobile-online-orders">
 @media(max-width:900px), (hover:none) and (pointer:coarse){
  .pagehead{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:14px!important;margin:8px 0 16px!important}
