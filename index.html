@@ -4209,27 +4209,23 @@ function productModal(id){
     <button type="button" data-product-tab="photo" onclick="switchProductTab('photo')">Data Foto</button>
    </div>
    <section class="odoo-product-tab active" data-product-panel="prices">
-    <div class="odoo-section-title">Informasi Harga Barang</div>
+    <div class="odoo-section-title">Harga dan Pajak</div>
     <div class="odoo-form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
      <label>Harga Beli sebelum PPN<input id="f_harga_beli" type="number" min="0" class="field" value="${Number(p.harga_beli||0)}" oninput="recalcProductPrices()"></label>
      <label>PPN Harga Beli (%)<input id="f_ppn_beli" type="number" min="0" max="100" step="0.01" class="field" value="${buyVat}" oninput="recalcProductPrices()"></label>
      <label>Total Modal setelah PPN<input id="f_modal_total" type="text" class="field" readonly value="0"></label>
      <label>PPN Harga Jual (%)<input id="f_ppn_jual" type="number" min="0" max="100" step="0.01" class="field" value="${sellVat}" oninput="recalcProductPrices()"></label>
     </div>
-    <div class="odoo-section-title" style="margin-top:20px">Harga Jual dan Margin</div>
+    <div class="odoo-section-title" style="margin-top:18px">Isi Harga Jual (Sudah Termasuk PPN)</div>
     <div class="odoo-form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
-     <label style="grid-column:1/-1;font-weight:700;color:#126b49">PILIH TIPE MARGIN<select id="f_margin_type" class="field" style="display:block;width:100%;margin-top:7px;border:2px solid #16845b;background:#f8fcf9;font-weight:700" onchange="recalcProductPrices('type')"><option value="markup" ${marginType==='markup'?'selected':''}>Markup — Persen dari harga modal</option><option value="margin" ${marginType==='margin'?'selected':''}>Margin — Persen dari harga jual</option><option value="rupiah" ${marginType==='rupiah'?'selected':''}>Nominal — Tambahan Rupiah dari modal</option></select></label>
-     <label class="price-margin-field"><span id="f_margin_label1">Margin Harga Jual 1 (${marginType==='rupiah'?'Rp':'%'})</span><small class="price-field-note">Harga utama kasir</small><input id="f_margin1" type="number" step="0.01" class="field" value="${initialMargin(1).toFixed(2)}" oninput="recalcProductPrices('margin1')"></label>
-     <label class="price-margin-field"><span id="f_margin_label2">Margin Harga Jual 2 (${marginType==='rupiah'?'Rp':'%'})</span><small class="price-field-note">&nbsp;</small><input id="f_margin2" type="number" step="0.01" class="field" value="${initialMargin(2).toFixed(2)}" oninput="recalcProductPrices('margin2')"></label>
-     <label class="price-margin-field"><span id="f_margin_label3">Margin Harga Jual 3 (${marginType==='rupiah'?'Rp':'%'})</span><small class="price-field-note">&nbsp;</small><input id="f_margin3" type="number" step="0.01" class="field" value="${initialMargin(3).toFixed(2)}" oninput="recalcProductPrices('margin3')"></label>
-     <label>Harga Jual 1 sebelum PPN<input id="f_harga" type="number" min="0" class="field" value="${initialBase(1)}" oninput="recalcProductPrices('price1')"></label>
-     <label>Harga Jual 2 sebelum PPN<input id="f_harga2" type="number" min="0" class="field" value="${initialBase(2)}" oninput="recalcProductPrices('price2')"></label>
-     <label>Harga Jual 3 sebelum PPN<input id="f_harga3" type="number" min="0" class="field" value="${initialBase(3)}" oninput="recalcProductPrices('price3')"></label>
-     <label>Harga Jual 1 termasuk PPN<input id="f_final1" type="text" class="field" readonly></label>
-     <label>Harga Jual 2 termasuk PPN<input id="f_final2" type="text" class="field" readonly></label>
-     <label>Harga Jual 3 termasuk PPN<input id="f_final3" type="text" class="field" readonly></label>
+     <label>Harga Jual 1 · Kasir<input id="f_sell_incl1" type="number" min="0" class="field" value="${Number(p.harga_jual_1??p.harga??0)}" oninput="recalcProductPrices('sell1')"></label>
+     <label>Harga Jual 2<input id="f_sell_incl2" type="number" min="0" class="field" value="${Number(p.harga_jual_2||0)}" oninput="recalcProductPrices('sell2')"></label>
+     <label>Harga Jual 3<input id="f_sell_incl3" type="number" min="0" class="field" value="${Number(p.harga_jual_3||0)}" oninput="recalcProductPrices('sell3')"></label>
+     <label>Margin Jual 1 (%)<input id="f_margin_auto1" type="text" class="field" readonly></label>
+     <label>Margin Jual 2 (%)<input id="f_margin_auto2" type="text" class="field" readonly></label>
+     <label>Margin Jual 3 (%)<input id="f_margin_auto3" type="text" class="field" readonly></label>
     </div>
-    <p class="odoo-help">Margin dihitung dari total modal setelah PPN beli. Harga jual sebelum PPN dihitung otomatis, lalu PPN jual ditambahkan. Harga yang dikirim ke kasir adalah harga termasuk PPN. Tarif awal 11% dan dapat diubah sesuai ketentuan barang.</p>
+    <p class="odoo-help">Cukup isi Harga Jual 1, 2, dan 3. Semua harga yang dimasukkan sudah termasuk PPN dan langsung digunakan di kasir. Margin dihitung otomatis dari total modal setelah PPN beli. Ubah tarif PPN jual bila diperlukan.</p>
    </section>
    <section class="odoo-product-tab" data-product-panel="inventory">
     <div class="odoo-section-title">Informasi Stok</div>
@@ -4273,28 +4269,18 @@ function switchProductTab(tab){
 function moneySeaMart(n){return Math.round(Number(n)||0).toLocaleString('id-ID')}
 function recalcProductPrices(source){
  const v=id=>Number(document.getElementById(id)?.value||0),set=(id,value)=>{const el=document.getElementById(id);if(el)el.value=String(value)};
- const cost=v('f_harga_beli')*(1+v('f_ppn_beli')/100),tax=v('f_ppn_jual')/100,type=document.getElementById('f_margin_type')?.value||'markup';
+ const cost=v('f_harga_beli')*(1+v('f_ppn_beli')/100),tax=1+v('f_ppn_jual')/100;
  const modal=document.getElementById('f_modal_total');if(modal)modal.value=moneySeaMart(cost);
- const unit=type==='rupiah'?'Rp':'%';
- [1,2,3].forEach(n=>{const label=document.getElementById('f_margin_label'+n);if(label)label.textContent='Margin Harga Jual '+n+' ('+unit+')';});
  [1,2,3].forEach(n=>{
-  const marginId='f_margin'+n,priceId=n===1?'f_harga':'f_harga'+n,finalId='f_final'+n;
-  let base=v(priceId),margin=v(marginId);
-  if(source==='margin'+n||source==='type'||!source){
-   if(type==='rupiah')base=cost+margin;
-   else if(type==='margin')base=margin>=100?0:cost/(1-margin/100);
-   else base=cost*(1+margin/100);
-   base=Math.round(base);set(priceId,base);
-  }else if(source==='price'+n){
-   margin=type==='rupiah'?base-cost:type==='margin'?(base>0?100*(1-cost/base):0):(cost>0?(base/cost-1)*100:0);
-   set(marginId,Number(margin.toFixed(2)));
-  }
-  const final=Math.round(base*(1+tax)),out=document.getElementById(finalId);if(out)out.value=moneySeaMart(final);
+  const selling=v('f_sell_incl'+n),base=tax>0?selling/tax: selling;
+  const margin=cost>0?(base-cost)/cost*100:0;
+  const out=document.getElementById('f_margin_auto'+n);
+  if(out)out.value=selling>0?margin.toFixed(2)+' %':'—';
  });
  updateProductKpis();
 }
 function updateProductKpis(){
- const n=Number(document.getElementById('f_stok')?.value||0),h=Number(document.getElementById('f_harga')?.value||0),b=Number(document.getElementById('f_harga_beli')?.value||0);
+ const n=Number(document.getElementById('f_stok')?.value||0),h=Number(document.getElementById('f_sell_incl1')?.value||0),b=Number(document.getElementById('f_harga_beli')?.value||0);
  const a=document.getElementById('odooStockKpi'),i=document.getElementById('odooStockInline'),p=document.getElementById('odooPriceKpi'),m=document.getElementById('odooMarginDisplay');
  if(a)a.textContent=n;if(i)i.textContent=n;if(p)p.textContent=h.toLocaleString('id-ID');if(m)m.value=(h-b).toLocaleString('id-ID');
 }
@@ -4323,7 +4309,7 @@ function selectVisibleProducts(checked){document.querySelectorAll('#ptable .p-ro
 function updateProductSelectionCount(){const n=selectedVisibleProductIds().length,el=document.getElementById('pselectedcount');if(el)el.textContent=n+' dipilih';const all=[...document.querySelectorAll('#ptable .p-row-check')],top=document.getElementById('pselectall');if(top)top.checked=all.length>0&&all.every(x=>x.checked)}
 async function bulkSetProductActive(active){const ids=selectedVisibleProductIds();if(!ids.length)return alert('Pilih minimal satu barang terlebih dahulu.');if(!confirm((active?'Aktifkan ':'Nonaktifkan ')+ids.length+' barang yang dipilih?'))return;const changed=[];ids.forEach(id=>{const p=db.products.find(x=>String(x.id)===String(id));if(p){p.active=!!active;changed.push(p)}});save();filterProducts();if(window.seamartSupabase&&window.seamartStoreId){let failed=0;const errors=[];for(const p of changed){try{await syncOneProduct(p,new Map())}catch(e){failed++;if(errors.length<5)errors.push((p.nama||p.kode||'Barang')+': '+(e?.message||String(e))+(e?.code?' [kode '+e.code+']':''));}}if(failed){console.error('SeaMart bulk product sync failed:',errors);alert(changed.length+' barang diperbarui di perangkat, '+failed+' gagal tersinkron ke cloud.\n\nDetail error:\n'+errors.join('\n')+'\n\nKirim foto pesan ini ke Min agar penyebabnya bisa diperbaiki.');}else alert(changed.length+' barang berhasil '+(active?'diaktifkan':'dinonaktifkan')+' dan dikirim ke cloud.')}else alert(changed.length+' barang diperbarui di perangkat ini. Login cloud diperlukan agar status ikut ke HP/perangkat lain.')}
 function toggleProductActive(id){const p=db.products.find(x=>String(x.id)===String(id));if(!p)return;p.active=p.active===false?true:false;save();filterProducts();syncOneProduct(p,new Map()).catch(e=>alert('Status tersimpan lokal, tetapi belum tersinkron ke cloud: '+e.message))}
-async function saveProduct(id){let nama=document.getElementById('f_nama')?.value.trim();if(!nama)return alert('Nama produk wajib diisi.');recalcProductPrices();const val=k=>Number(document.getElementById(k)?.value||0);const text=k=>(document.getElementById(k)?.value||'').trim();let h1=Math.round(val('f_harga')*(1+val('f_ppn_jual')/100)),h2=Math.round(val('f_harga2')*(1+val('f_ppn_jual')/100)),h3=Math.round(val('f_harga3')*(1+val('f_ppn_jual')/100));let p={id,nama,kode:text('f_kode')||text('f_kode_tab'),barcode:text('f_barcode')||text('f_barcode_tab'),kategori:text('f_kategori')||'Umum',harga:h1,harga_beli:val('f_harga_beli'),ppn_beli:val('f_ppn_beli'),ppn_jual:val('f_ppn_jual'),tipe_margin:document.getElementById('f_margin_type')?.value||'markup',margin_1:val('f_margin1'),margin_2:val('f_margin2'),margin_3:val('f_margin3'),harga_jual_1:h1,harga_jual_2:h2,harga_jual_3:h3,harga_jual_1_sebelum_ppn:val('f_harga'),harga_jual_2_sebelum_ppn:val('f_harga2'),harga_jual_3_sebelum_ppn:val('f_harga3'),stok:val('f_stok'),active:document.getElementById('f_active')?.checked!==false,foto:window.pendingProductPhoto||db.products.find(x=>x.id===id)?.foto||''};window.pendingProductPhoto=null;let i=db.products.findIndex(x=>x.id===id);if(i<0)db.products.push(p);else db.products[i]=p;save();closeModal();products();if(!window.seamartSupabase||!window.seamartStoreId){alert('Barang tersimpan di perangkat ini saja. Login cloud diperlukan untuk sinkronisasi ke perangkat lain.');return;}try{await syncOneProduct(p);p._clearFoto=false;save();alert('Berhasil! Harga Jual 1, 2, dan 3 sudah dikonfirmasi tersimpan di SeaMart Cloud.');}catch(e){console.error('SeaMart product sync verification failed:',e);alert('PERINGATAN: Data hanya tersimpan di perangkat ini dan BELUM terkonfirmasi di cloud.\\n\\n'+(e.message||String(e))+'\\n\\nJangan sinkronkan master seluruh barang. Kirim screenshot pesan ini ke Min.')}}
+async function saveProduct(id){let nama=document.getElementById('f_nama')?.value.trim();if(!nama)return alert('Nama produk wajib diisi.');recalcProductPrices();const val=k=>Number(document.getElementById(k)?.value||0);const text=k=>(document.getElementById(k)?.value||'').trim();const tax=1+val('f_ppn_jual')/100,cost=val('f_harga_beli')*(1+val('f_ppn_beli')/100);let h1=Math.round(val('f_sell_incl1')),h2=Math.round(val('f_sell_incl2')),h3=Math.round(val('f_sell_incl3'));const base1=tax>0?h1/tax:h1,base2=tax>0?h2/tax:h2,base3=tax>0?h3/tax:h3;let p={id,nama,kode:text('f_kode')||text('f_kode_tab'),barcode:text('f_barcode')||text('f_barcode_tab'),kategori:text('f_kategori')||'Umum',harga:h1,harga_beli:val('f_harga_beli'),ppn_beli:val('f_ppn_beli'),ppn_jual:val('f_ppn_jual'),tipe_margin:'manual_inclusive',margin_1:cost>0?(base1-cost)/cost*100:0,margin_2:cost>0?(base2-cost)/cost*100:0,margin_3:cost>0?(base3-cost)/cost*100:0,harga_jual_1:h1,harga_jual_2:h2,harga_jual_3:h3,harga_jual_1_sebelum_ppn:Math.round(base1),harga_jual_2_sebelum_ppn:Math.round(base2),harga_jual_3_sebelum_ppn:Math.round(base3),stok:val('f_stok'),active:document.getElementById('f_active')?.checked!==false,foto:window.pendingProductPhoto||db.products.find(x=>x.id===id)?.foto||''};window.pendingProductPhoto=null;let i=db.products.findIndex(x=>x.id===id);if(i<0)db.products.push(p);else db.products[i]=p;save();closeModal();products();if(!window.seamartSupabase||!window.seamartStoreId){alert('Barang tersimpan di perangkat ini saja. Login cloud diperlukan untuk sinkronisasi ke perangkat lain.');return;}try{await syncOneProduct(p);p._clearFoto=false;save();alert('Berhasil! Harga Jual 1, 2, dan 3 sudah dikonfirmasi tersimpan di SeaMart Cloud.');}catch(e){console.error('SeaMart product sync verification failed:',e);alert('PERINGATAN: Data hanya tersimpan di perangkat ini dan BELUM terkonfirmasi di cloud.\\n\\n'+(e.message||String(e))+'\\n\\nJangan sinkronkan master seluruh barang. Kirim screenshot pesan ini ke Min.')}}
 function closeModal(){document.getElementById('modalroot').innerHTML=''}
 function normalizeProductIdentifier(value){let s=String(value??'').trim();if(/^\d+\.0+$/.test(s))s=s.replace(/\.0+$/,'');return s;}
 function parseCSV(text){let rows=[],row=[],v='',q=false;for(let i=0;i<text.length;i++){let c=text[i];if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){row.push(v);v=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v=''}else v+=c}row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows}
