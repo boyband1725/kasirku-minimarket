@@ -2692,7 +2692,14 @@ window.addEventListener('error', function(e) {
 .sm-order-notify-tools{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
 .sm-order-notify-tools button{border:0;border-radius:7px;background:#eef7f1;color:#176b42;padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer}
 @media(max-width:520px){.sm-order-notify-head{align-items:flex-start!important;gap:8px!important;flex-direction:column!important}.sm-order-notify-tools{justify-content:flex-start}}
-</style></head>
+</style><style id="seamart-notification-voice-settings">
+.sm-order-voice-settings{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-top:1px solid #e4eee8;margin-top:5px}
+.sm-order-voice-settings label{font-size:12px;font-weight:700;color:#52665d}
+.sm-order-voice-settings select{min-width:150px;max-width:100%;min-height:34px;border:1px solid #d5e4dc;border-radius:9px;padding:5px 8px;background:#fff;color:#244b3d;font-size:12px}
+.sm-order-voice-settings button{min-height:34px;padding:7px 10px;border:1px solid #cfe2d8;border-radius:9px;background:#eef8f2;color:#176c45;font-size:12px;font-weight:700}
+@media(max-width:600px){.sm-order-voice-settings{align-items:stretch}.sm-order-voice-settings label{width:100%}.sm-order-voice-settings select{flex:1;min-width:0}}
+</style>
+</head>
 <body>
 <div class="app">
 <aside class="sidebar">
@@ -2714,7 +2721,7 @@ window.addEventListener('error', function(e) {
  <div class="sidefoot">SeaMart POS · Web Preview</div>
 </aside>
 <main class="main">
- <header class="topbar"><div class="topbar-left"><button class="mobile-menu-btn" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><button type="button" class="btn-light" id="seamartRefreshBtn" onclick="refreshSeaMartNow()" title="Ambil data terbaru tanpa memuat ulang halaman">↻ Refresh</button><span id="seamartRefreshStatus" aria-live="polite">Siap</span><span id="sessionUser">Belum login</span><div class="sm-order-notify-wrap"><button type="button" id="smOrderNotifyBtn" class="sm-order-notify-btn" onclick="toggleOrderNotifications()" aria-label="Notifikasi pesanan" title="Notifikasi pesanan"><span aria-hidden="true">🔔</span><b id="smOrderNotifyBadge" hidden>0</b></button><div id="smOrderNotifyPanel" class="sm-order-notify-panel" hidden><div class="sm-order-notify-head"><strong>Notifikasi Pesanan</strong><div class="sm-order-notify-tools"><button type="button" onclick="testSeaMartOrderAlarm()">🔊 Tes alarm</button><button type="button" onclick="testSeaMartFemaleVoice()">🗣️ Tes suara perempuan</button><button type="button" onclick="stopSeaMartOrderAlarm()">Hentikan alarm</button><button type="button" onclick="clearOrderNotifications()">Tandai dibaca</button></div></div><div id="smOrderNotifyItems" class="sm-order-notify-items"><div class="sm-order-notify-empty">Belum ada pesanan baru.</div></div></div></div><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="odoo-appnav" id="inventoryAppNav"><span class="appnav-title">Inventory</span><button type="button" data-invnav="overview" onclick="page('dashboard')">Overview</button><button type="button" data-invnav="operations" onclick="page('stok')">Operations</button><button type="button" data-invnav="products" onclick="page('produk')">Products</button><button type="button" data-invnav="reporting" onclick="page('penjualan')">Reporting</button><button type="button" data-invnav="configuration" onclick="page('pengaturan')">Configuration</button></div><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
+ <header class="topbar"><div class="topbar-left"><button class="mobile-menu-btn" type="button" onclick="toggleAppLauncher()" aria-label="Buka daftar menu">☰ Menu</button><div class="crumb" id="crumb">Dashboard</div></div><div class="user"><button type="button" class="btn-light" id="seamartRefreshBtn" onclick="refreshSeaMartNow()" title="Ambil data terbaru tanpa memuat ulang halaman">↻ Refresh</button><span id="seamartRefreshStatus" aria-live="polite">Siap</span><span id="sessionUser">Belum login</span><div class="sm-order-notify-wrap"><button type="button" id="smOrderNotifyBtn" class="sm-order-notify-btn" onclick="toggleOrderNotifications()" aria-label="Notifikasi pesanan" title="Notifikasi pesanan"><span aria-hidden="true">🔔</span><b id="smOrderNotifyBadge" hidden>0</b></button><div id="smOrderNotifyPanel" class="sm-order-notify-panel" hidden><div class="sm-order-notify-head"><strong>Notifikasi Pesanan</strong><div class="sm-order-notify-tools"><button type="button" onclick="testSeaMartOrderAlarm()">🔊 Tes alarm</button><button type="button" onclick="testSeaMartFemaleVoice()">🗣️ Tes suara perempuan</button><button type="button" onclick="stopSeaMartOrderAlarm()">Hentikan alarm</button><button type="button" onclick="clearOrderNotifications()">Tandai dibaca</button></div><div class="sm-order-voice-settings"><label for="smOrderVoiceSelect">Suara notifikasi</label><select id="smOrderVoiceSelect" onchange="setSeaMartNotificationVoice(this.value)"><option value="">Memuat pilihan suara…</option></select><button type="button" onclick="testSelectedSeaMartVoice()">▶ Coba suara</button></div></div><div id="smOrderNotifyItems" class="sm-order-notify-items"><div class="sm-order-notify-empty">Belum ada pesanan baru.</div></div></div></div><button type="button" class="mobile-cart-trigger" id="mobileCartTrigger" onclick="toggleMobileCart()" aria-label="Buka keranjang" aria-expanded="false"><span aria-hidden="true">🛒</span><b id="mobileCartCount">0</b></button><button class="btn-light" id="shiftAction" onclick="toggleCashierShift()">Buka Kasir</button><button class="btn-light" onclick="accountSettings()">Akun Saya</button><button class="btn-light" onclick="logout()">Keluar</button><div class="avatar" id="sessionAvatar">S</div></div></header><div class="odoo-appnav" id="inventoryAppNav"><span class="appnav-title">Inventory</span><button type="button" data-invnav="overview" onclick="page('dashboard')">Overview</button><button type="button" data-invnav="operations" onclick="page('stok')">Operations</button><button type="button" data-invnav="products" onclick="page('produk')">Products</button><button type="button" data-invnav="reporting" onclick="page('penjualan')">Reporting</button><button type="button" data-invnav="configuration" onclick="page('pengaturan')">Configuration</button></div><div class="app-launcher-backdrop" id="appLauncherBackdrop" onclick="closeAppLauncher()"><section class="app-launcher" role="dialog" aria-label="Daftar menu SeaMart" onclick="event.stopPropagation()">
 <div class="launcher-heading">APLIKASI</div><div class="launcher-grid">
 <button class="launcher-tile" onclick="openAppPage('dashboard')"><span class="launcher-icon icon-0">▥</span><b>Dashboard</b></button>
 <button class="launcher-tile" onclick="openAppPage('kasir')"><span class="launcher-icon icon-1">▣</span><b>Point of Sale</b></button>
@@ -4435,6 +4442,34 @@ async function unlockSeaMartOrderSound(){
   return seamartOrderAlarmUnlocked;
  }catch(e){console.warn('Suara belum dapat diaktifkan:',e);return false;}
 }
+function getSeaMartAvailableVoices(){
+ if(!('speechSynthesis'in window))return [];
+ return (window.speechSynthesis.getVoices()||[]).filter(v=>(v.lang||'').toLowerCase().startsWith('id'));
+}
+function populateSeaMartVoiceOptions(){
+ const select=document.getElementById('smOrderVoiceSelect');if(!select)return;
+ const voices=getSeaMartAvailableVoices();
+ if(!voices.length){select.innerHTML='<option value="">Suara Indonesia belum tersedia di perangkat</option>';return;}
+ const saved=localStorage.getItem('seamart_order_voice_uri')||'';
+ select.innerHTML=voices.map((v,i)=>'<option value="'+escapeOrderNotifyText(v.voiceURI)+'">'+escapeOrderNotifyText(v.name)+' ('+escapeOrderNotifyText(v.lang)+')</option>').join('');
+ if(saved&&voices.some(v=>v.voiceURI===saved))select.value=saved;
+ else{const preferred=voices.find(v=>/female|woman|perempuan|google bahasa indonesia/i.test(v.name))||voices[0];select.value=preferred.voiceURI;localStorage.setItem('seamart_order_voice_uri',preferred.voiceURI);}
+}
+function setSeaMartNotificationVoice(uri){
+ if(uri)localStorage.setItem('seamart_order_voice_uri',uri);
+}
+function getSeaMartSelectedVoice(){
+ const voices=getSeaMartAvailableVoices(),saved=localStorage.getItem('seamart_order_voice_uri')||'';
+ return voices.find(v=>v.voiceURI===saved)||voices.find(v=>/female|woman|perempuan|google bahasa indonesia/i.test(v.name))||voices[0]||null;
+}
+async function testSelectedSeaMartVoice(){
+ const ok=await unlockSeaMartOrderSound();
+ if(!ok){alert('Tekan izinkan suara di browser dan periksa volume media HP.');return;}
+ populateSeaMartVoiceOptions();
+ const voice=getSeaMartSelectedVoice();
+ if(!voice){alert('Belum ada suara Bahasa Indonesia di perangkat. Aktifkan/unduh suara Bahasa Indonesia pada pengaturan Text-to-Speech HP.');return;}
+ speakSeaMartFemale('Halo, ini suara notifikasi SeaMart yang dipilih.');
+}
 function getSeaMartIndonesianFemaleVoice(){
  if(!('speechSynthesis'in window))return null;
  const voices=window.speechSynthesis.getVoices()||[];
@@ -4448,7 +4483,7 @@ function speakSeaMartFemale(text){
   window.speechSynthesis.cancel();
   const utterance=new SpeechSynthesisUtterance(text);
   utterance.lang='id-ID';utterance.rate=.92;utterance.pitch=1.12;utterance.volume=1;
-  const voice=getSeaMartIndonesianFemaleVoice();if(voice)utterance.voice=voice;
+  const voice=getSeaMartSelectedVoice()||getSeaMartIndonesianFemaleVoice();if(voice)utterance.voice=voice;
   window.speechSynthesis.speak(utterance);
   return true;
  }catch(e){console.warn('Suara SeaMart tidak tersedia:',e);return false;}
@@ -4487,6 +4522,7 @@ function renderOrderNotifications(){
 }
 function toggleOrderNotifications(){
  unlockSeaMartOrderSound();
+ setTimeout(populateSeaMartVoiceOptions,150);
  if('Notification'in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
  const panel=document.getElementById('smOrderNotifyPanel');if(!panel)return;
  panel.hidden=!panel.hidden;
