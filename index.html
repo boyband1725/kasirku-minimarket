@@ -2699,6 +2699,68 @@ window.addEventListener('error', function(e) {
 .sm-order-voice-settings button{min-height:34px;padding:7px 10px;border:1px solid #cfe2d8;border-radius:9px;background:#eef8f2;color:#176c45;font-size:12px;font-weight:700}
 @media(max-width:600px){.sm-order-voice-settings{align-items:stretch}.sm-order-voice-settings label{width:100%}.sm-order-voice-settings select{flex:1;min-width:0}}
 </style>
+<style id="seamart-mobile-product-page">
+/* SeaMart Master Barang: mobile-only layout polish. Tablet/desktop (601px+) unchanged. */
+@media screen and (max-width:600px){
+  #view .pagehead{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin-bottom:14px}
+  #view .pagehead h1{font-size:21px;line-height:1.2;margin:0}
+  #view .product-admin-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%}
+  #view .product-admin-actions button{min-width:0;width:100%;min-height:40px;padding:9px 7px;font-size:12px;line-height:1.25;white-space:normal}
+  #view .product-list-heading{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:7px;margin:4px 0 12px}
+  #view .product-list-heading>button{grid-column:1/-1;justify-self:start;padding:8px 10px;font-size:12px}
+  #view .product-list-heading h2{font-size:16px;min-width:0;line-height:1.3;overflow-wrap:anywhere}
+  #view .product-list-heading .pill{white-space:nowrap;font-size:11px}
+  #view .product-search-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+  #view .product-search-toolbar #psearch{grid-column:1/-1;width:100%;min-width:0;margin:0}
+  #view .product-search-toolbar #pstatus{width:100%;min-width:0;margin:0;font-size:13px}
+  #view .product-search-toolbar #bulkPhotoButton{width:100%;min-width:0;padding:11px 12px;font-size:13px;white-space:nowrap}
+  #view #productListSection>.panel{padding:12px;margin-top:12px;border-radius:14px}
+  #view #productListSection>.panel>div:first-child{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px!important;align-items:center}
+  #view #productListSection #pselectall{width:19px;height:19px;flex:none}
+  #view #productListSection label[style]{grid-column:1/-1;font-size:14px}
+  #view #pselectedcount{font-size:12px}
+  #view #productListSection>.panel>div:first-child button{width:100%;min-width:0;padding:10px 6px;font-size:12px;line-height:1.25;white-space:normal}
+  #view #ptable .tablewrap{overflow:visible;border:0}
+  #view #ptable table,#view #ptable tbody{display:block;width:100%;min-width:0}
+  #view #ptable thead{display:none}
+  #view #ptable tbody{display:grid;gap:12px}
+  #view #ptable tr{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:
+    "photo name"
+    "code barcode"
+    "category buy"
+    "sell1 sell2"
+    "sell3 stock"
+    "status status"
+    "action action";
+    gap:7px 9px;padding:12px;border:1px solid #dfe9e3;border-radius:14px;background:#fff;box-shadow:0 3px 12px #123b2410;min-width:0}
+  #view #ptable td{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;padding:9px 8px;border:1px solid #edf1ee;border-radius:9px;background:#f8faf9;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+  #view #ptable td:before{font-size:11px;font-weight:700;color:#718078;flex:0 0 auto}
+  #view #ptable td:nth-child(1){position:absolute;top:17px;left:16px;z-index:1;border:0;background:transparent;padding:0}
+  #view #ptable td:nth-child(1):before{content:none}
+  #view #ptable td:nth-child(1) input{width:18px;height:18px}
+  #view #ptable td:nth-child(2){grid-area:photo;justify-content:center;min-height:108px;background:#fff}
+  #view #ptable td:nth-child(2):before{content:none}
+  #view #ptable td:nth-child(2) img{width:100%!important;height:104px!important;max-width:110px;object-fit:contain}
+  #view #ptable td:nth-child(3){grid-area:name;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;background:#fff;border:0;font-size:15px;font-weight:800;color:#173d30}
+  #view #ptable td:nth-child(3):before{content:none}
+  #view #ptable td:nth-child(4){grid-area:code} #view #ptable td:nth-child(4):before{content:"Kode"}
+  #view #ptable td:nth-child(5){grid-area:barcode} #view #ptable td:nth-child(5):before{content:"Barcode"}
+  #view #ptable td:nth-child(6){grid-area:category;display:block}
+  #view #ptable td:nth-child(6):before{content:"Kategori";display:block;margin-bottom:5px}
+  #view #ptable td:nth-child(6) select{width:100%;min-width:0;margin:0;padding:7px 6px;font-size:12px}
+  #view #ptable td:nth-child(7){grid-area:buy} #view #ptable td:nth-child(7):before{content:"Harga beli"}
+  #view #ptable td:nth-child(8){grid-area:sell1} #view #ptable td:nth-child(8):before{content:"Jual 1"}
+  #view #ptable td:nth-child(9){grid-area:sell2} #view #ptable td:nth-child(9):before{content:"Jual 2"}
+  #view #ptable td:nth-child(10){grid-area:sell3} #view #ptable td:nth-child(10):before{content:"Jual 3"}
+  #view #ptable td:nth-child(11){grid-area:stock} #view #ptable td:nth-child(11):before{content:"Stok"}
+  #view #ptable td:nth-child(12){grid-area:status} #view #ptable td:nth-child(12):before{content:"Status"}
+  #view #ptable td:nth-child(12) button{padding:7px 12px;font-size:12px}
+  #view #ptable td:nth-child(13){grid-area:action;justify-content:center;background:#fff}
+  #view #ptable td:nth-child(13):before{content:none}
+  #view #ptable td:nth-child(13) button{width:100%;padding:10px;font-size:13px}
+  #view #ptable .photo-placeholder{font-size:28px;color:#8ba397}
+}
+</style>
 </head>
 <body>
 <div class="app">
