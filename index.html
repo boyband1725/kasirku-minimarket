@@ -4453,14 +4453,14 @@ function populateSeaMartVoiceOptions(){
  const saved=localStorage.getItem('seamart_order_voice_uri')||'';
  select.innerHTML=voices.map((v,i)=>'<option value="'+escapeOrderNotifyText(v.voiceURI)+'">'+escapeOrderNotifyText(v.name)+' ('+escapeOrderNotifyText(v.lang)+')</option>').join('');
  if(saved&&voices.some(v=>v.voiceURI===saved))select.value=saved;
- else{const preferred=voices.find(v=>/female|woman|perempuan|google bahasa indonesia/i.test(v.name))||voices[0];select.value=preferred.voiceURI;localStorage.setItem('seamart_order_voice_uri',preferred.voiceURI);}
+ else{const preferred=voices.find(v=>/google.*bahasa indonesia|bahasa indonesia.*google/i.test(v.name))||voices.find(v=>/female|woman|perempuan/i.test(v.name))||voices[0];select.value=preferred.voiceURI;localStorage.setItem('seamart_order_voice_uri',preferred.voiceURI);}
 }
 function setSeaMartNotificationVoice(uri){
  if(uri)localStorage.setItem('seamart_order_voice_uri',uri);
 }
 function getSeaMartSelectedVoice(){
  const voices=getSeaMartAvailableVoices(),saved=localStorage.getItem('seamart_order_voice_uri')||'';
- return voices.find(v=>v.voiceURI===saved)||voices.find(v=>/female|woman|perempuan|google bahasa indonesia/i.test(v.name))||voices[0]||null;
+ return voices.find(v=>v.voiceURI===saved)||voices.find(v=>/google.*bahasa indonesia|bahasa indonesia.*google/i.test(v.name))||voices.find(v=>/female|woman|perempuan/i.test(v.name))||voices[0]||null;
 }
 async function testSelectedSeaMartVoice(){
  const ok=await unlockSeaMartOrderSound();
