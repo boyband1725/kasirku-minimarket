@@ -2993,7 +2993,7 @@ async function refreshSeaMartNow(){
     if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
     else if(!p.foto){p.foto='';p.image_url='';}
    }else{
-    db.products.push({id:row.id,nama:row.name||'',kode:normalizeProductIdentifier(row.code||''),barcode:normalizeProductIdentifier(row.barcode||''),kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),harga_jual_2:Number(row.price_2||0),harga_jual_3:Number(row.price_3||0),harga_beli:Number(row.purchase_price||0),ppn_beli:Number(row.purchase_vat_rate??11),ppn_jual:Number(row.sales_vat_rate??11),margin_1:Number(row.margin_1??50),margin_2:Number(row.margin_2??50),margin_3:Number(row.margin_3??50),harga_jual_1_sebelum_ppn:Number(row.sale_base_1||0),harga_jual_2_sebelum_ppn:Number(row.sale_base_2||0),harga_jual_3_sebelum_ppn:Number(row.sale_base_3||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});
+    // Cloud-only products are intentionally not imported into the local 138-item master.
    }
   }
   refreshPhase='mengambil riwayat penjualan';
@@ -3124,12 +3124,7 @@ async function refreshSeaMartCloudSales(){
  const officialMaster=await loadNovemberMasterRows();
  db.products=mergeNovemberMaster(officialMaster,db.products,remote.data||[]);
  save();localStorage.setItem('seamart_master_source_v1','local');
- const syncSummary=await syncAllProducts(remote.data||[]);
- if(syncSummary.failed>0)console.warn('Sebagian produk master 138 belum tersinkron:',syncSummary.errors);
- remote=await fetchAllStoreProducts(sb,member.data.store_id);
- db.products=mergeNovemberMaster(officialMaster,db.products,remote.data||[]);
- save();
- updateSeaMartSyncProgress(100,'Master resmi 138 barang aktif. Produk cloud di luar master disembunyikan; stok dan foto yang cocok tetap disinkronkan.',{total:138,added:syncSummary.added,skipped:syncSummary.skipped,failed:syncSummary.failed,finished:true});
+ updateSeaMartSyncProgress(100,'Master resmi 138 barang ditampilkan. Barang cloud di luar master tidak ditarik atau disinkronkan otomatis. Gunakan tombol sinkronisasi manual bila diperlukan.',{total:138,added:0,skipped:138,failed:0,finished:true});
  try{await refreshSeaMartCloudStock();}catch(e){console.warn('Stok cloud awal belum berhasil dimuat:',e.message||e);}
  startSeaMartStockRealtime();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
