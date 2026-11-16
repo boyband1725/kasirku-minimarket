@@ -4061,7 +4061,7 @@ function productModal(id){
   <div class="modal odoo-product-modal" role="dialog" aria-modal="true" aria-label="Form produk SeaMart">
    <div class="odoo-product-top">
     <div><div class="odoo-breadcrumb">Inventory <span>›</span> Products <span>›</span> ${id?'Edit Product':'New Product'}</div><h2>${id?'Detail Produk':'Produk Baru'}</h2><div class="odoo-product-sub">Kelola informasi, harga, stok, barcode, dan foto barang dalam satu halaman.</div></div>
-    <div class="odoo-product-actions"><button class="btn-light" type="button" onclick="closeModal()">Tutup</button><button class="btn-primary" type="button" onclick="saveProduct('${p.id}')">Simpan</button></div>
+    <div class="odoo-product-actions"><button class="btn-light" id="productEditButton" type="button" onclick="setProductEditMode(true)">Ubah</button><button class="btn-light" type="button" onclick="cancelProductEdit()">Batal</button></div>
    </div>
    <div class="odoo-product-kpis">
     <div><small>Stok tersedia</small><b id="odooStockKpi">${stock}</b><span>Unit</span></div>
@@ -4140,10 +4140,19 @@ function productModal(id){
      <div id="foto_lookup_status" class="odoo-help">Foto akan dicari berdasarkan barcode dan nama produk.</div>
     </aside>
    </div>
-   <div class="odoo-product-footer"><span>SeaMart Inventory · Data produk</span><div><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-primary" type="button" onclick="saveProduct('${p.id}')">Simpan Produk</button></div></div>
+   <div class="odoo-product-footer"><span>SeaMart Inventory · Data produk</span><div><button class="btn-light" type="button" onclick="cancelProductEdit()">Batal</button><button class="btn-primary" id="productSaveButton" type="button" disabled onclick="saveProduct('${p.id}')">Simpan</button></div></div>
   </div>
  </div>`;
+ setProductEditMode(!id);
 }
+function setProductEditMode(enabled){
+ const root=document.querySelector('.odoo-product-modal');if(!root)return;
+ root.querySelectorAll('input,select,textarea').forEach(el=>{if(el.id!=='odooMarginDisplay')el.disabled=!enabled;});
+ const saveBtn=document.getElementById('productSaveButton');if(saveBtn)saveBtn.disabled=!enabled;
+ const editBtn=document.getElementById('productEditButton');if(editBtn)editBtn.disabled=enabled;
+ root.classList.toggle('product-readonly',!enabled);
+}
+function cancelProductEdit(){closeModal();if(typeof products==='function')products();}
 function switchProductTab(tab){
  document.querySelectorAll('[data-product-tab]').forEach(b=>b.classList.toggle('active',b.dataset.productTab===tab));
  document.querySelectorAll('[data-product-panel]').forEach(p=>p.classList.toggle('active',p.dataset.productPanel===tab));
