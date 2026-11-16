@@ -2416,7 +2416,7 @@ window.addEventListener('error', function(e) {
 .sm-order-notify-empty{padding:22px 14px;text-align:center;color:#84918a;font-size:12px}
 @media(max-width:700px){.sm-order-notify-btn{width:32px;height:32px;min-width:32px!important;min-height:32px!important}.sm-order-notify-panel{right:-80px}}
 </style><style id="seamart-mobile-online-orders">
-@media(max-width:700px){
+@media(max-width:900px), (hover:none) and (pointer:coarse){
  .pagehead{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:14px!important;margin:8px 0 16px!important}
  .pagehead h1{font-size:25px!important;line-height:1.2!important;margin:0 0 5px!important}
  .pagehead .sub{font-size:14px!important;line-height:1.4!important}
@@ -4217,7 +4217,7 @@ async function onlineOrdersPage(){
  if(res.error){root.innerHTML='<div class="notice">Tabel pesanan belum tersedia. Jalankan SQL dari folder supabase di GitHub. '+String(res.error.message).replace(/[&<>]/g,'')+'</div>';return}
  const rows=res.data||[];window.seamartOnlineOrders=rows;
  if(!rows.length){root.innerHTML='<div class="empty">Belum ada pesanan online.</div>';return}
- if(window.matchMedia('(max-width:700px)').matches){root.innerHTML=rows.map(o=>{
+ if(window.matchMedia('(max-width:900px), (hover:none) and (pointer:coarse)').matches){root.innerHTML=rows.map(o=>{
   const locked=['completed','cancelled'].includes(String(o.order_status||''));
   const ready=String(o.order_status||'')==='ready';
   const safe=v=>String(v||'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
