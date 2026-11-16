@@ -4011,6 +4011,9 @@ function productModal(id){
  window.pendingProductPhoto=null;
  const p=db.products.find(x=>x.id===id)||{id:'p'+Date.now(),nama:'',kode:'',barcode:'',kategori:'Umum',harga:0,harga_beli:0,harga_jual_1:0,harga_jual_2:0,harga_jual_3:0,stok:0,active:true,foto:''};
  const h1=Number(p.harga_jual_1??p.harga??0),stock=Number(p.stok||0);
+ const buyVat=Number(p.ppn_beli??11),sellVat=Number(p.ppn_jual??11),totalCost=Number(p.harga_beli||0)*(1+buyVat/100);
+ const initialBase=n=>Number(p['harga_jual_'+n+'_sebelum_ppn']??(Number(p['harga_jual_'+n]??(n===1?h1:0))/(1+sellVat/100)));
+ const initialMargin=n=>p['margin_'+n]!=null?Number(p['margin_'+n]):(totalCost>0?(initialBase(n)-totalCost)/totalCost*100:50);
  document.getElementById('modalroot').innerHTML=`
  <div class="modalback odoo-product-back" onclick="if(event.target===this)closeModal()">
   <div class="modal odoo-product-modal" role="dialog" aria-modal="true" aria-label="Form Master Barang SeaMart" style="width:min(980px,96vw);max-width:980px;max-height:92vh;overflow:auto;padding:24px">
