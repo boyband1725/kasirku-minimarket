@@ -3681,6 +3681,72 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  }
 }
 
+
+/* FIX POS CATALOG CARD OVERLAP: stable 3 x 2 desktop grid */
+@media screen and (min-width:761px){
+ #view #odooPosLayout #posproducts .pos-products-grid,
+ #view #odooPosLayout #posproducts .pos-featured-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-template-rows:repeat(2,190px)!important;
+  grid-auto-rows:190px!important;
+  align-content:start!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+ }
+ #view #odooPosLayout #posproducts .odoo-product{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
+  width:100%!important;
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:10px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+ }
+ #view #odooPosLayout #posproducts .odoo-product-image{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  flex:0 0 82px!important;
+  width:100%!important;
+  height:82px!important;
+  min-height:82px!important;
+  max-height:82px!important;
+  margin:0 0 8px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+ }
+ #view #odooPosLayout #posproducts .odoo-product-image img{
+  max-width:100%!important;max-height:100%!important;object-fit:contain!important
+ }
+ #view #odooPosLayout #posproducts .odoo-product-name{
+  flex:0 0 auto!important;
+  min-height:32px!important;max-height:34px!important;
+  font-size:12px!important;line-height:1.3!important;
+  overflow:hidden!important;overflow-wrap:anywhere!important
+ }
+ #view #odooPosLayout #posproducts .odoo-product-meta{
+  flex:0 0 auto!important;margin-top:4px!important;
+  font-size:10px!important;line-height:1.2!important;
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+ }
+ #view #odooPosLayout #posproducts .odoo-product-price{
+  flex:0 0 auto!important;margin-top:auto!important;padding-top:5px!important;
+  font-size:14px!important;line-height:1.2!important
+ }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
