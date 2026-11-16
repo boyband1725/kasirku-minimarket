@@ -4015,89 +4015,62 @@ function productModal(id){
  const h1=Number(p.harga_jual_1??p.harga??0),stock=Number(p.stok||0);
  document.getElementById('modalroot').innerHTML=`
  <div class="modalback odoo-product-back" onclick="if(event.target===this)closeModal()">
-  <div class="modal odoo-product-modal" role="dialog" aria-modal="true" aria-label="Form produk SeaMart">
+  <div class="modal odoo-product-modal" role="dialog" aria-modal="true" aria-label="Form Master Barang SeaMart" style="width:min(980px,96vw);max-width:980px;max-height:92vh;overflow:auto;padding:24px">
    <div class="odoo-product-top">
-    <div><div class="odoo-breadcrumb">Inventory <span>›</span> Products <span>›</span> ${id?'Edit Product':'New Product'}</div><h2>${id?'Detail Produk':'Produk Baru'}</h2><div class="odoo-product-sub">Kelola informasi, harga, stok, barcode, dan foto barang dalam satu halaman.</div></div>
+    <div><div class="odoo-breadcrumb">Master Barang <span>›</span> ${id?'Ubah Barang':'Barang Baru'}</div><h2>${id?'Form Ubah Data Barang':'Form Input Data Barang'}</h2><div class="odoo-product-sub">Satu formulir untuk identitas, harga, stok, dan foto barang SeaMart.</div></div>
     <div class="odoo-product-actions"><button class="btn-light" id="productEditButton" type="button" onclick="setProductEditMode(true)">Ubah</button><button class="btn-light" type="button" onclick="cancelProductEdit()">Batal</button></div>
    </div>
    <div class="odoo-product-kpis">
     <div><small>Stok tersedia</small><b id="odooStockKpi">${stock}</b><span>Unit</span></div>
-    <div><small>Harga jual 1</small><b id="odooPriceKpi">${h1.toLocaleString('id-ID')}</b><span>Dipakai di kasir</span></div>
+    <div><small>Harga Jual 1</small><b id="odooPriceKpi">${h1.toLocaleString('id-ID')}</b><span>Harga utama kasir</span></div>
     <div><small>Harga beli</small><b id="odooBuyKpi">${Number(p.harga_beli||0).toLocaleString('id-ID')}</b><span>Modal barang</span></div>
-    <div><small>Status produk</small><b>${p.active===false?'Arsip':'Aktif'}</b><span>Visibilitas barang</span></div>
+    <div><small>Status</small><b>${p.active===false?'Nonaktif':'Aktif'}</b><span>Visibilitas barang</span></div>
    </div>
-   <div class="odoo-product-main">
-    <div class="odoo-product-fields">
-     <div class="odoo-product-name-row">
-      <div class="odoo-product-name-field"><label>Nama Produk</label><input id="f_nama" class="field odoo-name-input" placeholder="Contoh: AQUA BTL 600 ML" value="${esc(p.nama)}"></div>
-      <div class="odoo-product-state"><label><input id="f_active" type="checkbox" ${p.active!==false?'checked':''}> Aktif</label><span>Produk aktif tampil di kasir dan katalog.</span></div>
-     </div>
-     <div class="odoo-product-tabs" role="tablist">
-      <button type="button" class="active" data-product-tab="general" onclick="switchProductTab('general')">Informasi Umum</button>
-      <button type="button" data-product-tab="sales" onclick="switchProductTab('sales')">Penjualan</button>
-      <button type="button" data-product-tab="inventory" onclick="switchProductTab('inventory')">Inventory</button>
-      <button type="button" data-product-tab="accounting" onclick="switchProductTab('accounting')">Akuntansi</button>
-      <button type="button" data-product-tab="prices" onclick="switchProductTab('prices')">Master Harga</button>
-      <button type="button" data-product-tab="barcode" onclick="switchProductTab('barcode')">Barcode</button>
-     </div>
-     <section class="odoo-product-tab active" data-product-panel="general">
-      <div class="odoo-section-title">Informasi Produk</div>
-      <div class="odoo-form-grid">
-       <label>Kode Barang<input id="f_kode" class="field" value="${esc(p.kode||'')}" placeholder="Kode internal"></label>
-       <label>Kelompok Barang<input id="f_kategori" class="field" value="${esc(p.kategori||'Umum')}" placeholder="Contoh: Minuman"></label>
-       <label>Harga Beli<input id="f_harga_beli" type="number" min="0" class="field" value="${Number(p.harga_beli||0)}"></label>
-       <label>Harga Jual 1 <small>(Harga kasir)</small><input id="f_harga" type="number" min="0" class="field" value="${h1}"></label>
-      </div>
-     </section>
-     <section class="odoo-product-tab" data-product-panel="sales">
-      <div class="odoo-section-title">Pengaturan Penjualan</div>
-      <div class="odoo-form-grid">
-       <label>Harga Jual 1 <small>(Dipakai otomatis di kasir)</small><input id="f_sales_h1" type="number" min="0" class="field" value="${h1}" oninput="document.getElementById('f_harga').value=this.value;updateProductKpis()"></label>
-       <label>Kelompok Barang<input id="f_sales_category" class="field" value="${esc(p.kategori||'Umum')}" oninput="document.getElementById('f_kategori').value=this.value"></label>
-      </div>
-      <p class="odoo-help">Kasir menggunakan Harga Jual 1. Harga Jual 2 dan 3 dapat diatur pada tab Master Harga.</p>
-     </section>
-     <section class="odoo-product-tab" data-product-panel="inventory">
-      <div class="odoo-section-title">Pengelolaan Stok</div>
-      <div class="odoo-form-grid">
-       <label>Stok saat ini<input id="f_stok" type="number" min="0" class="field" value="${stock}" oninput="updateProductKpis()"></label>
-       <label>Barcode utama<input id="f_barcode" class="field" value="${esc(p.barcode||'')}" placeholder="Scan atau ketik barcode"></label>
-      </div>
-      <div class="odoo-stock-note"><b>Stok tersedia: <span id="odooStockInline">${stock}</span> unit</b><span>Perubahan stok awal disimpan bersama data produk. Mutasi stok berikutnya tetap dilakukan dari menu Stok & Mutasi.</span></div>
-     </section>
-     <section class="odoo-product-tab" data-product-panel="accounting">
-      <div class="odoo-section-title">Informasi Akuntansi</div>
-      <div class="odoo-form-grid">
-       <label>Harga Pokok / Harga Beli<input id="f_accounting_buy" type="number" min="0" class="field" value="${Number(p.harga_beli||0)}" oninput="document.getElementById('f_harga_beli').value=this.value;updateProductKpis()"></label>
-       <label>Estimasi Margin<input id="odooMarginDisplay" class="field" readonly value="${(h1-Number(p.harga_beli||0)).toLocaleString('id-ID')}"></label>
-      </div>
-      <p class="odoo-help">Nilai margin adalah selisih Harga Jual 1 dan Harga Beli, belum termasuk biaya lain.</p>
-     </section>
-     <section class="odoo-product-tab" data-product-panel="prices">
-      <div class="odoo-section-title">Daftar Harga Jual</div>
-      <div class="odoo-form-grid">
-       <label>Harga Jual 1 <small>(Kasir utama)</small><input id="f_price_h1" type="number" min="0" class="field" value="${h1}" oninput="document.getElementById('f_harga').value=this.value;document.getElementById('f_sales_h1').value=this.value;updateProductKpis()"></label>
-       <label>Harga Jual 2<input id="f_harga2" type="number" min="0" class="field" value="${Number(p.harga_jual_2||0)}"></label>
-       <label>Harga Jual 3<input id="f_harga3" type="number" min="0" class="field" value="${Number(p.harga_jual_3||0)}"></label>
-      </div>
-     </section>
-     <section class="odoo-product-tab" data-product-panel="barcode">
-      <div class="odoo-section-title">Identitas Barcode</div>
-      <div class="odoo-form-grid">
-       <label>Barcode produk<input id="f_barcode_tab" class="field" value="${esc(p.barcode||'')}" placeholder="Scan barcode dengan scanner" oninput="document.getElementById('f_barcode').value=this.value"></label>
-       <label>Kode internal<input id="f_kode_tab" class="field" value="${esc(p.kode||'')}" placeholder="Kode barang" oninput="document.getElementById('f_kode').value=this.value"></label>
-      </div>
-      <p class="odoo-help">Scanner Bluetooth/USB dapat langsung digunakan pada kolom barcode. Nilai barcode disimpan ke data produk.</p>
-     </section>
+   <div class="odoo-product-section">
+    <div class="odoo-section-title">Informasi Utama Barang</div>
+    <div class="odoo-form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+     <label>Kode Barang<input id="f_kode" class="field" value="${esc(p.kode||'')}" placeholder="Kode Odoo"></label>
+     <label>Barcode<input id="f_barcode" class="field" value="${esc(p.barcode||'')}" placeholder="Scan atau ketik barcode"></label>
+     <label>Kelompok Barang<input id="f_kategori" class="field" value="${esc(p.kategori||'Umum')}" placeholder="Kelompok barang"></label>
+     <label style="grid-column:span 2">Nama Barang<input id="f_nama" class="field odoo-name-input" value="${esc(p.nama)}" placeholder="Nama barang"></label>
+     <label style="display:flex;align-items:center;gap:8px"><input id="f_active" type="checkbox" ${p.active!==false?'checked':''}> Aktif di Kasir dan Toko Online</label>
     </div>
-    <aside class="odoo-product-photo">
-     <div class="odoo-photo-frame" id="foto_preview">${p.foto?'<img src="'+p.foto+'" alt="Foto produk">':'<div class="odoo-photo-empty"><span>▧</span><b>Belum ada foto</b><small>Tambahkan foto produk</small></div>'}</div>
-     <label class="odoo-photo-upload">Pilih Foto Produk<input id="f_foto" type="file" accept="image/*" onchange="previewProductPhoto(this)"></label>
-     <button type="button" class="btn-light" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button><button type="button" class="btn-light" data-reset-photo-id="${p.id}" onclick="resetProductPhoto(this.dataset.resetPhotoId)">Hapus Foto Produk</button>
-     <div id="foto_lookup_status" class="odoo-help">Foto akan dicari berdasarkan barcode dan nama produk.</div>
-    </aside>
    </div>
-   <div class="odoo-product-footer"><span>SeaMart Inventory · Data produk</span><div><button class="btn-light" type="button" onclick="cancelProductEdit()">Batal</button><button class="btn-primary" id="productSaveButton" type="button" disabled onclick="saveProduct('${p.id}')">Simpan</button></div></div>
+   <div class="odoo-product-tabs" role="tablist" style="margin-top:18px">
+    <button type="button" class="active" data-product-tab="prices" onclick="switchProductTab('prices')">Data Harga</button>
+    <button type="button" data-product-tab="inventory" onclick="switchProductTab('inventory')">Data Stok</button>
+    <button type="button" data-product-tab="photo" onclick="switchProductTab('photo')">Data Foto</button>
+   </div>
+   <section class="odoo-product-tab active" data-product-panel="prices">
+    <div class="odoo-section-title">Informasi Harga Barang</div>
+    <div class="odoo-form-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+     <label>Harga Beli<input id="f_harga_beli" type="number" min="0" class="field" value="${Number(p.harga_beli||0)}"></label>
+     <label>Harga Jual 1 <small>(Dipakai di kasir)</small><input id="f_harga" type="number" min="0" class="field" value="${h1}" oninput="updateProductKpis()"></label>
+     <label>Harga Jual 2<input id="f_harga2" type="number" min="0" class="field" value="${Number(p.harga_jual_2||0)}"></label>
+     <label>Harga Jual 3<input id="f_harga3" type="number" min="0" class="field" value="${Number(p.harga_jual_3||0)}"></label>
+    </div>
+    <p class="odoo-help">Harga Jual 1 menjadi harga utama kasir. Harga Jual 2 dan 3 disimpan terpisah.</p>
+   </section>
+   <section class="odoo-product-tab" data-product-panel="inventory">
+    <div class="odoo-section-title">Informasi Stok</div>
+    <div class="odoo-form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+     <label>Stok saat ini<input id="f_stok" type="number" min="0" class="field" value="${stock}" oninput="updateProductKpis()"></label>
+    </div>
+    <div class="odoo-stock-note"><b>Stok tersedia: <span id="odooStockInline">${stock}</span> unit</b><span>Mutasi stok berikutnya tetap dilakukan melalui menu Stok & Mutasi.</span></div>
+   </section>
+   <section class="odoo-product-tab" data-product-panel="photo">
+    <div class="odoo-section-title">Foto Barang</div>
+    <div style="display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px;align-items:start">
+     <div class="odoo-photo-frame" id="foto_preview" style="min-height:180px">${p.foto?'<img src="'+esc(p.foto)+'" alt="Foto produk">':'<div class="odoo-photo-empty"><span>▧</span><b>Belum ada foto</b><small>Tambahkan foto produk</small></div>'}</div>
+     <div style="display:grid;gap:10px">
+      <label class="odoo-photo-upload">Pilih Foto Produk<input id="f_foto" type="file" accept="image/*" onchange="previewProductPhoto(this)"></label>
+      <button type="button" class="btn-light" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button>
+      <button type="button" class="btn-light" data-reset-photo-id="${p.id}" onclick="resetProductPhoto(this.dataset.resetPhotoId)">Hapus Foto Produk</button>
+      <div id="foto_lookup_status" class="odoo-help">Foto dicari berdasarkan barcode dan nama barang.</div>
+     </div>
+    </div>
+   </section>
+   <div class="odoo-product-footer"><span>SeaMart · Satu Master Barang</span><div><button class="btn-light" type="button" onclick="cancelProductEdit()">Batal</button><button class="btn-primary" id="productSaveButton" type="button" disabled onclick="saveProduct('${p.id}')">Simpan</button></div></div>
   </div>
  </div>`;
  setProductEditMode(!id);
