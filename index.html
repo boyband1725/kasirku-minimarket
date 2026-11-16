@@ -3567,45 +3567,49 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
 
 #cartScreenKeyboard .cart-keyboard-head{cursor:move!important;user-select:none!important;-webkit-user-select:none!important;pointer-events:auto!important}
 
-/* Compact SeaMart PC catalog: keep 3x2 cards within a shorter vertical area */
+/* Extra-compact SeaMart PC catalog: 3 columns x 2 rows */
 @media(min-width:901px){
- #view #odooPosLayout #posproducts .pos-products-grid,
- #view #odooPosLayout #posproducts .pos-featured-grid{
+ #odooPosLayout #posproducts .pos-products-grid,
+ #odooPosLayout #posproducts .pos-featured-grid,
+ #posproducts .pos-products-grid,
+ #posproducts .pos-featured-grid{
   display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  grid-template-rows:repeat(2,minmax(0,1fr))!important;
-  grid-auto-rows:minmax(0,1fr)!important;
-  gap:8px!important;
-  width:100%!important;
-  max-height:440px!important;
+  grid-template-rows:repeat(2,132px)!important;
+  grid-auto-rows:132px!important;
+  gap:7px!important;
+  max-height:271px!important;
   overflow:hidden!important;
   align-content:start!important
  }
- #view #odooPosLayout #posproducts .odoo-product{
-  height:198px!important;min-height:0!important;max-height:198px!important;
-  padding:7px!important;gap:0!important;overflow:hidden!important;
-  box-sizing:border-box!important
+ #odooPosLayout #posproducts .odoo-product,
+ #posproducts .odoo-product{
+  height:132px!important;min-height:132px!important;max-height:132px!important;
+  padding:5px!important;gap:0!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;box-sizing:border-box!important
  }
- #view #odooPosLayout #posproducts .odoo-product-image{
-  height:78px!important;min-height:78px!important;max-height:78px!important;
-  flex:0 0 78px!important;aspect-ratio:auto!important;
-  margin:0 0 6px!important;padding:4px!important
+ #odooPosLayout #posproducts .odoo-product-image,
+ #posproducts .odoo-product-image{
+  height:48px!important;min-height:48px!important;max-height:48px!important;
+  flex:0 0 48px!important;aspect-ratio:auto!important;
+  margin:0 0 3px!important;padding:2px!important
  }
- #view #odooPosLayout #posproducts .odoo-product-name{
-  min-height:30px!important;max-height:32px!important;
-  font-size:11px!important;line-height:1.25!important;
-  overflow:hidden!important
+ #odooPosLayout #posproducts .odoo-product-name,
+ #posproducts .odoo-product-name{
+  min-height:24px!important;max-height:25px!important;
+  font-size:10px!important;line-height:1.2!important;overflow:hidden!important
  }
- #view #odooPosLayout #posproducts .odoo-product-meta{
-  font-size:9px!important;line-height:1.2!important;
-  max-height:14px!important;overflow:hidden!important
+ #odooPosLayout #posproducts .odoo-product-meta,
+ #posproducts .odoo-product-meta{
+  font-size:8px!important;line-height:1.1!important;
+  max-height:11px!important;overflow:hidden!important
  }
- #view #odooPosLayout #posproducts .odoo-product-price{
-  font-size:12px!important;line-height:1.2!important;
-  padding:5px 7px!important;margin-top:auto!important
+ #odooPosLayout #posproducts .odoo-product-price,
+ #posproducts .odoo-product-price{
+  font-size:11px!important;line-height:1.1!important;
+  padding:3px 6px!important;margin-top:auto!important
  }
 }
-
 </style>
 <script>
 window.__seamartRuntimeError = '';
