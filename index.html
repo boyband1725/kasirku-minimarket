@@ -4061,7 +4061,8 @@ function productModal(id){
  const h1=Number(p.harga_jual_1??p.harga??0),stock=Number(p.stok||0);
  const buyVat=Number(p.ppn_beli??11),sellVat=Number(p.ppn_jual??11),totalCost=Number(p.harga_beli||0)*(1+buyVat/100);
  const initialBase=n=>Number(p['harga_jual_'+n+'_sebelum_ppn']??(Number(p['harga_jual_'+n]??(n===1?h1:0))/(1+sellVat/100)));
- const initialMargin=n=>p['margin_'+n]!=null?Number(p['margin_'+n]):(totalCost>0?(initialBase(n)-totalCost)/totalCost*100:50);
+ // Derive margin from the saved sale price and modal; do not trust stale/corrupt cached margin fields.
+  const initialMargin=n=>{const base=initialBase(n);return totalCost>0&&base>0?Number(((base-totalCost)/totalCost*100).toFixed(2)):50;};
  document.getElementById('modalroot').innerHTML=`
  <div class="modalback odoo-product-back" onclick="if(event.target===this)closeModal()">
   <div class="modal odoo-product-modal" role="dialog" aria-modal="true" aria-label="Form Master Barang SeaMart" style="width:min(980px,96vw);max-width:980px;max-height:92vh;overflow:auto;padding:24px">
@@ -4100,9 +4101,9 @@ function productModal(id){
     </div>
     <div class="odoo-section-title" style="margin-top:20px">Harga Jual dan Margin</div>
     <div class="odoo-form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
-     <label>Margin Harga Jual 1 (%) <small>Harga utama kasir · awal 50%</small><input id="f_margin1" type="number" min="0" step="0.01" class="field" value="${initialMargin(1).toFixed(2)}" oninput="recalcProductPrices('margin1')"></label>
-     <label>Margin Harga Jual 2 (%)<input id="f_margin2" type="number" min="0" step="0.01" class="field" value="${initialMargin(2).toFixed(2)}" oninput="recalcProductPrices('margin2')"></label>
-     <label>Margin Harga Jual 3 (%)<input id="f_margin3" type="number" min="0" step="0.01" class="field" value="${initialMargin(3).toFixed(2)}" oninput="recalcProductPrices('margin3')"></label>
+     <label>Margin Harga Jual 1 (%) <small>Harga utama kasir · awal 50%</small><input id="f_margin1" type="number" min="-100" step="0.01" class="field" value="${initialMargin(1).toFixed(2)}" oninput="recalcProductPrices('margin1')"></label>
+     <label>Margin Harga Jual 2 (%)<input id="f_margin2" type="number" min="-100" step="0.01" class="field" value="${initialMargin(2).toFixed(2)}" oninput="recalcProductPrices('margin2')"></label>
+     <label>Margin Harga Jual 3 (%)<input id="f_margin3" type="number" min="-100" step="0.01" class="field" value="${initialMargin(3).toFixed(2)}" oninput="recalcProductPrices('margin3')"></label>
      <label>Harga Jual 1 sebelum PPN<input id="f_harga" type="number" min="0" class="field" value="${initialBase(1)}" oninput="recalcProductPrices('price1')"></label>
      <label>Harga Jual 2 sebelum PPN<input id="f_harga2" type="number" min="0" class="field" value="${initialBase(2)}" oninput="recalcProductPrices('price2')"></label>
      <label>Harga Jual 3 sebelum PPN<input id="f_harga3" type="number" min="0" class="field" value="${initialBase(3)}" oninput="recalcProductPrices('price3')"></label>
