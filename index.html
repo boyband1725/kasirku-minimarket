@@ -2439,6 +2439,16 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}
  #onlineOrdersList .online-orders-table select{height:27px!important;min-height:27px!important;font-size:9px!important;padding-right:12px!important}
 }
 
+
+/* SeaMart price form: consistent rows, columns and field alignment */
+.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:start!important;column-gap:16px!important;row-gap:14px!important}
+.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid>label{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:6px!important;min-width:0!important;width:100%!important;line-height:1.35!important;font-size:12px!important;font-weight:650!important}
+.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid>label>small{display:block!important;min-height:15px!important;font-size:10px!important;font-weight:400!important;color:#77808b!important}
+.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid>label>.field{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;height:40px!important;min-height:40px!important;box-sizing:border-box!important;font-size:13px!important}
+.odoo-product-tab[data-product-panel="prices"] #f_margin_type{width:100%!important}
+.odoo-product-tab[data-product-panel="prices"] .odoo-section-title{margin:8px 0 12px!important;padding-bottom:7px!important;border-bottom:1px solid #e8eeeb!important}
+@media(max-width:760px){.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}}
+@media(max-width:460px){.odoo-product-tab[data-product-panel="prices"] .odoo-form-grid{grid-template-columns:minmax(0,1fr)!important}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
