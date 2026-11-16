@@ -2830,7 +2830,7 @@ async function fetchAllStoreProducts(sb,store){
   let result=null,lastError=null;
   for(let attempt=1;attempt<=3;attempt++){
    try{
-    result=await sb.from('products').select('id,code,barcode,name,category_id,price,stock,active,image_url').eq('store_id',store).range(from,from+pageSize-1);
+    result=await sb.from('products').select('id,code,barcode,name,category_id,price,price_2,price_3,stock,active,image_url').eq('store_id',store).range(from,from+pageSize-1);
     if(result.error)throw result.error;
     lastError=null;break;
    }catch(error){
@@ -2934,13 +2934,15 @@ async function refreshSeaMartNow(){
     p.barcode=row.barcode==null?p.barcode:normalizeProductIdentifier(row.barcode);
     p.harga=Number(row.price??p.harga??0);
     p.harga_jual_1=Number(row.price??p.harga_jual_1??p.harga);
+    if(row.price_2!=null)p.harga_jual_2=Number(row.price_2);
+    if(row.price_3!=null)p.harga_jual_3=Number(row.price_3);
     p.stok=Number(row.stock??p.stok??0);
     p.active=row.active!==false;
     p.kategori=catNames.get(row.category_id)||'Umum';
     if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
     else if(!p.foto){p.foto='';p.image_url='';}
    }else{
-    db.products.push({id:row.id,nama:row.name||'',kode:normalizeProductIdentifier(row.code||''),barcode:normalizeProductIdentifier(row.barcode||''),kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});
+    db.products.push({id:row.id,nama:row.name||'',kode:normalizeProductIdentifier(row.code||''),barcode:normalizeProductIdentifier(row.barcode||''),kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),harga_jual_2:Number(row.price_2||0),harga_jual_3:Number(row.price_3||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});
    }
   }
   refreshPhase='mengambil riwayat penjualan';
@@ -3322,7 +3324,7 @@ async function syncOneProduct(p,categoryCache=new Map()){
    p.foto=imageUrl;
   }else imageUrl=String(p.foto);
  }
- const row={id:p.id,store_id:store,code:(normalizeProductIdentifier(p.kode)||null),barcode:(normalizeProductIdentifier(p.barcode)||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false,image_url:imageUrl};
+ const row={id:p.id,store_id:store,code:(normalizeProductIdentifier(p.kode)||null),barcode:(normalizeProductIdentifier(p.barcode)||null),name:p.nama,category_id:categoryId,price:Number(p.harga_jual_1??p.harga??0),price_2:Number(p.harga_jual_2||0),price_3:Number(p.harga_jual_3||0),stock:Math.max(0,Number(p.stok||0)),active:p.active!==false,image_url:imageUrl};
  // A product may already exist in cloud under the unique (store_id, code) key
  // but have a different UUID from this browser's local copy. Reuse that cloud ID.
  let existing=null;
@@ -3333,7 +3335,7 @@ async function syncOneProduct(p,categoryCache=new Map()){
  }
  if(existing){
   if(!row.image_url&&existing.image_url&&!p._clearFoto)row.image_url=existing.image_url;
-  const result=await sb.from('products').update({code:row.code,barcode:row.barcode,name:row.name,category_id:row.category_id,price:row.price,stock:row.stock,active:row.active,image_url:row.image_url}).eq('id',existing.id).eq('store_id',store);
+  const result=await sb.from('products').update({code:row.code,barcode:row.barcode,name:row.name,category_id:row.category_id,price:row.price,price_2:row.price_2,price_3:row.price_3,stock:row.stock,active:row.active,image_url:row.image_url}).eq('id',existing.id).eq('store_id',store);
   if(result.error)throw result.error;
   p.id=existing.id;
  }else{
