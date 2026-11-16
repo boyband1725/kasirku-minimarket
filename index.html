@@ -2581,22 +2581,21 @@ async function refreshSeaMartNow(){
    let p=db.products.find(x=>String(x.id||'')===String(row.id||''));   if(!p&&row.barcode){const matches=db.products.filter(x=>String(x.barcode||'').trim()===String(row.barcode).trim());if(matches.length===1)p=matches[0];}
    if(!p&&row.code){const matches=db.products.filter(x=>String(x.kode||'').trim()===String(row.code).trim());if(matches.length===1)p=matches[0];}
    if(p){
+    // Supabase is the shared source of truth: apply every cloud field on every device.
     p.id=row.id;
-    if(localStorage.getItem('seamart_master_source_v1')==='local'){
-     p.stok=Number(row.stock??p.stok);
-     if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
-     else if(/^data:image\//i.test(String(p.foto||''))){
-      try{const url=await uploadSeaMartProductPhoto(sb,store,row.id,p.foto);const upd=await sb.from('products').update({image_url:url}).eq('id',row.id).eq('store_id',store);if(upd.error)throw upd.error;p.foto=url;p.image_url=url;}
-      catch(photoError){console.warn('Foto lokal belum tersinkron untuk '+(p.nama||row.code)+':',photoError.message||photoError);warnings.push('Foto '+(p.nama||row.code)+' belum tersinkron');}
-     }
-    }else{
-     p.nama=row.name||p.nama;p.kode=row.code==null?p.kode:normalizeProductIdentifier(row.code);p.barcode=row.barcode==null?p.barcode:normalizeProductIdentifier(row.barcode);p.harga=Number(row.price??p.harga);p.harga_jual_1=Number(row.price??p.harga_jual_1??p.harga);p.stok=Number(row.stock??p.stok);p.active=row.active!==false;p.kategori=catNames.get(row.category_id)||p.kategori||'Umum';
-     if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
-    }
-   }else if(localStorage.getItem('seamart_master_source_v1')!=='local'){
+    p.nama=row.name??p.nama;
+    p.kode=row.code==null?p.kode:normalizeProductIdentifier(row.code);
+    p.barcode=row.barcode==null?p.barcode:normalizeProductIdentifier(row.barcode);
+    p.harga=Number(row.price??p.harga??0);
+    p.harga_jual_1=Number(row.price??p.harga_jual_1??p.harga);
+    p.stok=Number(row.stock??p.stok??0);
+    p.active=row.active!==false;
+    p.kategori=catNames.get(row.category_id)||'Umum';
+    if(row.image_url){p.foto=row.image_url;p.image_url=row.image_url;}
+    else if(!p.foto){p.foto='';p.image_url='';}
+   }else{
     db.products.push({id:row.id,nama:row.name||'',kode:normalizeProductIdentifier(row.code||''),barcode:normalizeProductIdentifier(row.barcode||''),kategori:catNames.get(row.category_id)||'Umum',harga:Number(row.price||0),harga_jual_1:Number(row.price||0),stok:Number(row.stock||0),active:row.active!==false,foto:row.image_url||'',image_url:row.image_url||''});
    }
-  }
   refreshPhase='mengambil riwayat penjualan';
   try{await refreshSeaMartCloudSalesGlobal();}
   catch(e){console.warn('Riwayat penjualan tidak dapat dibaca dari cloud:',e.message||e);warnings.push('Riwayat penjualan tidak dapat diakses');}
@@ -2628,8 +2627,14 @@ function startSeaMartStockRealtime(){
  if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);
  window.seamartStockChannel=sb.channel('seamart-store-'+store)
   .on('postgres_changes',{event:'*',schema:'public',table:'products',filter:'store_id=eq.'+store},payload=>{
-   if(payload.new)applySeaMartCloudStock([payload.new]);
-   if(payload.eventType==='DELETE'&&payload.old?.id){db.products=db.products.filter(p=>String(p.id)!==String(payload.old.id));save();}
+   if(payload.eventType==='DELETE'&&payload.old?.id){
+    db.products=db.products.filter(p=>String(p.id)!==String(payload.old.id));save();
+    if(document.getElementById('ptable')&&typeof filterProducts==='function')filterProducts();
+    if(typeof renderPosProducts==='function'&&document.getElementById('posproducts'))renderPosProducts();
+   }else if(document.visibilityState==='visible'){
+    // Refresh full product records (name, code, barcode, category, price, stock, photo, active).
+    refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi master barang realtime gagal:',e.message||e));
+   }
   })
   .on('postgres_changes',{event:'*',schema:'public',table:'seamart_pos_sales',filter:'store_id=eq.'+store},()=>{
    if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi penjualan realtime gagal:',e.message||e));
