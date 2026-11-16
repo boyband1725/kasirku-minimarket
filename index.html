@@ -2627,6 +2627,9 @@ function startSeaMartStockRealtime(){
  if(window.seamartStockChannel){try{sb.removeChannel(window.seamartStockChannel)}catch(e){}}
  if(window.seamartStockPollTimer)clearInterval(window.seamartStockPollTimer);
  window.seamartStockChannel=sb.channel('seamart-store-'+store)
+  .on('postgres_changes',{event:'*',schema:'public',table:'categories',filter:'store_id=eq.'+store},()=>{
+   if(document.visibilityState==='visible')refreshSeaMartNow().catch(e=>console.warn('Sinkronisasi kategori realtime gagal:',e.message||e));
+  })
   .on('postgres_changes',{event:'*',schema:'public',table:'products',filter:'store_id=eq.'+store},payload=>{
    if(payload.eventType==='DELETE'&&payload.old?.id){
     db.products=db.products.filter(p=>String(p.id)!==String(payload.old.id));save();
