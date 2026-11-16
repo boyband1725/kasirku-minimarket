@@ -4468,7 +4468,7 @@ async function testSelectedSeaMartVoice(){
  populateSeaMartVoiceOptions();
  const voice=getSeaMartSelectedVoice();
  if(!voice){alert('Belum ada suara Bahasa Indonesia di perangkat. Aktifkan/unduh suara Bahasa Indonesia pada pengaturan Text-to-Speech HP.');return;}
- speakSeaMartFemale('Halo, ini suara notifikasi Sii Mart yang dipilih.');
+ speakSeaMartFemale('Halo, ini suara notifikasi Sii. Mart yang dipilih.');
 }
 function getSeaMartIndonesianFemaleVoice(){
  if(!('speechSynthesis'in window))return null;
@@ -4491,8 +4491,8 @@ function speakSeaMartFemale(text){
 function testSeaMartFemaleVoice(){
  if(!('speechSynthesis'in window)){alert('Browser ini belum mendukung suara otomatis. Coba Chrome terbaru.');return;}
  const voices=window.speechSynthesis.getVoices();
- if(!voices.length){window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;speakSeaMartFemale('Halo, ini tes suara perempuan Sii Mart. Notifikasi pesanan baru akan dibacakan di sini.');};}
- else speakSeaMartFemale('Halo, ini tes suara perempuan Sii Mart. Notifikasi pesanan baru akan dibacakan di sini.');
+ if(!voices.length){window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;speakSeaMartFemale('Halo, ini tes suara perempuan Sii. Mart. Notifikasi pesanan baru akan dibacakan di sini.');};}
+ else speakSeaMartFemale('Halo, ini tes suara perempuan Sii. Mart. Notifikasi pesanan baru akan dibacakan di sini.');
 }
 async function testSeaMartOrderAlarm(){
  const ok=await unlockSeaMartOrderSound();
@@ -4511,7 +4511,7 @@ function startSeaMartOrderAlarm(order){
  },1100);
  const queue=String(order?.queue_number||order?.order_code||'pesanan baru');
  const customer=String(order?.customer_name||'pelanggan');
- speakSeaMartFemale('Perhatian. Pesanan baru masuk. Nomor antrean '+queue+'. Pelanggan '+customer+'. Silakan periksa pesanan di Sii Mart.');
+ speakSeaMartFemale('Perhatian. Pesanan baru masuk. Nomor antrean '+queue+'. Pelanggan '+customer+'. Silakan periksa pesanan di Sii. Mart.');
 }
 function escapeOrderNotifyText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderOrderNotifications(){
