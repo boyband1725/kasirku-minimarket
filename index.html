@@ -5086,6 +5086,84 @@ restoreSeaMartSession();
 @keyframes smAlertFade{from{opacity:0}to{opacity:1}}@keyframes smAlertPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:520px){#smAlertDialog{width:calc(100vw - 26px);border-radius:13px}#smAlertDialog .sm-alert-head{padding:13px 15px}#smAlertDialog .sm-alert-content{padding:16px;font-size:12px}}
 .btn-wa{margin-top:7px;background:#16845b;color:#fff;border:0;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:750;white-space:nowrap}.btn-wa:disabled{background:#e9eef0;color:#8a969e;cursor:not-allowed}
+
+/* SeaMart mobile master-barang cards: stop field clipping and overlapping */
+@media(max-width:760px){
+  #ptable{overflow:visible!important}
+  #ptable .tablewrap{width:100%!important;overflow:visible!important;padding:0!important}
+  #ptable .tablewrap table,#ptable .tablewrap tbody{display:block!important;width:100%!important;min-width:0!important}
+  #ptable .tablewrap tr{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:0 14px!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    padding:14px!important;
+    margin:0 0 14px!important;
+    border:1px solid #dce9e2!important;
+    border-radius:16px!important;
+    background:#fff!important;
+    box-shadow:0 3px 12px rgba(20,70,45,.07)!important;
+  }
+  #ptable .tablewrap td{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+    width:auto!important;
+    min-width:0!important;
+    min-height:66px!important;
+    box-sizing:border-box!important;
+    padding:9px 10px!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:10px!important;
+    background:#f6f9f7!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    overflow-wrap:anywhere!important;
+    text-overflow:clip!important;
+    line-height:1.35!important;
+    font-size:13px!important;
+  }
+  #ptable .tablewrap td:before{
+    flex:none!important;
+    width:100%!important;
+    max-width:none!important;
+    color:#77867e!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+    font-weight:750!important;
+    overflow-wrap:normal!important;
+  }
+  #ptable .tablewrap td:nth-child(1),
+  #ptable .tablewrap td:nth-child(2),
+  #ptable .tablewrap td:nth-child(3),
+  #ptable .tablewrap td:nth-child(13){grid-column:1/-1!important}
+  #ptable .tablewrap td:nth-child(1),
+  #ptable .tablewrap td:nth-child(2){min-height:42px!important;align-items:flex-start!important}
+  #ptable .tablewrap td:nth-child(2) img{width:76px!important;height:76px!important;object-fit:contain!important;margin:2px 0!important}
+  #ptable .tablewrap td:nth-child(3){font-size:16px!important;font-weight:800!important;color:#183b2b!important;min-height:54px!important}
+  #ptable .tablewrap td:nth-child(3) b{white-space:normal!important;overflow-wrap:anywhere!important}
+  #ptable .tablewrap td:nth-child(6) select,
+  #ptable .product-category-select{
+    display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;
+    box-sizing:border-box!important;height:38px!important;padding:7px 9px!important;font-size:12px!important;
+  }
+  #ptable .tablewrap td:nth-child(12) button,
+  #ptable .tablewrap td:nth-child(13) button{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    min-height:38px!important;height:auto!important;white-space:normal!important;
+    font-size:12px!important;padding:8px 10px!important;box-sizing:border-box!important;
+  }
+  #ptable .tablewrap td:nth-child(13){display:flex!important;flex-direction:row!important;align-items:center!important}
+  #ptable .tablewrap td:nth-child(13):before{width:auto!important;flex:1 1 auto!important}
+}
+@media(max-width:380px){
+  #ptable .tablewrap tr{gap:0 8px!important;padding:10px!important}
+  #ptable .tablewrap td{padding:8px!important;font-size:12px!important}
+}
 </style>
 <script>
 (function(){
