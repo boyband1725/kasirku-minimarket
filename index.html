@@ -3405,6 +3405,69 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  #odooPosLayout #posproducts .odoo-product-image{height:105px!important;min-height:105px!important;flex-basis:105px!important}
 }
 
+
+/* EMERGENCY DESKTOP POS GRID REPAIR: explicit placement prevents cart/catalog stacking */
+@media screen and (min-width:1101px){
+ #view #odooPosLayout{
+  display:grid!important;
+  position:relative!important;
+  grid-template-columns:minmax(0,1fr) 350px!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  grid-template-areas:"catalog cart"!important;
+  column-gap:14px!important;row-gap:0!important;
+  width:100%!important;max-width:100%!important;
+  min-width:0!important;height:auto!important;
+  align-items:start!important;justify-items:stretch!important;
+ }
+ #view #odooPosLayout > #odooCategoryPanel{display:none!important}
+ #view #odooPosLayout > .mobile-cart-backdrop{display:none!important;position:absolute!important;inset:auto!important}
+ #view #odooPosLayout > .odoo-catalog-panel{
+  display:block!important;grid-area:catalog!important;
+  position:relative!important;inset:auto!important;float:none!important;
+  order:0!important;align-self:stretch!important;justify-self:stretch!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:auto!important;min-height:calc(100vh - 180px)!important;
+  margin:0!important;transform:none!important;box-sizing:border-box!important;
+  overflow:visible!important
+ }
+ #view #odooPosLayout > #odooOrderPanel{
+  display:flex!important;grid-area:cart!important;
+  position:sticky!important;inset:auto!important;float:none!important;
+  order:0!important;align-self:start!important;justify-self:stretch!important;
+  width:350px!important;min-width:0!important;max-width:350px!important;
+  height:auto!important;max-height:calc(100vh - 150px)!important;
+  margin:0!important;transform:none!important;box-sizing:border-box!important;
+  flex-direction:column!important;overflow:auto!important
+ }
+ #view #odooPosLayout #posproducts.odoo-products{
+  display:block!important;position:relative!important;float:none!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  margin:0!important;transform:none!important;box-sizing:border-box!important
+ }
+ #view #odooPosLayout #posproducts .pos-products-grid,
+ #view #odooPosLayout #posproducts .pos-featured-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  gap:12px!important;box-sizing:border-box!important
+ }
+ #view #odooPosLayout #posproducts .odoo-product{
+  display:flex!important;position:relative!important;float:none!important;
+  flex-direction:column!important;width:auto!important;min-width:0!important;
+  min-height:205px!important;margin:0!important;padding:12px!important;
+  transform:none!important;box-sizing:border-box!important
+ }
+ #view #odooPosLayout #posproducts .odoo-product-image{
+  width:100%!important;height:118px!important;min-height:118px!important;
+  flex:0 0 118px!important
+ }
+}
+@media screen and (min-width:1101px) and (max-width:1250px){
+ #view #odooPosLayout{grid-template-columns:minmax(0,1fr) 300px!important;column-gap:10px!important}
+ #view #odooPosLayout > #odooOrderPanel{width:300px!important;max-width:300px!important}
+ #view #odooPosLayout #posproducts .odoo-product{min-height:190px!important;padding:9px!important}
+ #view #odooPosLayout #posproducts .odoo-product-image{height:105px!important;min-height:105px!important;flex-basis:105px!important}
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
