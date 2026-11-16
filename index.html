@@ -3202,7 +3202,47 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  body.seamart-pos-fullscreen #odooPosLayout .odoo-catalog-panel{height:calc(100vh - 125px)!important;max-height:calc(100vh - 125px)!important}
 }
 
-\n/* SeaMart POS desktop: spacious four-column catalog; one-click add-to-cart */\n@media(min-width:901px){#odooPosLayout{grid-template-columns:150px minmax(0,1fr) 340px!important;gap:12px!important}#posproducts .pos-products-grid,#posproducts .pos-featured-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}#posproducts .odoo-product{min-width:0!important;min-height:190px!important;padding:10px!important;display:flex!important;flex-direction:column!important}#posproducts .odoo-product-image{height:105px!important;flex:0 0 105px!important}#posproducts .odoo-product-name{font-size:12px!important;line-height:1.35!important;min-height:34px!important;white-space:normal!important;overflow-wrap:anywhere!important}#posproducts .odoo-product-meta{font-size:10px!important}#posproducts .odoo-product-price{font-size:14px!important;margin-top:auto!important;padding-top:7px!important}}\n#posproducts .product-qty-control{display:none!important}\n</style>
+\n/* SeaMart POS desktop: spacious four-column catalog; one-click add-to-cart */\n@media(min-width:901px){#odooPosLayout{grid-template-columns:150px minmax(0,1fr) 340px!important;gap:12px!important}#posproducts .pos-products-grid,#posproducts .pos-featured-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}#posproducts .odoo-product{min-width:0!important;min-height:190px!important;padding:10px!important;display:flex!important;flex-direction:column!important}#posproducts .odoo-product-image{height:105px!important;flex:0 0 105px!important}#posproducts .odoo-product-name{font-size:12px!important;line-height:1.35!important;min-height:34px!important;white-space:normal!important;overflow-wrap:anywhere!important}#posproducts .odoo-product-meta{font-size:10px!important}#posproducts .odoo-product-price{font-size:14px!important;margin-top:auto!important;padding-top:7px!important}}\n#posproducts .product-qty-control{display:none!important}\n
+/* FINAL FIX: keep the cashier numpad compact and floating on every POS layout */
+#odooPosLayout #cartScreenKeyboard:not([hidden]){
+ position:fixed!important;
+ left:auto!important;top:auto!important;right:24px!important;bottom:82px!important;
+ width:300px!important;max-width:calc(100vw - 32px)!important;
+ height:auto!important;max-height:calc(100vh - 110px)!important;
+ box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
+ flex:0 0 auto!important;gap:0!important;overflow:auto!important;
+ padding:10px!important;margin:0!important;
+ border:1px solid #d7e0e8!important;border-radius:13px!important;
+ background:#fff!important;box-shadow:0 12px 34px #172b3d30!important;
+ z-index:99999!important
+}
+#odooPosLayout #cartScreenKeyboard[hidden]{display:none!important}
+#odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:6px!important;width:100%!important
+}
+#odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+ width:100%!important;min-width:0!important;height:40px!important;min-height:40px!important;
+ padding:0!important;font-size:16px!important;box-sizing:border-box!important
+}
+#odooPosLayout #cartScreenKeyboard #cartKeyboardDisplay{
+ width:100%!important;height:40px!important;min-height:40px!important;
+ box-sizing:border-box!important
+}
+#odooPosLayout #cartScreenKeyboard .cart-key-apply{
+ width:100%!important;height:38px!important;min-height:38px!important
+}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-head{
+ cursor:move!important;user-select:none!important;touch-action:none!important
+}
+@media(max-width:700px){
+ #odooPosLayout #cartScreenKeyboard:not([hidden]){
+  right:12px!important;bottom:72px!important;width:280px!important;
+  max-width:calc(100vw - 24px)!important
+ }
+}
+
+</style>
 <script>
 window.__seamartRuntimeError = '';
 window.addEventListener('error', function(e) {
