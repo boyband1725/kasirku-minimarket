@@ -3,13 +3,22 @@
 alter table public.online_orders
   add column if not exists queue_number bigint;
 
-with numbered as (
-  select id, row_number() over (partition by store_id order by created_at, id) as rn
+-- Backfill missing/zero queue numbers without changing valid existing numbers.
+with store_max as (
+  select store_id, coalesce(max(queue_number) filter (where queue_number > 0),0) as max_no
   from public.online_orders
-  where queue_number is null
+  group by store_id
+),
+numbered as (
+  select o.id,
+         coalesce(m.max_no,0) +
+         row_number() over (partition by o.store_id order by o.created_at, o.id) as new_no
+  from public.online_orders o
+  left join store_max m on m.store_id = o.store_id
+  where coalesce(o.queue_number,0) <= 0
 )
 update public.online_orders o
-   set queue_number = n.rn
+   set queue_number = n.new_no
   from numbered n
  where o.id = n.id;
 
