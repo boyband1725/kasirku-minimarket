@@ -1495,7 +1495,44 @@ async function lookupInlineProductPhoto(){
 }
 function previewInlineProductPhoto(input){let file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/'))return alert('Pilih file gambar.');let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,500/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);window.pendingInlinePhoto=canvas.toDataURL('image/jpeg',0.76);document.getElementById('inline_photo_preview').innerHTML='<img src="'+window.pendingInlinePhoto+'" style="width:90px;height:90px;object-fit:cover;border-radius:9px>'};img.src=reader.result};reader.readAsDataURL(file)}
 function saveInlineProduct(){let id=window.selectedEditProductId,p=db.products.find(x=>x.id===id);if(!p)return alert('Pilih barang terlebih dahulu.');let nama=document.getElementById('if_nama').value.trim();if(!nama)return alert('Nama barang wajib diisi.');p.nama=nama;p.kode=document.getElementById('if_kode').value.trim();p.barcode=document.getElementById('if_barcode').value.trim();p.kategori=document.getElementById('if_kategori').value.trim()||'Umum';p.harga_beli=Number(document.getElementById('if_hb').value)||0;p.harga_jual_1=Number(document.getElementById('if_h1').value)||0;p.harga=p.harga_jual_1;p.harga_jual_2=Number(document.getElementById('if_h2').value)||0;p.harga_jual_3=Number(document.getElementById('if_h3').value)||0;p.stok=Number(document.getElementById('if_stok').value)||0;if(window.pendingInlinePhoto)p.foto=window.pendingInlinePhoto;save();window.pendingInlinePhoto=null;alert('Data barang tersimpan. Sinkronisasi cloud dimulai.');editProductsPage();syncOneProduct(p).catch(e=>alert('Belum tersinkron ke cloud: '+e.message))}
-function productModal(id){window.pendingProductPhoto=null;let p=db.products.find(x=>x.id===id)||{id:'p'+Date.now(),nama:'',kode:'',barcode:'',kategori:'Umum',harga:0,harga_beli:0,harga_jual_1:0,harga_jual_2:0,harga_jual_3:0,stok:0};document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>${id?'Edit':'Tambah'} Produk</h2><div class="formgrid"><label>Nama Produk<input id="f_nama" class="field" value="${esc(p.nama)}"></label><label>Kode Barang<input id="f_kode" class="field" value="${esc(p.kode)}"></label><label>Barcode<input id="f_barcode" class="field" value="${esc(p.barcode)}"></label><label>Kategori<input id="f_kategori" class="field" value="${esc(p.kategori)}"></label><label>Harga Beli<input id="f_harga_beli" type="number" class="field" value="${p.harga_beli||0}"></label><label>Harga Jual 1 (Kasir)<input id="f_harga" type="number" class="field" value="${p.harga_jual_1??p.harga??0}"></label><label>Harga Jual 2<input id="f_harga2" type="number" class="field" value="${p.harga_jual_2||0}"></label><label>Harga Jual 3<input id="f_harga3" type="number" class="field" value="${p.harga_jual_3||0}"></label><label>Stok<input id="f_stok" type="number" class="field" value="${p.stok}"></label></div><label style="display:block;margin-top:14px">Foto Produk <span class="emptyhint">(opsional, JPG/PNG)</span><input id="f_foto" type="file" accept="image/*" class="field" style="display:block;width:100%;margin-top:6px" onchange="previewProductPhoto(this)"></label><div id="foto_preview" style="margin-top:8px">${p.foto?'<img src="'+p.foto+'" style="width:88px;height:88px;object-fit:cover;border-radius:10px">':'<span class="emptyhint">Belum ada foto — ikon kelompok barang akan ditampilkan.</span>'}</div><button type="button" class="btn-light" style="margin-top:9px" onclick="lookupProductPhoto()">Cari Foto Otomatis dari Barcode</button><div id="foto_lookup_status" class="emptyhint" style="margin-top:6px">Mencari foto berdasarkan barcode produk.</div><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveProduct('${p.id}')">Simpan</button></div></div></div>`}
+function productModal(id){
+ window.pendingProductPhoto=null;window.productPhotoRemoved=false;
+ let p=db.products.find(x=>x.id===id)||{id:'p'+Date.now(),nama:'',kode:'',barcode:'',kategori:'Umum',harga:0,harga_beli:0,harga_jual_1:0,harga_jual_2:0,harga_jual_3:0,stok:0};
+ const photo=p.foto?'<img src="'+esc(p.foto)+'" alt="Foto '+esc(p.nama)+'">':'<div class="sm-product-no-photo"><span>▧</span><b>Belum ada foto</b><small>Tambahkan foto produk</small></div>';
+ document.getElementById('modalroot').innerHTML=`<div class="modalback sm-product-backdrop" onclick="if(event.target===this)closeModal()"><section class="modal sm-product-editor" role="dialog" aria-modal="true" aria-label="${id?'Edit':'Tambah'} Produk">
+  <header class="sm-product-heading"><div><span class="sm-product-eyebrow">SEAMART POS · MASTER BARANG</span><h2>${id?'Edit':'Tambah'} Produk</h2><p>Atur informasi, harga, stok, dan foto produk dalam satu form.</p></div><button type="button" class="sm-product-close" onclick="closeModal()" aria-label="Tutup">×</button></header>
+  <div class="sm-product-stats">
+   <div class="sm-product-stat"><span>Stok Tersedia</span><strong>${Number(p.stok||0).toLocaleString('id-ID')}</strong><small>Unit</small></div>
+   <div class="sm-product-stat"><span>Harga Jual 1</span><strong>${Number(p.harga_jual_1??p.harga??0).toLocaleString('id-ID')}</strong><small>Dipakai di Kasir</small></div>
+   <div class="sm-product-stat"><span>Harga Beli</span><strong>${Number(p.harga_beli||0).toLocaleString('id-ID')}</strong><small>Modal Barang</small></div>
+   <div class="sm-product-stat status"><span>Status Produk</span><strong>${p.aktif===false?'Nonaktif':'Aktif'}</strong><small>Visibilitas Barang</small></div>
+  </div>
+  <div class="sm-product-name"><label for="f_nama">Nama Produk</label><input id="f_nama" class="field" value="${esc(p.nama)}" placeholder="Masukkan nama produk"></div>
+  <nav class="sm-product-tabs" aria-label="Bagian produk"><span class="active">Informasi Umum</span><span>Penjualan</span><span>Inventory</span></nav>
+  <div class="sm-product-body">
+   <section class="sm-product-info"><h3><i></i>Informasi Produk</h3>
+    <div class="sm-product-fields">
+     <label>Kode Barang<input id="f_kode" class="field" value="${esc(p.kode)}"></label>
+     <label>Barcode<input id="f_barcode" class="field" value="${esc(p.barcode)}"></label>
+     <label>Kelompok Barang<input id="f_kategori" class="field" value="${esc(p.kategori)}"></label>
+     <label>Harga Beli<input id="f_harga_beli" type="number" min="0" class="field" value="${p.harga_beli||0}"></label>
+     <label>Harga Jual 1 · Kasir<input id="f_harga" type="number" min="0" class="field" value="${p.harga_jual_1??p.harga??0}"></label>
+     <label>Harga Jual 2<input id="f_harga2" type="number" min="0" class="field" value="${p.harga_jual_2||0}"></label>
+     <label>Harga Jual 3<input id="f_harga3" type="number" min="0" class="field" value="${p.harga_jual_3||0}"></label>
+     <label>Stok<input id="f_stok" type="number" min="0" class="field" value="${p.stok}"></label>
+    </div>
+   </section>
+   <aside class="sm-product-photo"><h3>Foto Produk</h3><div id="foto_preview" class="sm-product-photo-preview">${photo}</div>
+    <label class="sm-product-upload">＋ Pilih Foto Produk<input id="f_foto" type="file" accept="image/*" onchange="previewProductPhoto(this)"></label>
+    <button type="button" class="btn-light sm-product-photo-action" onclick="lookupProductPhoto()">▥ Cari Foto Otomatis dari Barcode</button>
+    <button type="button" class="btn-danger sm-product-photo-action" onclick="removeProductPhoto()">Hapus Foto Produk</button>
+    <div id="foto_lookup_status" class="emptyhint">Foto akan dicari berdasarkan barcode dan nama produk.</div>
+   </aside>
+  </div>
+  <footer class="sm-product-footer"><button class="btn-light" type="button" onclick="closeModal()">Batal</button><button class="btn-primary" type="button" onclick="saveProduct('${p.id}')">Simpan Perubahan</button></footer>
+ </section></div>`;
+}
+function removeProductPhoto(){window.pendingProductPhoto=null;window.productPhotoRemoved=true;const preview=document.getElementById('foto_preview');if(preview)preview.innerHTML='<div class="sm-product-no-photo"><span>▧</span><b>Foto akan dihapus</b><small>Simpan perubahan untuk menerapkan</small></div>';const status=document.getElementById('foto_lookup_status');if(status)status.textContent='Foto akan dihapus setelah Anda menekan Simpan Perubahan.'}
 function previewProductPhoto(input){let file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/'))return alert('Pilih file gambar.');let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,500/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);window.pendingProductPhoto=canvas.toDataURL('image/jpeg',0.76);document.getElementById('foto_preview').innerHTML='<img src="'+window.pendingProductPhoto+'" style="width:88px;height:88px;object-fit:cover;border-radius:10px">'};img.src=reader.result};reader.readAsDataURL(file)}
 
 async function lookupProductPhoto(){
@@ -1533,7 +1570,7 @@ async function lookupProductPhoto(){
   if(status)status.textContent='Foto lolos pemeriksaan ('+chosen.check.width+'×'+chosen.check.height+'). Pastikan gambar benar sebelum Simpan.';
  }catch(err){window.pendingProductPhoto=null;if(status)status.textContent=err.message||'Foto tidak cocok. Silakan unggah foto sendiri.'}
 }
-function saveProduct(id){let nama=document.getElementById('f_nama').value.trim();if(!nama)return alert('Nama produk wajib diisi.');let h1=Number(document.getElementById('f_harga').value);let p={id,nama,kode:document.getElementById('f_kode').value.trim(),barcode:document.getElementById('f_barcode').value.trim(),kategori:document.getElementById('f_kategori').value.trim()||'Umum',harga:h1,harga_beli:Number(document.getElementById('f_harga_beli').value),harga_jual_1:h1,harga_jual_2:Number(document.getElementById('f_harga2').value),harga_jual_3:Number(document.getElementById('f_harga3').value),stok:Number(document.getElementById('f_stok').value),foto:window.pendingProductPhoto||db.products.find(x=>x.id===id)?.foto||''};window.pendingProductPhoto=null;let i=db.products.findIndex(x=>x.id===id);if(i<0)db.products.push(p);else db.products[i]=p;save();closeModal();products();syncOneProduct(p).catch(e=>alert('Barang tersimpan di perangkat, tetapi belum tersinkron ke cloud: '+e.message))}
+function saveProduct(id){let nama=document.getElementById('f_nama').value.trim();if(!nama)return alert('Nama produk wajib diisi.');let h1=Number(document.getElementById('f_harga').value);let p={id,nama,kode:document.getElementById('f_kode').value.trim(),barcode:document.getElementById('f_barcode').value.trim(),kategori:document.getElementById('f_kategori').value.trim()||'Umum',harga:h1,harga_beli:Number(document.getElementById('f_harga_beli').value),harga_jual_1:h1,harga_jual_2:Number(document.getElementById('f_harga2').value),harga_jual_3:Number(document.getElementById('f_harga3').value),stok:Number(document.getElementById('f_stok').value),foto:window.productPhotoRemoved?'':(window.pendingProductPhoto||db.products.find(x=>x.id===id)?.foto||'')};window.pendingProductPhoto=null;let i=db.products.findIndex(x=>x.id===id);if(i<0)db.products.push(p);else db.products[i]=p;save();closeModal();products();syncOneProduct(p).catch(e=>alert('Barang tersimpan di perangkat, tetapi belum tersinkron ke cloud: '+e.message))}
 function closeModal(){document.getElementById('modalroot').innerHTML=''}
 function parseCSV(text){let rows=[],row=[],v='',q=false;for(let i=0;i<text.length;i++){let c=text[i];if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){row.push(v);v=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v=''}else v+=c}row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows}
 document.getElementById('csvfile').onchange=async e=>{let f=e.target.files[0];if(!f)return;let csvText=(await f.text()).replace(/^\\uFEFF/,''),rows=parseCSV(csvText),head=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\\uFEFF/,'')),idx=(...names)=>head.findIndex(h=>names.includes(h));let ni=idx('nama','name','nama_barang'),bi=idx('barcode'),hi=idx('harga','price','harga_jual_1'),hbi=idx('harga_beli'),h2i=idx('harga_jual_2'),h3i=idx('harga_jual_3'),si=idx('stok','stock'),ki=idx('kode','kode_barang','sku'),ci=idx('kategori','category','kelompok_barang');if(ni<0){alert('Kolom nama_barang/nama tidak ditemukan.');return}let added=0;rows.forEach(r=>{let barcode=(r[bi]||'').trim(),kode=(r[ki]||'').trim(),old=db.products.find(p=>(kode&&p.kode===kode)||(barcode&&p.barcode===barcode));let num=i=>i<0?0:Number((r[i]||'0').replace(/[^\d.-]/g,''))||0;let h1=num(hi);if(h1<=0&&h2i>=0&&num(h2i)>0&&hi<0)h1=num(h2i);let p={id:old?.id||'csv'+Date.now()+Math.random(),nama:r[ni]||'',barcode:old?.barcode||barcode,kode:old?.kode||kode,harga:h1,harga_beli:num(hbi),harga_jual_1:h1,harga_jual_2:num(h2i),harga_jual_3:num(h3i),stok:num(si),kategori:r[ci]||old?.kategori||'Umum'};if(old)Object.assign(old,p);else db.products.push(p);added++});save();e.target.value='';alert(added+' baris produk diimpor. Sinkronisasi cloud dimulai.');products();syncAllProducts().catch(e=>alert('Impor tersimpan di perangkat, tetapi sinkronisasi cloud gagal: '+e.message))}
@@ -1812,6 +1849,57 @@ function printStockReport(){const rows=getStockRows(),start=document.getElementB
  #loginroot .login-layout>.login-showcase{padding-top:18px!important;padding-bottom:38px!important}
  #loginroot .login-layout>.login-showcase h1{margin-bottom:18px!important}
  #loginroot .login-layout>.seamart-login-form{padding-top:22px!important;padding-bottom:22px!important}
+}
+
+/* SeaMart product editor — aligned desktop columns and safe mobile layout */
+.sm-product-backdrop{z-index:2147483000!important;padding:clamp(8px,2.5vw,24px)!important;overflow-y:auto!important;align-items:center!important}
+.sm-product-editor{width:min(980px,100%)!important;max-width:980px!important;max-height:calc(100dvh - 32px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:22px!important;border:1px solid #e4eee8!important;border-radius:18px!important}
+.sm-product-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
+.sm-product-heading h2{margin:3px 0 5px!important;font-size:22px!important;color:#153b29}
+.sm-product-heading p{margin:0;color:#748078;font-size:12px}
+.sm-product-eyebrow{font-size:10px;font-weight:800;letter-spacing:1.1px;color:#16834b}
+.sm-product-close{width:36px;height:36px;padding:0;border:1px solid #e1e9e4;background:#fff;color:#526158;font-size:24px;line-height:1}
+.sm-product-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.sm-product-stat{min-width:0;padding:12px 14px;background:#eff9f1;border:1px solid #dcefe1;border-radius:11px}
+.sm-product-stat span,.sm-product-stat small{display:block;color:#617268;font-size:11px}
+.sm-product-stat strong{display:block;margin:4px 0;font-size:22px;line-height:1.15;color:#075b2e;overflow-wrap:anywhere}
+.sm-product-stat.status{background:#fff8e7;border-color:#f4e8bf}.sm-product-stat.status strong{color:#8a6412}
+.sm-product-name{margin-bottom:14px}.sm-product-name label{display:block;margin:0 0 6px;font-weight:800;color:#293b31}
+.sm-product-name input{width:100%;min-width:0;height:50px;font-size:20px;font-weight:800}
+.sm-product-tabs{display:flex;gap:24px;align-items:center;overflow-x:auto;border-bottom:1px solid #dce6df;margin-bottom:16px;white-space:nowrap}
+.sm-product-tabs span{padding:11px 4px;color:#65736a;font-size:13px;font-weight:700}
+.sm-product-tabs span.active{color:#087b43;border-bottom:3px solid #0b9a4b}
+.sm-product-body{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.9fr);gap:14px;align-items:stretch}
+.sm-product-info,.sm-product-photo{min-width:0;padding:15px;border:1px solid #dfe8e2;border-radius:12px;background:#fff}
+.sm-product-info h3,.sm-product-photo h3{display:flex;align-items:center;gap:9px;margin:0 0 14px;font-size:15px;color:#20382a}
+.sm-product-info h3 i{width:7px;height:24px;border-radius:5px;background:#16a34a}
+.sm-product-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
+.sm-product-fields label{display:block;min-width:0;font-size:12px;font-weight:700;color:#56645b}
+.sm-product-fields .field{display:block;width:100%;min-width:0;margin-top:6px;height:43px}
+.sm-product-photo-preview{height:220px;display:grid;place-items:center;overflow:hidden;border:1px dashed #cbd9cf;border-radius:10px;background:#f8faf9}
+.sm-product-photo-preview>img{width:100%;height:100%;object-fit:contain;background:#fff}
+.sm-product-no-photo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#59665e;text-align:center}
+.sm-product-no-photo span{font-size:42px;color:#83948a}.sm-product-no-photo small{font-size:11px;color:#8a958e}
+.sm-product-upload{position:relative;display:flex;justify-content:center;align-items:center;min-height:42px;margin-top:10px;border:1px solid #16834b;border-radius:9px;color:#087b43;font-weight:800;cursor:pointer;overflow:hidden}
+.sm-product-upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.sm-product-photo-action{display:block;width:100%;margin-top:8px;min-height:40px}
+.sm-product-photo .btn-danger{background:#fff4f3;color:#bd342c;border:1px solid #f3d2cf}
+.sm-product-photo .emptyhint{display:block;margin-top:9px;line-height:1.45}
+.sm-product-footer{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;padding-top:14px;border-top:1px solid #e8eee9}
+.sm-product-footer button{min-height:42px}
+@media(max-width:700px){
+ .sm-product-backdrop{padding:8px!important;align-items:flex-start!important}
+ .sm-product-editor{width:100%!important;max-height:calc(100dvh - 16px)!important;padding:14px!important;border-radius:14px!important}
+ .sm-product-heading h2{font-size:19px!important}.sm-product-heading p{font-size:11px}
+ .sm-product-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .sm-product-stat{padding:9px 10px}.sm-product-stat strong{font-size:19px}
+ .sm-product-name input{font-size:17px;height:46px}
+ .sm-product-tabs{gap:18px;margin-bottom:12px}
+ .sm-product-body{grid-template-columns:minmax(0,1fr);gap:10px}
+ .sm-product-fields{grid-template-columns:minmax(0,1fr);gap:10px}
+ .sm-product-photo-preview{height:170px}
+ .sm-product-footer{position:sticky;bottom:-14px;background:#fff;padding:12px 0 2px;z-index:2}
+ .sm-product-footer button{flex:1}
 }
 </style></head><body><h2>SEAMART — POSISI DAN MUTASI STOK BARANG</h2><p>Periode: ${start} – ${end}</p><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kelompok</th><th>Awal Qty</th><th>Awal Nilai</th><th>Masuk Qty</th><th>Masuk Nilai</th><th>Keluar Qty</th><th>Keluar Nilai</th><th>Akhir Qty</th><th>Nilai Persediaan</th></tr></thead><tbody>${cells}</tbody></table><script>window.print()<\\/script></body></html>`);w.document.close()}
 function moveModal(){let opts=db.products.map(p=>`<option value="${p.id}">${esc(p.nama)}</option>`).join('');document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>Catat Mutasi Stok</h2><label>Produk<select id="m_prod" class="field" style="width:100%;margin:6px 0 12px">${opts}</select></label><label>Jenis<select id="m_type" class="field" style="width:100%;margin:6px 0 12px"><option>Masuk / Pembelian</option><option>Keluar / Mutasi Cabang</option><option>Penyesuaian Stok</option></select></label><label>Jumlah<input id="m_qty" type="number" min="1" class="field" style="width:100%;margin:6px 0 12px"></label><label>Keterangan<input id="m_note" class="field" style="width:100%;margin:6px 0"></label><div class="actions"><button class="btn-light" onclick="closeModal()">Batal</button><button class="btn-primary" onclick="saveMove()">Simpan Mutasi</button></div></div></div>`}
