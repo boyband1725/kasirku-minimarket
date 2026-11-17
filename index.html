@@ -5794,7 +5794,7 @@ async function syncOneProduct(p,categoryCache=new Map()){
   const result=await sb.from('products').update({code:row.code,barcode:row.barcode,name:row.name,category_id:row.category_id,price:row.price,price_2:row.price_2,price_3:row.price_3,stock:row.stock,active:row.active,image_url:row.image_url,purchase_price:row.purchase_price,purchase_vat_rate:row.purchase_vat_rate,sales_vat_rate:row.sales_vat_rate,margin_1:row.margin_1,margin_2:row.margin_2,margin_3:row.margin_3,sale_base_1:row.sale_base_1,sale_base_2:row.sale_base_2,sale_base_3:row.sale_base_3}).eq('id',existing.id).eq('store_id',store).select('id,price,price_2,price_3').maybeSingle();
   if(result.error)throw result.error;
   if(!result.data)throw new Error('Cloud tidak mengonfirmasi perubahan barang. Periksa izin UPDATE/RLS tabel products; data lokal tidak dianggap tersinkron.');
-  if(Number(result.data.price_2)!==row.price_2||Number(result.data.price_3)!==row.price_3)throw new Error('Verifikasi cloud gagal: Harga Jual 2/3 yang tersimpan tidak sama dengan nilai yang dikirim.');
+  if(Number(result.data.price)!==row.price)throw new Error('Verifikasi cloud gagal: Harga Jual 1 yang tersimpan ('+Number(result.data.price||0)+') berbeda dari nilai yang dikirim ('+row.price+'). Perubahan tidak dianggap tersinkron.');if(Number(result.data.price_2)!==row.price_2||Number(result.data.price_3)!==row.price_3)throw new Error('Verifikasi cloud gagal: Harga Jual 2/3 yang tersimpan tidak sama dengan nilai yang dikirim.');
   p.id=existing.id;
  }else{
   const byId=await sb.from('products').select('id,image_url').eq('id',row.id).eq('store_id',store).maybeSingle();
@@ -5803,7 +5803,7 @@ async function syncOneProduct(p,categoryCache=new Map()){
   const result=await sb.from('products').upsert(row,{onConflict:'id'}).select('id,price,price_2,price_3').maybeSingle();
   if(result.error)throw result.error;
   if(!result.data)throw new Error('Cloud tidak mengonfirmasi penyimpanan barang baru.');
-  if(Number(result.data.price_2)!==row.price_2||Number(result.data.price_3)!==row.price_3)throw new Error('Verifikasi cloud gagal: Harga Jual 2/3 belum tersimpan sesuai nilai yang dikirim.');
+  if(Number(result.data.price)!==row.price)throw new Error('Verifikasi cloud gagal: Harga Jual 1 yang tersimpan ('+Number(result.data.price||0)+') berbeda dari nilai yang dikirim ('+row.price+'). Perubahan tidak dianggap tersinkron.');if(Number(result.data.price_2)!==row.price_2||Number(result.data.price_3)!==row.price_3)throw new Error('Verifikasi cloud gagal: Harga Jual 2/3 belum tersimpan sesuai nilai yang dikirim.');
  }
 }
 async function syncPcMasterToCloud(){
