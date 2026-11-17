@@ -9709,4 +9709,53 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
  color:#20382a!important;font-weight:900!important;
 }
 </style>
+
+<style id="seamart-cart-no-overlap-final">
+/* Final cart structure: product list scrolls in its own area; totals and keypad stay in normal flow. */
+@media (min-width:901px){
+ html body #view #odooPosLayout > #odooOrderPanel{
+  display:flex!important;flex-direction:column!important;
+  height:100%!important;min-height:0!important;max-height:100%!important;
+  overflow:hidden!important;box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-head{
+  display:flex!important;flex:0 0 48px!important;height:48px!important;min-height:48px!important;
+  position:relative!important;inset:auto!important;box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  gap:6px!important;padding:8px 10px!important;overflow:hidden!important;
+  box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body > #cartlines{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;
+  margin:0!important;padding:0 2px!important;overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior:contain!important;box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body > .totalrow{
+  display:flex!important;position:relative!important;flex:0 0 23px!important;flex-shrink:0!important;
+  width:100%!important;height:23px!important;min-height:23px!important;max-height:23px!important;
+  margin:0!important;padding:2px 4px!important;box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body > .totalrow.grand{
+  flex-basis:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body > #cartScreenKeyboard{
+  display:flex!important;position:relative!important;inset:auto!important;float:none!important;
+  flex:0 0 auto!important;flex-shrink:0!important;align-self:stretch!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:auto!important;min-height:0!important;max-height:52vh!important;
+  margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+  transform:none!important;box-sizing:border-box!important;z-index:1!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel > .odoo-order-body > #cartScreenKeyboard > *{
+  flex-shrink:0!important;position:relative!important;inset:auto!important;transform:none!important
+ }
+ html body #view #odooPosLayout > #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+  flex-shrink:0!important
+ }
+}
+</style>
 </body></html>
