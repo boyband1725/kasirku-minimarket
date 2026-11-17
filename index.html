@@ -4294,6 +4294,13 @@ body:not(.seamart-pos-fullscreen) #ptable>.tablewrap{overflow:auto!important}
 @media(min-width:701px){
  body:not(.seamart-pos-fullscreen) .content{padding-bottom:32px!important}
 }
+
+/* Robust mouse drag for payment modal: drag from any blank/dialog surface */
+#modalroot .modal.sm-payment-modal{cursor:grab!important}
+#modalroot .modal.sm-payment-modal:active{cursor:grabbing!important}
+#modalroot .modal.sm-payment-modal button,#modalroot .modal.sm-payment-modal input{cursor:auto!important}
+#modalroot .modal.sm-payment-modal .sm-payment-drag-handle{cursor:grab!important;min-height:38px!important}
+#modalroot .modal.sm-payment-modal.sm-payment-dragging{transition:none!important;user-select:none!important}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -5468,10 +5475,10 @@ document.addEventListener('keydown',function(e){
   if(window.confirm(message))page('dashboard');
   return;
  }
+ if(e.key==='F4'){e.preventDefault();if(!modal)checkout();return;}
  if(modal)return;
  if(e.key==='F2'){e.preventDefault();document.getElementById('possearch')?.focus();return}
  if(e.key==='F3'){e.preventDefault();document.getElementById('posbarcode')?.focus();return}
- if(e.key==='F4'){e.preventDefault();document.getElementById('paymethod')?.focus();return}
  if(e.key==='F5'){e.preventDefault();renderPosProducts();return}
  if(e.key==='F9'){e.preventDefault();if(cart.length&&window.confirm('Lanjutkan proses pembayaran sekarang?'))checkout();return}
  if(e.key==='F10'){e.preventDefault();const last=db.sales[db.sales.length-1];if(last)printReceipt(last.id);else alert('Belum ada transaksi untuk dicetak.');return}
@@ -6251,8 +6258,8 @@ function checkout(){
  if(!cart.length)return alert('Keranjang masih kosong.');
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const current=window.posPaymentMode||document.getElementById('paymethod')?.value||'Tunai';
- document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal sm-payment-modal">
- <div class="sm-payment-drag-handle" onpointerdown="startPaymentModalDrag(event)" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
+ document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal sm-payment-modal" onpointerdown="startPaymentModalDrag(event)">
+ <div class="sm-payment-drag-handle" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
  <h2 style="text-align:center;margin:15px 0 5px">Pilih Metode Pembayaran</h2>
  <div class="sm-payment-options">
  <button type="button" id="chooseCash" class="sm-payment-option ${current==='Tunai'?'active':''}" onclick="selectPaymentMethod('Tunai')"><span>💵</span><b>Tunai</b><small>Uang cash</small></button>
@@ -6280,13 +6287,14 @@ function selectPaymentMethod(method){
 let smPaymentDragState=null;
 function startPaymentModalDrag(event){
  const dialog=document.querySelector('#modalroot .sm-payment-modal');
- if(!dialog||event.button!==0||event.target.closest('button'))return;
+ if(!dialog||event.button!==0||event.target.closest('button,input,select,textarea,a'))return;
  const rect=dialog.getBoundingClientRect();
- smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,moved:false};
+ smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,pointerId:event.pointerId};
  dialog.classList.add('sm-payment-dragging');
  dialog.style.position='fixed';dialog.style.margin='0';dialog.style.left=rect.left+'px';dialog.style.top=rect.top+'px';dialog.style.transform='none';
- document.addEventListener('pointermove',movePaymentModalDrag);
+ document.addEventListener('pointermove',movePaymentModalDrag,{passive:false});
  document.addEventListener('pointerup',endPaymentModalDrag,{once:true});
+ document.addEventListener('pointercancel',endPaymentModalDrag,{once:true});
  event.preventDefault();
 }
 function movePaymentModalDrag(event){
@@ -6295,11 +6303,12 @@ function movePaymentModalDrag(event){
  const maxLeft=Math.max(0,window.innerWidth-d.dialog.offsetWidth),maxTop=Math.max(0,window.innerHeight-d.dialog.offsetHeight);
  d.dialog.style.left=Math.max(0,Math.min(maxLeft,d.left+dx))+'px';
  d.dialog.style.top=Math.max(0,Math.min(maxTop,d.top+dy))+'px';
- d.moved=true;
+ event.preventDefault();
 }
 function endPaymentModalDrag(){
- if(smPaymentDragState){smPaymentDragState.dialog.classList.remove('sm-payment-dragging');}
+ if(smPaymentDragState)smPaymentDragState.dialog.classList.remove('sm-payment-dragging');
  smPaymentDragState=null;document.removeEventListener('pointermove',movePaymentModalDrag);
+ document.removeEventListener('pointercancel',endPaymentModalDrag);
 }
 
 function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
