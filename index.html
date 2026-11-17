@@ -8177,6 +8177,8 @@ restoreSeaMartSession();
 /* DESKTOP POS CLEAN REBUILD: stable two-panel layout and one payment action row */
 @media(min-width:901px){
  body:has(#odooPosLayout) .app{display:flex!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+ body:has(#odooPosLayout) .main{display:flex!important;flex:1 1 0!important;flex-direction:column!important;min-width:0!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+ body:has(#odooPosLayout) .main>.topbar{flex:0 0 64px!important;height:64px!important;min-height:64px!important}
  body:has(#odooPosLayout) .sidebar{flex:0 0 210px!important;width:210px!important}
  body:has(#odooPosLayout) .main{flex:1 1 0!important;width:calc(100% - 210px)!important;min-width:0!important}
  body:has(#odooPosLayout) .content{padding:8px 10px!important;width:100%!important;max-width:none!important;margin:0!important;box-sizing:border-box!important}
