@@ -8869,6 +8869,22 @@ restoreSeaMartSession();
 }
 #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{width:100%!important;min-width:0!important;margin:0!important}
 #odooPosLayout #cartScreenKeyboard .cart-change-card{margin-top:12px!important;margin-bottom:10px!important;min-height:42px!important;height:42px!important}
+
+/* FINAL OVERRIDE: ukuran tombol BAYAR harus setengah lebar panel, tidak ditimpa rule lama */
+#view #odooPosLayout #odooOrderPanel #checkoutBtn{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 50%!important;
+ width:50%!important;
+ min-width:0!important;
+ max-width:50%!important;
+ height:40px!important;
+ min-height:40px!important;
+ max-height:40px!important;
+ margin:7px auto 2px!important;
+ box-sizing:border-box!important;
+}
 </style>
 <script>
 (function(){
