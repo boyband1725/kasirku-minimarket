@@ -6385,6 +6385,24 @@ function endPaymentModalDrag(event){
  document.removeEventListener('pointercancel',endPaymentModalDrag,true);
 }
 function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
+
+// Keyboard fisik PC: aktif hanya ketika overlay pembayaran sedang terbuka.
+document.addEventListener('keydown',function(event){
+ const modal=document.querySelector('#modalroot .sm-payment-modal');
+ if(!modal)return;
+ const input=modal.querySelector('#smCashReceived');
+ if(!input||input.disabled||window.smSelectedPayment==='QRIS')return;
+ const code=event.code||'';
+ let key=null;
+ if(/^Numpad[0-9]$/.test(code))key=code.slice(-1);
+ else if(code==='NumpadEnter')key='enter';
+ else if(code==='Backspace')key='back';
+ else if(code==='Delete')key='clear';
+ if(key===null)return;
+ event.preventDefault();
+ event.stopPropagation();
+ paymentModalKey(key);
+},true);
 function updatePaymentModalChange(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const paid=Number(document.getElementById('smCashReceived')?.value||0);
