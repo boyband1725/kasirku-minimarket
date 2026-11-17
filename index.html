@@ -8988,6 +8988,37 @@ restoreSeaMartSession();
   box-sizing:border-box!important;
  }
 }
+
+/* Empty cart should collapse; reserve five rows only after products are added */
+@media(min-width:1101px){
+ #view #odooPosLayout #odooOrderPanel .odoo-order-lines:has(.empty){
+  flex:0 0 64px!important;
+  height:64px!important;
+  min-height:64px!important;
+  max-height:64px!important;
+  overflow:hidden!important;
+ }
+ #view #odooPosLayout #odooOrderPanel .odoo-order-lines:not(:has(.empty)){
+  flex:0 0 270px!important;
+  height:270px!important;
+  min-height:270px!important;
+  max-height:270px!important;
+  overflow-y:auto!important;
+ }
+}
+@media(max-width:1100px){
+ #view #odooPosLayout #odooOrderPanel .odoo-order-lines:has(.empty){
+  min-height:58px!important;
+  max-height:58px!important;
+  height:58px!important;
+  overflow:hidden!important;
+ }
+ #view #odooPosLayout #odooOrderPanel .odoo-order-lines:not(:has(.empty)){
+  min-height:230px!important;
+  max-height:230px!important;
+  overflow-y:auto!important;
+ }
+}
 </style>
 <script>
 (function(){
