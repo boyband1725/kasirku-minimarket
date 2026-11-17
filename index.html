@@ -4031,6 +4031,38 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{height:33px!important;min-height:33px!important;max-height:33px!important}
 }
 
+
+/* NUMPAD GRID TIGHTENING: remove excessive gaps and make keys fill each cell */
+@media (min-width:901px){
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard{
+  gap:3px!important;padding:5px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(4,40px)!important;grid-auto-rows:40px!important;
+  gap:2px!important;row-gap:2px!important;column-gap:2px!important;
+  width:100%!important;margin:0!important;padding:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:40px!important;min-height:40px!important;max-height:40px!important;
+  min-width:0!important;margin:0!important;padding:0!important;
+  box-sizing:border-box!important;border-radius:7px!important;
+  font-size:18px!important;line-height:1!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-key-mode{gap:3px!important;margin:0!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-key-mode button{margin:0!important}
+}
+@media (min-width:901px) and (max-height:800px){
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+  grid-template-rows:repeat(4,34px)!important;grid-auto-rows:34px!important;
+  gap:2px!important;row-gap:2px!important;column-gap:2px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+  height:34px!important;min-height:34px!important;max-height:34px!important
+ }
+}
+
 </style>
 <script>
 window.__seamartRuntimeError = '';
