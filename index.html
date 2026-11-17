@@ -4872,6 +4872,61 @@ window.addEventListener('error', function(e) {
   }
 }
 </style>
+
+<style id="seamart-final-change-bayar-alignment">
+/* FINAL: KEMBALIAN and BAYAR share identical centered width and alignment */
+#view #odooPosLayout #odooOrderPanel .odoo-order-body #cartScreenKeyboard .cart-change-card,
+#view #odooPosLayout #odooOrderPanel .odoo-order-body #cartScreenKeyboard > .cart-change-card{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ box-sizing:border-box!important;
+ width:50%!important;
+ min-width:50%!important;
+ max-width:50%!important;
+ height:36px!important;
+ min-height:36px!important;
+ max-height:36px!important;
+ margin:6px auto 0!important;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ padding:4px 9px!important;
+ position:relative!important;
+ inset-inline:auto!important;
+ left:auto!important;
+ right:auto!important;
+ transform:none!important;
+ align-self:center!important;
+ float:none!important;
+}
+#view #odooPosLayout #odooOrderPanel .odoo-order-body #cartScreenKeyboard .cart-change-card span{
+ font-size:10px!important;line-height:1!important;white-space:nowrap!important;
+}
+#view #odooPosLayout #odooOrderPanel .odoo-order-body #cartScreenKeyboard .cart-change-card b{
+ font-size:13px!important;line-height:1!important;white-space:nowrap!important;text-align:right!important;
+}
+#view #odooPosLayout #odooOrderPanel .odoo-order-body > #checkoutBtn{
+ display:flex!important;
+ box-sizing:border-box!important;
+ width:50%!important;
+ min-width:50%!important;
+ max-width:50%!important;
+ height:42px!important;
+ min-height:42px!important;
+ max-height:42px!important;
+ margin:6px auto 0!important;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ align-self:center!important;
+ float:none!important;
+ position:relative!important;
+ inset-inline:auto!important;
+ left:auto!important;
+ right:auto!important;
+ transform:none!important;
+}
+</style>
 </head>
 <body>
 <div class="app">
