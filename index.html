@@ -8361,11 +8361,19 @@ restoreSeaMartSession();
   align-items:center!important;box-sizing:border-box!important
  }
  body:has(#odooPosLayout) #odooPosLayout .odoo-order-body{
-  display:flex!important;flex:1 1 0!important;flex-direction:column!important;align-items:stretch!important;
+  display:grid!important;flex:1 1 0!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(50px,1fr) 23px 34px auto 44px!important;
+  align-items:stretch!important;align-content:stretch!important;
   width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
   max-height:none!important;gap:5px!important;padding:8px 10px!important;
   overflow:hidden!important;box-sizing:border-box!important
  }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>#cartlines{grid-row:1!important;min-height:50px!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>.totalrow:not(.grand){grid-row:2!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>.totalrow.grand{grid-row:3!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>#cartScreenKeyboard{grid-row:4!important;min-height:0!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>#checkoutBtn{grid-row:5!important;align-self:stretch!important}
  /* The cart list owns all remaining space, including when the cart is empty. */
  body:has(#odooPosLayout) #odooPosLayout #cartlines.odoo-order-lines,
  body:has(#odooPosLayout) #odooPosLayout #cartlines.odoo-order-lines:has(.empty){
