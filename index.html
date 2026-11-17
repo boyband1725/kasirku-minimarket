@@ -5547,7 +5547,7 @@ async function refreshSeaMartCloudSales(){
  db.products=mergeNovemberMaster(officialMaster,db.products,remote.data||[]);
  save();localStorage.setItem('seamart_master_source_v1','local');
  updateSeaMartSyncProgress(100,'Master resmi 138 barang ditampilkan. Barang cloud di luar master tidak ditarik atau disinkronkan otomatis. Gunakan tombol sinkronisasi manual bila diperlukan.',{total:138,added:0,skipped:138,failed:0,finished:true});
- try{await refreshSeaMartCloudStock();}catch(e){console.warn('Stok cloud awal belum berhasil dimuat:',e.message||e);}
+ try{await refreshSeaMartNow();}catch(e){console.warn('Sinkronisasi master cloud awal belum berhasil:',e.message||e);}
  startSeaMartStockRealtime();
  currentUser={username:user.email||user.id,nama:user.user_metadata?.name||user.email||'Pengguna SeaMart',role:member.data.role==='owner'?'admin':'kasir'};
  const app=document.querySelector('.app');if(app)app.style.display='';
