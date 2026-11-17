@@ -4972,6 +4972,102 @@ window.addEventListener('error', function(e) {
  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>.cart-change-card #posCashChange{font-size:17px!important}
 }
 </style>
+
+<style id="seamart-pos-fullscreen-fit-final">
+/* Desktop POS: fit the available browser viewport; keep mobile layout rules intact */
+@media (min-width:1101px){
+ html,body{min-height:100%!important}
+ body:has(#odooPosLayout){overflow:hidden!important}
+ .app:has(#odooPosLayout){height:100dvh!important;min-height:0!important;overflow:hidden!important}
+ .app:has(#odooPosLayout)>.main{height:100dvh!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+ .app:has(#odooPosLayout)>.main>.topbar{flex:0 0 64px!important}
+ .app:has(#odooPosLayout)>.main>.content{
+  flex:1 1 auto!important;min-height:0!important;height:auto!important;
+  width:100%!important;max-width:none!important;margin:0!important;
+  padding:10px 14px 12px!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;
+ }
+ .app:has(#odooPosLayout) #view{
+  flex:1 1 auto!important;min-height:0!important;width:100%!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+ }
+ #view:has(#odooPosLayout) .odoo-pos-head{
+  flex:0 0 auto!important;min-height:48px!important;
+  margin:0 0 9px!important;gap:10px!important;
+ }
+ #view:has(#odooPosLayout) .odoo-pos-head h1{font-size:clamp(19px,1.6vw,25px)!important}
+ #view:has(#odooPosLayout) #odooPosLayout{
+  flex:1 1 auto!important;min-height:0!important;width:100%!important;height:auto!important;
+  display:grid!important;grid-template-columns:minmax(0,7fr) minmax(350px,3fr)!important;
+  grid-template-rows:auto minmax(0,1fr)!important;gap:10px!important;align-items:stretch!important;
+ }
+ #view:has(#odooPosLayout) #odooCategoryPanel{
+  grid-column:1!important;grid-row:1!important;min-width:0!important;
+  max-height:54px!important;min-height:42px!important;padding:6px 10px!important;
+  overflow:hidden!important;position:relative!important;top:auto!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout.categories-hidden #odooCategoryPanel{min-height:38px!important;max-height:42px!important}
+ #view:has(#odooPosLayout) #odooPosLayout #poscategories{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-catalog-panel{
+  grid-column:1!important;grid-row:2!important;min-width:0!important;min-height:0!important;
+  height:100%!important;padding:10px!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top{flex:0 0 auto!important;margin-bottom:8px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-products{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+  align-content:stretch!important;grid-auto-rows:minmax(0,1fr)!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-product{
+  min-height:0!important;height:100%!important;display:flex!important;flex-direction:column!important;
+  justify-content:flex-start!important;padding:8px!important;overflow:hidden!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-product-image{
+  height:clamp(54px,10vh,105px)!important;flex:0 0 auto!important;margin-bottom:6px!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-product-name{min-height:30px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-product-price{margin-top:auto!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-panel{
+  grid-column:2!important;grid-row:1 / span 2!important;
+  position:relative!important;top:auto!important;right:auto!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  overflow:hidden!important;display:flex!important;flex-direction:column!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-head{flex:0 0 auto!important;padding:10px 12px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-body{
+  flex:1 1 auto!important;min-height:0!important;height:auto!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:8px 10px!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-lines{
+  flex:1 1 auto!important;min-height:36px!important;max-height:none!important;
+  overflow-y:auto!important;overscroll-behavior:contain!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .totalrow{flex:0 0 auto!important;padding:5px 0!important}
+ #view:has(#odooPosLayout) #odooPosLayout .totalrow.grand{font-size:clamp(17px,1.35vw,21px)!important;margin-top:3px!important;padding-top:7px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-screen-keyboard{
+  flex:0 0 auto!important;width:100%!important;max-width:none!important;
+  margin:5px 0!important;padding:6px!important;
+ }
+ #view:has(#odooPosLayout) #odooPosLayout .cart-keyboard-head{margin-bottom:4px!important}
+ #view:has(#odooPosLayout) #odooPosLayout #cartKeyboardDisplay{height:27px!important;margin-bottom:4px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-keypad-grid{gap:4px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-keypad-grid button{height:clamp(23px,4.1vh,34px)!important;min-height:23px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-payment-actions{flex:0 0 auto!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-scan-hint{display:none!important}
+}
+@media (min-width:1101px) and (max-height:700px){
+ #view:has(#odooPosLayout) .odoo-pos-head{min-height:40px!important;margin-bottom:6px!important}
+ #view:has(#odooPosLayout) #odooPosLayout{gap:7px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-head{padding:7px 10px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .odoo-order-body{padding:5px 8px!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-screen-keyboard{padding:4px!important;margin:3px 0!important}
+ #view:has(#odooPosLayout) #odooPosLayout .cart-keypad-grid button{height:22px!important;min-height:22px!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
