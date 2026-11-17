@@ -5490,7 +5490,17 @@ document.addEventListener('keydown',function(e){
  }
  if(e.key==='F4'){e.preventDefault();if(!modal)checkout();return;}
  if(modal)return;
- if(e.key==='F2'){e.preventDefault();document.getElementById('possearch')?.focus();return}
+ if(e.key==='F2'){
+  e.preventDefault();
+  const selectedId=window.selectedCartId;
+  if(selectedId===undefined||selectedId===null||!cart.some(x=>String(x.id)===String(selectedId))){
+   alert('Pilih satu baris barang di keranjang terlebih dahulu, lalu tekan F2.');
+   return;
+  }
+  removeCartItem(selectedId);
+  renderPosProducts();
+  return;
+ }
  if(e.key==='F3'){e.preventDefault();document.getElementById('posbarcode')?.focus();return}
  if(e.key==='F5'){e.preventDefault();renderPosProducts();return}
  if(e.key==='F9'){e.preventDefault();if(cart.length&&window.confirm('Lanjutkan proses pembayaran sekarang?'))checkout();return}
@@ -5498,7 +5508,7 @@ document.addEventListener('keydown',function(e){
  if(e.key==='Delete'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();if(cart.length&&window.confirm('Kosongkan semua barang di keranjang?')){cart=[];renderCart()}return}
 });
 function showKeyboardHelp(){
- const rows=[['F1','Bantuan tombol keyboard'],['F2','Cari nama barang'],['F3','Fokus scan barcode'],['F4','Pilih metode pembayaran'],['F5','Refresh daftar barang'],['F9','Proses pembayaran (dengan konfirmasi)'],['F10','Cetak struk transaksi terakhir'],['F12','Tutup sesi kasir'],['ESC','Kembali ke menu sebelumnya'],['Delete','Kosongkan keranjang (dengan konfirmasi)']];
+ const rows=[['F1','Bantuan tombol keyboard'],['F2','Hapus baris barang terpilih dari keranjang'],['F3','Fokus scan barcode'],['F4','Pilih metode pembayaran'],['F5','Refresh daftar barang'],['F9','Proses pembayaran (dengan konfirmasi)'],['F10','Cetak struk transaksi terakhir'],['F12','Tutup sesi kasir'],['ESC','Kembali ke menu sebelumnya'],['Delete','Kosongkan keranjang (dengan konfirmasi)']];
  document.getElementById('modalroot').innerHTML='<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2>⌨ Tombol Pintas SeaMart</h2><p class="muted">Gunakan tombol keyboard untuk mempercepat pekerjaan kasir.</p>'+rows.map(r=>'<div class="totalrow"><b style="min-width:64px"><kbd style="display:inline-block;padding:4px 9px;border:1px solid #cbd5cf;border-radius:6px;background:#f5f8f6">'+r[0]+'</kbd></b><span>'+r[1]+'</span></div>').join('')+'<div class="actions"><button class="btn-primary" onclick="closeModal()">Mengerti</button></div></div></div>';
 }
 function dashboard(){
