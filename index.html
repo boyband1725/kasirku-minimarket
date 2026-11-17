@@ -9692,4 +9692,21 @@ restoreSeaMartSession();
 </script>
 
 
+
+<style id="seamart-total-neutral-final-override">
+/* Highest-priority final override: total sales box must look like received-cash input, not a green action button. */
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display:hover,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display:focus,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display:active{
+ background:#fff!important;background-image:none!important;background-color:#fff!important;
+ color:#20382a!important;border:1px solid #cfdcd3!important;
+ box-shadow:none!important;filter:none!important;opacity:1!important;
+ cursor:default!important;pointer-events:none!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display b,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn.pos-total-display #posPayAmount{
+ color:#20382a!important;font-weight:900!important;
+}
+</style>
 </body></html>
