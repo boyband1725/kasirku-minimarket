@@ -9758,7 +9758,7 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
  }
 }
 
-<style id="seamart-mobile-cart-access-final">
+
 /* MOBILE: keep a visible floating cart launcher; open the cart as a usable bottom sheet. */
 @media screen and (max-width:1100px){
  html body #mobileCartTrigger,
@@ -9818,6 +9818,14 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
   width:32px!important;height:32px!important;margin-left:auto!important
  }
 }
-</style>
+
+/* Ensure product cards respond consistently to taps on Android touchscreens. */
+@media(max-width:1100px){
+ html body #view #odooPosLayout #posproducts .odoo-product{
+  cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(8,139,120,.16)!important
+ }
+ html body #view #odooPosLayout #posproducts .odoo-product *{pointer-events:none}
+}
 </style>
 </body></html>
