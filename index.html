@@ -5506,7 +5506,13 @@ document.addEventListener('keydown',function(e){
    return;
   }
   if(code==='Backspace'){e.preventDefault();cartKey('back');return;}
-  if(code==='Delete'||code==='NumpadDecimal'){e.preventDefault();cartKey('clear');return;}
+  if(code==='Delete'){
+    e.preventDefault();
+    const id=window.selectedCartId;
+    if(!id||!cart.some(x=>String(x.id)===String(id))){alert('Pilih barang di keranjang terlebih dahulu.');return;}
+    removeCartItem(id);renderPosProducts();return;
+   }
+   if(code==='NumpadDecimal'){e.preventDefault();cartKey('clear');return;}
  }
  if(e.key==='F2'){
   e.preventDefault();
