@@ -8810,6 +8810,15 @@ restoreSeaMartSession();
 #odooPosLayout #cartScreenKeyboard .cart-payment-actions .cart-change-card{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;min-height:42px!important;height:clamp(42px,6vh,56px)!important;box-sizing:border-box!important;padding:5px 3px!important;border:1.5px solid #12864b!important;border-radius:9px!important;background:#e7f4eb!important;color:#087b43!important;text-align:center!important;overflow:hidden!important}
 #odooPosLayout #cartScreenKeyboard .cart-payment-actions .cart-change-card span{font-size:clamp(9px,.85vw,11px)!important;font-weight:900!important;white-space:nowrap!important}
 #odooPosLayout #cartScreenKeyboard .cart-payment-actions .cart-change-card b{font-size:clamp(11px,1.05vw,15px)!important;font-weight:900!important;white-space:nowrap!important}
+
+/* Alternatif desain input kasir: dua kartu sejajar, ringkas dan jelas. */
+#odooPosLayout #cartScreenKeyboard .cart-key-mode{display:none!important}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin:8px 0 10px!important;align-items:stretch!important}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs label{position:relative!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;gap:7px!important;min-width:0!important;min-height:74px!important;padding:10px 12px 9px!important;box-sizing:border-box!important;border:1px solid #d6e2da!important;border-radius:12px!important;background:#f8fbf9!important;color:#53665b!important;font-size:12px!important;font-weight:800!important;letter-spacing:.15px!important}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs label:focus-within{border:2px solid #15945a!important;background:#f1faf4!important;padding:9px 11px 8px!important;box-shadow:0 0 0 3px rgba(21,148,90,.09)!important}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs input{display:block!important;width:100%!important;min-width:0!important;height:34px!important;min-height:34px!important;margin:0!important;padding:2px 0!important;box-sizing:border-box!important;border:0!important;border-top:1px solid #e1eae4!important;border-radius:0!important;background:transparent!important;color:#173c29!important;font-size:19px!important;font-weight:900!important;text-align:right!important;outline:none!important;box-shadow:none!important}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs input::placeholder{color:#a0aaa4!important;font-size:13px!important;font-weight:600!important}
+@media(max-width:600px){#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs{gap:7px!important}#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs label{min-height:68px!important;padding:8px!important;font-size:11px!important}#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs input{font-size:17px!important}}
 </style>
 <script>
 (function(){
