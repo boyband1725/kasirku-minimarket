@@ -4204,6 +4204,19 @@ body:has(#ptable) #ptable>.tablewrap>table thead th{position:sticky!important;to
  body:has(#ptable) #view>.panel:has(#ptable){height:70vh!important;min-height:360px!important;flex:0 0 70vh!important}
  body:has(#ptable) #ptable>.tablewrap{overflow:auto!important}
 }
+
+/* Master Barang hard fix: explicit scroll viewport; avoid zero-height flex chain */
+body:has(#ptable) .content{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}
+body:has(#ptable) #view{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}
+body:has(#ptable) #view>.panel:has(#ptable){display:block!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+body:has(#ptable) #ptable{display:block!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+body:has(#ptable) #ptable>.tablewrap{display:block!important;width:100%!important;height:58vh!important;min-height:320px!important;max-height:680px!important;overflow:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;scrollbar-gutter:stable!important}
+body:has(#ptable) #ptable>.tablewrap>table{width:max-content!important;min-width:1120px!important}
+body:has(#ptable) #ptable>.tablewrap thead th{position:sticky!important;top:0!important;z-index:8!important;background:#f4f8f5!important}
+@media(max-width:900px){
+ body:has(#ptable) .content{overflow:visible!important}
+ body:has(#ptable) #ptable>.tablewrap{height:65vh!important;min-height:300px!important;max-height:none!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
