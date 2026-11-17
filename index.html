@@ -5490,6 +5490,24 @@ document.addEventListener('keydown',function(e){
  }
  if(e.key==='F4'){e.preventDefault();if(!modal)checkout();return;}
  if(modal)return;
+ // Numpad fisik untuk mengubah jumlah barang pada baris keranjang terpilih.
+ if(window.cartKeyMode==='qty'){
+  const code=e.code||'';
+  if(/^Numpad[0-9]$/.test(code)){e.preventDefault();cartKey(code.slice(-1));return;}
+  if(code==='NumpadAdd'||code==='NumpadSubtract'){
+   e.preventDefault();
+   const id=window.selectedCartId;
+   if(!id||!cart.some(x=>String(x.id)===String(id))){alert('Pilih barang di keranjang terlebih dahulu.');return;}
+   changeQty(id,code==='NumpadAdd'?1:-1);return;
+  }
+  if(code==='NumpadEnter'){
+   e.preventDefault();
+   if(String(window.cartKeyboardValue||'').length)applyCartKeyboard();
+   return;
+  }
+  if(code==='Backspace'){e.preventDefault();cartKey('back');return;}
+  if(code==='Delete'||code==='NumpadDecimal'){e.preventDefault();cartKey('clear');return;}
+ }
  if(e.key==='F2'){
   e.preventDefault();
   const selectedId=window.selectedCartId;
