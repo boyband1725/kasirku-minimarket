@@ -4178,6 +4178,12 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
 #modalroot .sm-payment-keypad-grid button:last-child{background:#087a48!important;color:#fff!important;border-color:#087a48!important}
 body:has(#modalroot .modalback) #cartScreenKeyboard{display:none!important;visibility:hidden!important;pointer-events:none!important}
 @media(max-width:600px){#modalroot .modalback>.modal.sm-payment-modal{padding:14px!important}#modalroot .sm-payment-keypad-grid{gap:5px}#modalroot .sm-payment-keypad-grid button{height:34px;min-height:34px;font-size:14px}}
+
+/* Drag handle for payment dialog */
+#modalroot .sm-payment-drag-handle{cursor:move!important;cursor:grab!important}
+#modalroot .sm-payment-drag-handle:active{cursor:grabbing!important}
+#modalroot .sm-payment-drag-handle button{cursor:pointer!important}
+#modalroot .modalback>.modal.sm-payment-modal.sm-payment-dragging{transition:none!important;user-select:none!important}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -6134,7 +6140,7 @@ function checkout(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const current=window.posPaymentMode||document.getElementById('paymethod')?.value||'Tunai';
  document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal sm-payment-modal">
- <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
+ <div class="sm-payment-drag-handle" onpointerdown="startPaymentModalDrag(event)" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
  <h2 style="text-align:center;margin:15px 0 5px">Pilih Metode Pembayaran</h2>
  <div class="sm-payment-options">
  <button type="button" id="chooseCash" class="sm-payment-option ${current==='Tunai'?'active':''}" onclick="selectPaymentMethod('Tunai')"><span>💵</span><b>Tunai</b><small>Uang cash</small></button>
@@ -6158,6 +6164,32 @@ function selectPaymentMethod(method){
  const qrisInfo=document.getElementById('smQrisInfo');if(qrisInfo){qrisInfo.hidden=method!=='QRIS';qrisInfo.style.setProperty('display',method==='QRIS'?'block':'none','important');}
  if(cashInput){cashInput.disabled=method!=='Tunai';cashInput.readOnly=method!=='Tunai';cashInput.value=method==='QRIS'?'':cashInput.value;}
 }
+
+let smPaymentDragState=null;
+function startPaymentModalDrag(event){
+ const dialog=document.querySelector('#modalroot .sm-payment-modal');
+ if(!dialog||event.button!==0||event.target.closest('button'))return;
+ const rect=dialog.getBoundingClientRect();
+ smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,moved:false};
+ dialog.classList.add('sm-payment-dragging');
+ dialog.style.position='fixed';dialog.style.margin='0';dialog.style.left=rect.left+'px';dialog.style.top=rect.top+'px';dialog.style.transform='none';
+ document.addEventListener('pointermove',movePaymentModalDrag);
+ document.addEventListener('pointerup',endPaymentModalDrag,{once:true});
+ event.preventDefault();
+}
+function movePaymentModalDrag(event){
+ if(!smPaymentDragState)return;
+ const d=smPaymentDragState,dx=event.clientX-d.startX,dy=event.clientY-d.startY;
+ const maxLeft=Math.max(0,window.innerWidth-d.dialog.offsetWidth),maxTop=Math.max(0,window.innerHeight-d.dialog.offsetHeight);
+ d.dialog.style.left=Math.max(0,Math.min(maxLeft,d.left+dx))+'px';
+ d.dialog.style.top=Math.max(0,Math.min(maxTop,d.top+dy))+'px';
+ d.moved=true;
+}
+function endPaymentModalDrag(){
+ if(smPaymentDragState){smPaymentDragState.dialog.classList.remove('sm-payment-dragging');}
+ smPaymentDragState=null;document.removeEventListener('pointermove',movePaymentModalDrag);
+}
+
 function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
 function updatePaymentModalChange(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
