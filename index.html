@@ -5209,6 +5209,19 @@ window.addEventListener('error', function(e) {
  opacity:1!important;cursor:default!important;
 }
 </style>
+
+<style id="seamart-total-neutral-input-style">
+/* Total display: neutral field appearance matching Uang diterima, never payment-green. */
+#view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn.pos-total-display{
+ background:#fff!important;background-color:#fff!important;
+ color:#20382a!important;border:1px solid #cfdcd3!important;
+ border-radius:10px!important;box-shadow:none!important;
+}
+#view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn.pos-total-display b,
+#view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn.pos-total-display #posPayAmount{
+ color:#20382a!important;font-weight:900!important;
+}
+</style>
 </head>
 <body>
 <div class="app">
