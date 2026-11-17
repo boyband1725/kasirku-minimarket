@@ -7568,6 +7568,45 @@ restoreSeaMartSession();
  body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-panel{grid-column:1!important;grid-row:2!important}
  body:has(#odooPosLayout) #odooPosLayout .odoo-order-panel{grid-column:2!important;grid-row:1 / span 2!important}
 }
+
+/* FINAL DESKTOP POS REPAIR: move category filter inside catalog, then use exactly two columns */
+@media(min-width:901px){
+ body:has(#odooPosLayout) .content{
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  margin:0!important;padding:14px 18px!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #view{box-sizing:border-box!important;width:100%!important;max-width:none!important;min-width:0!important}
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;gap:12px!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  align-items:stretch!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-category-panel{
+  display:block!important;position:static!important;grid-column:1!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  padding:8px!important;margin:0 0 8px!important;box-shadow:none!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel{
+  display:flex!important;flex-direction:column!important;grid-column:1!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{
+  display:flex!important;flex-direction:column!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important;position:relative!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-category-heading{display:flex!important;align-items:center!important;justify-content:space-between!important}
+ body:has(#odooPosLayout) #odooPosLayout #poscategories{
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  gap:5px!important;overflow-x:auto!important;white-space:nowrap!important;
+  min-width:0!important;padding:4px 2px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-cat{flex:0 0 auto!important;width:auto!important;margin:0!important;padding:6px 10px!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top{flex:0 0 auto!important;min-width:0!important;flex-wrap:wrap!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-products{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
 </style>
 <script>
 (function(){
@@ -7626,6 +7665,26 @@ restoreSeaMartSession();
   event.preventDefault();
   if(typeof window.cartKey==='function')window.cartKey(mapped);
  },true);
+})();
+</script>
+
+<script>
+/* Keep category filters inside the catalog column, not as a third grid column. */
+(function(){
+ if(window.__seamartCategoryRelocationInstalled)return;
+ window.__seamartCategoryRelocationInstalled=true;
+ function place(){
+  const layout=document.getElementById('odooPosLayout');
+  if(!layout)return;
+  const cats=layout.querySelector(':scope > .odoo-category-panel');
+  const catalog=layout.querySelector(':scope > .odoo-catalog-panel');
+  if(cats&&catalog&&cats.parentElement!==catalog){
+   catalog.insertBefore(cats,catalog.firstChild);
+   cats.dataset.seamartEmbedded='1';
+  }
+ }
+ place();
+ new MutationObserver(place).observe(document.getElementById('view')||document.body,{childList:true,subtree:true});
 })();
 </script>
 </body></html>
