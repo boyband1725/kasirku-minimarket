@@ -9848,4 +9848,48 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
  html body.seamart-cart-open #view #posMobileCartFab{display:none!important}
 }
 </style>
+
+<style id="seamart-mobile-payment-cells-equal">
+/* Mobile POS: total and change cells below TUNAI/QRIS must have identical dimensions. */
+@media screen and (max-width:900px){
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:48px 48px!important;
+  grid-auto-flow:row!important;
+  align-items:stretch!important;justify-items:stretch!important;
+  gap:8px!important;width:100%!important;height:auto!important;
+  min-height:104px!important;max-height:none!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+  box-sizing:border-box!important
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#posPayCash{
+  grid-column:1!important;grid-row:1!important
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#posPayQris{
+  grid-column:2!important;grid-row:1!important
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn,
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>.cart-change-card{
+  grid-row:2!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:48px!important;min-height:48px!important;max-height:48px!important;
+  margin:0!important;padding:4px 8px!important;
+  border:1px solid #d4ded8!important;border-radius:12px!important;
+  background:#fff!important;box-shadow:none!important;
+  position:relative!important;inset:auto!important;transform:none!important;
+  overflow:hidden!important
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn{grid-column:1!important}
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>.cart-change-card{grid-column:2!important}
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>#checkoutBtn #posPayAmount,
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions>.cart-change-card #posCashChange{
+  display:block!important;width:100%!important;margin:0!important;
+  text-align:center!important;font-size:18px!important;line-height:1.1!important;
+  font-weight:900!important;white-space:nowrap!important;color:#20382a!important
+ }
+}
+</style>
 </body></html>
