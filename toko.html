@@ -364,6 +364,14 @@ body{background:#f5f7f8;color:#27323b}
 #shopCategoryPopup.open .shop-category-head{position:relative!important;top:auto!important;flex:0 0 auto!important;min-height:116px!important}
 #shopCategoryPopup.open .shop-category-products,#shopCategoryPopup.open .shop-category-picker{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important}
 @media(max-width:600px){#shopCategoryPopup{padding:8px!important}#shopCategoryPopup.open .shop-category-modal{width:100%!important;height:calc(100dvh - 16px)!important;max-height:calc(100dvh - 16px)!important;border-radius:14px!important}}
+
+/* Slim search field in category overlay */
+#shopCategoryPopup.open .shop-category-head{min-height:94px!important;padding:12px 18px!important;gap:7px!important}
+#shopCategoryPopup.open .category-popup-search{width:min(100%,560px)!important;max-width:560px!important;height:34px!important;min-height:34px!important;padding:0 10px!important;border-radius:8px!important;gap:7px!important}
+#shopCategoryPopup.open .category-popup-search input{height:30px!important;font-size:12px!important}
+#shopCategoryPopup.open .category-popup-search>span{font-size:14px!important}
+#shopCategoryPopup.open .category-popup-search button{width:22px!important;height:22px!important;flex-basis:22px!important;font-size:16px!important}
+@media(max-width:600px){#shopCategoryPopup.open .shop-category-head{min-height:88px!important;padding:9px 12px!important}#shopCategoryPopup.open .category-popup-search{width:100%!important;max-width:none!important;height:34px!important;min-height:34px!important}}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style><style id="seamart-slim-product-buttons">
 @media(max-width:599px){
