@@ -9031,6 +9031,61 @@ restoreSeaMartSession();
   box-sizing:border-box!important;
  }
 }
+
+/* Repair cart panel after 70/30 split: keep all cart controls inside visible panel */
+@media(min-width:1101px){
+ body:has(#view #odooPosLayout) #view #odooPosLayout{
+  min-height:0!important;height:calc(100vh - 150px)!important;
+  max-height:calc(100vh - 150px)!important;align-items:stretch!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout>#odooOrderPanel{
+  display:flex!important;flex-direction:column!important;width:100%!important;
+  height:100%!important;min-height:0!important;max-height:100%!important;
+  overflow:hidden!important;align-self:stretch!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout>#odooOrderPanel>.odoo-order-head{
+  flex:0 0 44px!important;height:44px!important;min-height:44px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout>#odooOrderPanel>.odoo-order-body{
+  display:grid!important;flex:1 1 0!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(90px,1fr) 22px 30px auto 42px!important;
+  gap:4px!important;padding:6px 8px!important;width:100%!important;
+  height:100%!important;min-height:0!important;max-height:100%!important;
+  overflow-y:auto!important;overflow-x:hidden!important;align-content:stretch!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-order-body>#cartlines{grid-row:1!important;min-height:90px!important;max-height:none!important}
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-order-body>.totalrow:not(.grand){grid-row:2!important}
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-order-body>.totalrow.grand{grid-row:3!important}
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-order-body>#cartScreenKeyboard{grid-row:4!important;min-height:0!important}
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-order-body>#checkoutBtn{grid-row:5!important;align-self:stretch!important}
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard.seamart-permanent-keypad{
+  display:flex!important;gap:3px!important;padding:4px!important;min-height:0!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+  grid-template-rows:repeat(4,clamp(25px,3.3vh,34px))!important;
+  grid-auto-rows:clamp(25px,3.3vh,34px)!important;gap:3px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-key-mode,
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-key-mode button{
+  height:26px!important;min-height:26px!important;max-height:26px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs label{
+  min-height:58px!important;padding:7px 9px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions,
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{
+  height:38px!important;min-height:38px!important;max-height:38px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #cartScreenKeyboard .cart-change-card{
+  min-height:36px!important;height:36px!important;margin:2px 0!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #checkoutBtn{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:50%!important;max-width:50%!important;height:40px!important;
+  min-height:40px!important;max-height:40px!important;margin:0 auto!important;
+ }
+}
 </style>
 <script>
 (function(){
@@ -9169,8 +9224,9 @@ restoreSeaMartSession();
   const change=keypad?.querySelector('.cart-change-card');
   const bayar=document.querySelector('#view #odooPosLayout #checkoutBtn');
   if(!keypad||!change||!bayar)return;
-  if(change.parentElement!==keypad||bayar.parentElement!==keypad||bayar.previousElementSibling!==change){
-   change.insertAdjacentElement('afterend',bayar);
+  const body=keypad.closest('.odoo-order-body');
+  if(body&&bayar.parentElement!==body){
+   keypad.insertAdjacentElement('afterend',bayar);
   }
  }
  placeBayar();
