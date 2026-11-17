@@ -8826,6 +8826,26 @@ restoreSeaMartSession();
 #odooPosLayout #cartScreenKeyboard .cart-change-card{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;width:100%!important;min-width:0!important;min-height:38px!important;height:38px!important;box-sizing:border-box!important;margin:6px 0 0!important;padding:6px 12px!important;border:1px solid #cfe2d5!important;border-radius:9px!important;background:#edf7f0!important;color:#17643a!important;text-align:left!important;overflow:hidden!important}
 #odooPosLayout #cartScreenKeyboard .cart-change-card span{font-size:11px!important;font-weight:900!important;letter-spacing:.5px!important;white-space:nowrap!important}
 #odooPosLayout #cartScreenKeyboard .cart-change-card b{font-size:16px!important;font-weight:900!important;white-space:nowrap!important;text-align:right!important}
+
+/* Penyesuaian jarak antar kolom numpad dan pembayaran agar seimbang. */
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ column-gap:8px!important;row-gap:6px!important;margin:6px 0 8px!important;
+}
+#odooPosLayout #cartScreenKeyboard .cart-keyboard-inputs label{min-width:0!important;margin:0!important}
+#odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ column-gap:6px!important;row-gap:5px!important;width:100%!important;
+}
+#odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+ width:100%!important;min-width:0!important;margin:0!important;box-sizing:border-box!important;
+}
+#odooPosLayout #cartScreenKeyboard .cart-payment-actions{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ column-gap:8px!important;row-gap:6px!important;width:100%!important;
+}
+#odooPosLayout #cartScreenKeyboard .cart-payment-actions button{width:100%!important;min-width:0!important;margin:0!important}
+#odooPosLayout #cartScreenKeyboard .cart-change-card{margin-top:5px!important}
 </style>
 <script>
 (function(){
