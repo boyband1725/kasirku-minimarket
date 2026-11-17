@@ -5499,7 +5499,7 @@ document.addEventListener('keydown',function(e){
   const minus=code==='NumpadSubtract'||kc===109||key==='-'||key==='Subtract';
   const del=key==='Delete'||code==='NumpadDecimal'||kc===46;
   const back=key==='Backspace'||kc===8;
-  const enter=code==='NumpadEnter'||(kc===13&&code.startsWith('Numpad'));
+  const enter=key==='Enter'||code==='NumpadEnter'||kc===13;
   const selectedId=window.selectedCartId;
   const selected=cart.find(x=>String(x.id)===String(selectedId));
   const focus=document.activeElement;
@@ -5519,7 +5519,7 @@ document.addEventListener('keydown',function(e){
    if(window.cartKeyMode==='qty'){
     if(digit!==null){e.preventDefault();e.stopPropagation();cartKey(digit);return;}
     if(back){e.preventDefault();e.stopPropagation();cartKey('back');return;}
-    if(enter){e.preventDefault();e.stopPropagation();if(String(window.cartKeyboardValue||'').length)applyCartKeyboard();return;}
+    if(enter){e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();applyCartKeyboard();return;}
     if(code==='NumpadDecimal'||kc===110){e.preventDefault();e.stopPropagation();cartKey('clear');return;}
    }
   }
