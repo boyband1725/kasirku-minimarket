@@ -5490,29 +5490,39 @@ document.addEventListener('keydown',function(e){
  }
  if(e.key==='F4'){e.preventDefault();if(!modal)checkout();return;}
  if(modal)return;
- // Numpad fisik untuk mengubah jumlah barang pada baris keranjang terpilih.
- if(window.cartKeyMode==='qty'){
-  const code=e.code||'';
-  if(/^Numpad[0-9]$/.test(code)){e.preventDefault();cartKey(code.slice(-1));return;}
-  if(code==='NumpadAdd'||code==='NumpadSubtract'){
-   e.preventDefault();
-   const id=window.selectedCartId;
-   if(!id||!cart.some(x=>String(x.id)===String(id))){alert('Pilih barang di keranjang terlebih dahulu.');return;}
-   changeQty(id,code==='NumpadAdd'?1:-1);return;
-  }
-  if(code==='NumpadEnter'){
-   e.preventDefault();
-   if(String(window.cartKeyboardValue||'').length)applyCartKeyboard();
-   return;
-  }
-  if(code==='Backspace'){e.preventDefault();cartKey('back');return;}
-  if(code==='Delete'){
-    e.preventDefault();
-    const id=window.selectedCartId;
-    if(!id||!cart.some(x=>String(x.id)===String(id))){alert('Pilih barang di keranjang terlebih dahulu.');return;}
-    removeCartItem(id);renderPosProducts();return;
+ // Numpad fisik PC: dukung NumLock aktif/nonaktif dan kode keyCode lama.
+ {
+  const code=e.code||'',key=e.key||'',kc=e.keyCode||e.which||0;
+  const digitMatch=code.match(/^Numpad([0-9])$/);
+  const digit=digitMatch?digitMatch[1]:(kc>=96&&kc<=105?String(kc-96):null);
+  const plus=code==='NumpadAdd'||kc===107||key==='+'||key==='Add';
+  const minus=code==='NumpadSubtract'||kc===109||key==='-'||key==='Subtract';
+  const del=key==='Delete'||code==='NumpadDecimal'||kc===46;
+  const back=key==='Backspace'||kc===8;
+  const enter=code==='NumpadEnter'||(kc===13&&code.startsWith('Numpad'));
+  const selectedId=window.selectedCartId;
+  const selected=cart.find(x=>String(x.id)===String(selectedId));
+  const focus=document.activeElement;
+  const typingInOtherField=focus&&focus!==document.body&&focus!==document.getElementById('cartKeyboardDisplay')&&
+   (focus.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(focus.tagName));
+  if(!modal&&!typingInOtherField){
+   if(plus||minus){
+    e.preventDefault();e.stopPropagation();
+    if(!selected){alert('Klik/pilih barang di keranjang terlebih dahulu.');return;}
+    changeQty(selected.id,plus?1:-1);return;
    }
-   if(code==='NumpadDecimal'){e.preventDefault();cartKey('clear');return;}
+   if(del){
+    e.preventDefault();e.stopPropagation();
+    if(!selected){alert('Klik/pilih barang di keranjang terlebih dahulu.');return;}
+    removeCartItem(selected.id);renderPosProducts();return;
+   }
+   if(window.cartKeyMode==='qty'){
+    if(digit!==null){e.preventDefault();e.stopPropagation();cartKey(digit);return;}
+    if(back){e.preventDefault();e.stopPropagation();cartKey('back');return;}
+    if(enter){e.preventDefault();e.stopPropagation();if(String(window.cartKeyboardValue||'').length)applyCartKeyboard();return;}
+    if(code==='NumpadDecimal'||kc===110){e.preventDefault();e.stopPropagation();cartKey('clear');return;}
+   }
+  }
  }
  if(e.key==='F2'){
   e.preventDefault();
