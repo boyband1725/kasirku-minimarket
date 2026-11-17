@@ -4280,6 +4280,20 @@ body:has(#ptable) #ptable .photo-placeholder{display:inline-grid!important;place
  body:has(#ptable) .product-search-toolbar button{grid-column:1/-1!important}
  body:has(#ptable) #ptable>.tablewrap{height:65vh!important;min-height:300px!important}
 }
+
+/* GLOBAL WORKSPACE SCROLL RESTORE — cashier fullscreen must never lock other pages */
+html,body{min-height:100%!important;height:auto!important;overflow-y:auto!important}
+body:not(.seamart-pos-fullscreen){overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important}
+body:not(.seamart-pos-fullscreen) .app{height:auto!important;min-height:100vh!important;overflow:visible!important;align-items:stretch!important}
+body:not(.seamart-pos-fullscreen) .main{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important}
+body:not(.seamart-pos-fullscreen) .content{height:auto!important;min-height:calc(100vh - 60px)!important;max-height:none!important;overflow:visible!important;overflow-y:visible!important;overscroll-behavior:auto!important;display:block!important}
+body:not(.seamart-pos-fullscreen) #view{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;display:block!important}
+body:not(.seamart-pos-fullscreen) #view>.panel,
+body:not(.seamart-pos-fullscreen) #view>.pagehead{flex-shrink:0!important}
+body:not(.seamart-pos-fullscreen) #ptable>.tablewrap{overflow:auto!important}
+@media(min-width:701px){
+ body:not(.seamart-pos-fullscreen) .content{padding-bottom:32px!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
