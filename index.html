@@ -4301,6 +4301,12 @@ body:not(.seamart-pos-fullscreen) #ptable>.tablewrap{overflow:auto!important}
 #modalroot .modal.sm-payment-modal button,#modalroot .modal.sm-payment-modal input{cursor:auto!important}
 #modalroot .modal.sm-payment-modal .sm-payment-drag-handle{cursor:grab!important;min-height:38px!important}
 #modalroot .modal.sm-payment-modal.sm-payment-dragging{transition:none!important;user-select:none!important}
+
+/* Reliable dedicated drag handle for payment dialog */
+#modalroot .sm-payment-drag-handle{width:100%;min-height:44px;touch-action:none!important;user-select:none!important;cursor:grab!important}
+#modalroot .sm-payment-drag-handle:active{cursor:grabbing!important}
+#modalroot .sm-payment-drag-handle button{cursor:pointer!important}
+#modalroot .modalback>.modal.sm-payment-modal{box-sizing:border-box!important;left:auto;right:auto}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -6258,8 +6264,8 @@ function checkout(){
  if(!cart.length)return alert('Keranjang masih kosong.');
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const current=window.posPaymentMode||document.getElementById('paymethod')?.value||'Tunai';
- document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal sm-payment-modal" onpointerdown="startPaymentModalDrag(event)">
- <div class="sm-payment-drag-handle" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
+ document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal sm-payment-modal">
+ <div class="sm-payment-drag-handle" onpointerdown="startPaymentModalDrag(event)" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
  <h2 style="text-align:center;margin:15px 0 5px">Pilih Metode Pembayaran</h2>
  <div class="sm-payment-options">
  <button type="button" id="chooseCash" class="sm-payment-option ${current==='Tunai'?'active':''}" onclick="selectPaymentMethod('Tunai')"><span>💵</span><b>Tunai</b><small>Uang cash</small></button>
@@ -6286,34 +6292,36 @@ function selectPaymentMethod(method){
 
 let smPaymentDragState=null;
 function startPaymentModalDrag(event){
- const dialog=document.querySelector('#modalroot .sm-payment-modal');
+ const handle=event.currentTarget,dialog=handle?.closest('.sm-payment-modal');
  if(!dialog||event.button!==0||event.target.closest('button,input,select,textarea,a'))return;
  event.preventDefault();event.stopPropagation();
  const rect=dialog.getBoundingClientRect();
  smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,pointerId:event.pointerId,moved:false};
+ dialog.style.position='fixed';dialog.style.margin='0';dialog.style.left=rect.left+'px';dialog.style.top=rect.top+'px';dialog.style.right='auto';dialog.style.bottom='auto';dialog.style.transform='none';
  dialog.classList.add('sm-payment-dragging');
- dialog.style.position='fixed';dialog.style.margin='0';dialog.style.left=rect.left+'px';dialog.style.top=rect.top+'px';dialog.style.transform='none';
- document.addEventListener('pointermove',movePaymentModalDrag,{passive:false});
- document.addEventListener('pointerup',endPaymentModalDrag,{once:true});
- document.addEventListener('pointercancel',endPaymentModalDrag,{once:true});
- event.preventDefault();
+ try{handle.setPointerCapture(event.pointerId)}catch(_){}
+ document.addEventListener('pointermove',movePaymentModalDrag,{capture:true,passive:false});
+ document.addEventListener('pointerup',endPaymentModalDrag,true);
+ document.addEventListener('pointercancel',endPaymentModalDrag,true);
 }
 function movePaymentModalDrag(event){
- if(!smPaymentDragState)return;
+ if(!smPaymentDragState||event.pointerId!==smPaymentDragState.pointerId)return;
  const d=smPaymentDragState,dx=event.clientX-d.startX,dy=event.clientY-d.startY;
- if(Math.abs(dx)+Math.abs(dy)>4)d.moved=true;
+ if(Math.abs(dx)+Math.abs(dy)>3)d.moved=true;
  const maxLeft=Math.max(0,window.innerWidth-d.dialog.offsetWidth),maxTop=Math.max(0,window.innerHeight-d.dialog.offsetHeight);
  d.dialog.style.left=Math.max(0,Math.min(maxLeft,d.left+dx))+'px';
  d.dialog.style.top=Math.max(0,Math.min(maxTop,d.top+dy))+'px';
  event.preventDefault();
 }
-function endPaymentModalDrag(){
- if(smPaymentDragState){
-  smPaymentDragState.dialog.classList.remove('sm-payment-dragging');
-  if(smPaymentDragState.moved)window.smPaymentDraggedAt=Date.now();
- }
- smPaymentDragState=null;document.removeEventListener('pointermove',movePaymentModalDrag);
- document.removeEventListener('pointercancel',endPaymentModalDrag);
+function endPaymentModalDrag(event){
+ if(!smPaymentDragState)return;
+ if(event&&event.pointerId!==undefined&&event.pointerId!==smPaymentDragState.pointerId)return;
+ smPaymentDragState.dialog.classList.remove('sm-payment-dragging');
+ if(smPaymentDragState.moved)window.smPaymentDraggedAt=Date.now();
+ smPaymentDragState=null;
+ document.removeEventListener('pointermove',movePaymentModalDrag,true);
+ document.removeEventListener('pointerup',endPaymentModalDrag,true);
+ document.removeEventListener('pointercancel',endPaymentModalDrag,true);
 }
 
 function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
