@@ -7497,6 +7497,27 @@ restoreSeaMartSession();
  #view #odooPosLayout #posproducts .odoo-product-stock{display:block!important;padding:2px 5px!important;background:#f0f4f1!important;border-radius:5px!important;font-size:10px!important;color:#52645a!important}
  #view #odooPosLayout #posproducts .odoo-product-price{display:block!important;background:#e2f5e7!important;color:#087b43!important;border-radius:6px!important;padding:5px 7px!important;font-weight:900!important;margin-top:auto!important}
 }
+
+/* Desktop POS split: catalog and cart each take half of the usable workspace */
+@media(min-width:1101px){
+ #view #odooPosLayout.odoo-pos-layout{
+  display:grid!important;
+  grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important;
+  gap:12px!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:100%!important;
+ }
+ #view #odooPosLayout .odoo-category-panel{min-width:0!important;width:auto!important}
+ #view #odooPosLayout .odoo-catalog-panel,
+ #view #odooPosLayout .odoo-order-panel{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important
+ }
+ #view #odooPosLayout .odoo-catalog-panel{grid-column:2!important}
+ #view #odooPosLayout .odoo-order-panel{grid-column:3!important}
+ #view #odooPosLayout #posproducts .pos-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
 </style>
 <script>
 (function(){
