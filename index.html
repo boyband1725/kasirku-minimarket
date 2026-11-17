@@ -6258,7 +6258,7 @@ function checkout(){
  if(!cart.length)return alert('Keranjang masih kosong.');
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const current=window.posPaymentMode||document.getElementById('paymethod')?.value||'Tunai';
- document.getElementById('modalroot').innerHTML=`<div class="modalback" onclick="if(event.target===this)closeModal()"><div class="modal sm-payment-modal" onpointerdown="startPaymentModalDrag(event)">
+ document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal sm-payment-modal" onpointerdown="startPaymentModalDrag(event)">
  <div class="sm-payment-drag-handle" style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:move;touch-action:none;user-select:none"><button class="btn-light" onclick="closeModal()">Batal</button><strong style="font-size:20px;color:#173d2a">${rupiah(total)}</strong><span class="pill">Pembayaran</span></div>
  <h2 style="text-align:center;margin:15px 0 5px">Pilih Metode Pembayaran</h2>
  <div class="sm-payment-options">
@@ -6288,6 +6288,7 @@ let smPaymentDragState=null;
 function startPaymentModalDrag(event){
  const dialog=document.querySelector('#modalroot .sm-payment-modal');
  if(!dialog||event.button!==0||event.target.closest('button,input,select,textarea,a'))return;
+ event.preventDefault();event.stopPropagation();
  const rect=dialog.getBoundingClientRect();
  smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,pointerId:event.pointerId,moved:false};
  dialog.classList.add('sm-payment-dragging');
