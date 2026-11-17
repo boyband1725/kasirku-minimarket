@@ -9001,6 +9001,36 @@ restoreSeaMartSession();
   box-sizing:border-box!important;
  }
 }
+
+/* FINAL DESKTOP 70/30: hide relocated category rail and use only catalog + cart */
+@media(min-width:1101px){
+ body:has(#view #odooPosLayout) #view #odooPosLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  grid-auto-flow:row!important;
+  column-gap:12px!important;
+  row-gap:0!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:none!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-category-panel{
+  display:none!important;
+  visibility:hidden!important;
+  width:0!important;min-width:0!important;max-width:0!important;
+  flex:0 0 0!important;padding:0!important;margin:0!important;border:0!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout>.odoo-catalog-panel{
+  grid-column:1!important;grid-row:1!important;
+  display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout>#odooOrderPanel{
+  grid-column:2!important;grid-row:1!important;
+  display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important;
+ }
+}
 </style>
 <script>
 (function(){
