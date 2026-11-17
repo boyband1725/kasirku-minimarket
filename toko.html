@@ -356,6 +356,14 @@ body{background:#f5f7f8;color:#27323b}
 #shopCategoryPopup.open .category-popup-search button{display:block!important;flex:0 0 28px!important;width:28px!important;height:28px!important;font-size:20px!important}
 #shopCategoryPopup.open .shop-category-close{grid-column:2!important;grid-row:1!important}
 #shopCategoryPopup.open .shop-category-products{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+
+/* FIX overlay stacking above sticky storefront header */
+#shopCategoryPopup{position:fixed!important;inset:0!important;z-index:2147483000!important;display:none!important;align-items:center!important;justify-content:center!important;padding:18px!important;box-sizing:border-box!important;background:rgba(8,20,30,.66)!important}
+#shopCategoryPopup.open{display:flex!important}
+#shopCategoryPopup.open .shop-category-modal{position:relative!important;z-index:1!important;width:min(1120px,calc(100vw - 36px))!important;height:min(88dvh,850px)!important;max-height:calc(100dvh - 36px)!important;min-height:0!important;margin:auto!important;transform:none!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+#shopCategoryPopup.open .shop-category-head{position:relative!important;top:auto!important;flex:0 0 auto!important;min-height:116px!important}
+#shopCategoryPopup.open .shop-category-products,#shopCategoryPopup.open .shop-category-picker{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+@media(max-width:600px){#shopCategoryPopup{padding:8px!important}#shopCategoryPopup.open .shop-category-modal{width:100%!important;height:calc(100dvh - 16px)!important;max-height:calc(100dvh - 16px)!important;border-radius:14px!important}}
 </style>
 <style id="seamart-white-header-fix">header.top{background:#fff!important;background-color:#fff!important;color:#17232c!important}header.top .brandmark .sea{fill:#17232c!important}header.top .brandmark .mart{fill:#62c900!important}header.top .tag{color:#687681!important}</style><style id="seamart-slim-product-buttons">
 @media(max-width:599px){
