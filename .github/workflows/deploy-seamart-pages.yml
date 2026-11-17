@@ -9,6 +9,7 @@ on:
       - 'toko.html'
       - 'shop.html'
       - 'assets/**'
+      - 'supabase/**'
       - '.github/workflows/deploy-seamart-pages.yml'
   workflow_dispatch:
 
