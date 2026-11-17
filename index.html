@@ -6310,38 +6310,57 @@ function selectPaymentMethod(method){
 
 let smPaymentDragState=null;
 function startPaymentModalDrag(event){
- const handle=event.currentTarget,dialog=handle?.closest('.sm-payment-modal');
- if(!dialog||event.button!==0||event.target.closest('button,input,select,textarea,a'))return;
- event.preventDefault();event.stopPropagation();
+ const handle=event.currentTarget;
+ const dialog=handle?.closest('.sm-payment-modal');
+ if(!dialog||!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+ if(event.target instanceof Element&&event.target.closest('button,input,select,textarea,a,[role="button"]'))return;
+ event.preventDefault();
  const rect=dialog.getBoundingClientRect();
- smPaymentDragState={dialog,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,pointerId:event.pointerId,moved:false};
- dialog.style.position='fixed';dialog.style.margin='0';dialog.style.left=rect.left+'px';dialog.style.top=rect.top+'px';dialog.style.right='auto';dialog.style.bottom='auto';dialog.style.transform='none';
+ const pointerId=event.pointerId;
+ dialog.style.setProperty('position','fixed','important');
+ dialog.style.setProperty('margin','0','important');
+ dialog.style.setProperty('left',rect.left+'px','important');
+ dialog.style.setProperty('top',rect.top+'px','important');
+ dialog.style.setProperty('right','auto','important');
+ dialog.style.setProperty('bottom','auto','important');
+ dialog.style.setProperty('transform','none','important');
  dialog.classList.add('sm-payment-dragging');
- try{handle.setPointerCapture(event.pointerId)}catch(_){}
+ smPaymentDragState={dialog,handle,pointerId,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top,moved:false};
+ try{handle.setPointerCapture(pointerId)}catch(_){}
  document.addEventListener('pointermove',movePaymentModalDrag,{capture:true,passive:false});
  document.addEventListener('pointerup',endPaymentModalDrag,true);
  document.addEventListener('pointercancel',endPaymentModalDrag,true);
 }
 function movePaymentModalDrag(event){
- if(!smPaymentDragState||event.pointerId!==smPaymentDragState.pointerId)return;
- const d=smPaymentDragState,dx=event.clientX-d.startX,dy=event.clientY-d.startY;
- if(Math.abs(dx)+Math.abs(dy)>3)d.moved=true;
- const maxLeft=Math.max(0,window.innerWidth-d.dialog.offsetWidth),maxTop=Math.max(0,window.innerHeight-d.dialog.offsetHeight);
- d.dialog.style.left=Math.max(0,Math.min(maxLeft,d.left+dx))+'px';
- d.dialog.style.top=Math.max(0,Math.min(maxTop,d.top+dy))+'px';
+ const d=smPaymentDragState;
+ if(!d||event.pointerId!==d.pointerId)return;
  event.preventDefault();
+ const dx=event.clientX-d.startX,dy=event.clientY-d.startY;
+ if(Math.abs(dx)+Math.abs(dy)>2)d.moved=true;
+ const viewport=window.visualViewport;
+ const width=viewport?.width||window.innerWidth;
+ const height=viewport?.height||window.innerHeight;
+ const offsetLeft=viewport?.offsetLeft||0;
+ const offsetTop=viewport?.offsetTop||0;
+ const maxLeft=Math.max(offsetLeft,width+offsetLeft-d.dialog.offsetWidth);
+ const maxTop=Math.max(offsetTop,height+offsetTop-d.dialog.offsetHeight);
+ const left=Math.min(maxLeft,Math.max(offsetLeft,d.left+dx));
+ const top=Math.min(maxTop,Math.max(offsetTop,d.top+dy));
+ d.dialog.style.setProperty('left',left+'px','important');
+ d.dialog.style.setProperty('top',top+'px','important');
 }
 function endPaymentModalDrag(event){
- if(!smPaymentDragState)return;
- if(event&&event.pointerId!==undefined&&event.pointerId!==smPaymentDragState.pointerId)return;
- smPaymentDragState.dialog.classList.remove('sm-payment-dragging');
- if(smPaymentDragState.moved)window.smPaymentDraggedAt=Date.now();
+ const d=smPaymentDragState;
+ if(!d)return;
+ if(event?.pointerId!==undefined&&event.pointerId!==d.pointerId)return;
+ d.dialog.classList.remove('sm-payment-dragging');
+ try{if(d.handle.hasPointerCapture(d.pointerId))d.handle.releasePointerCapture(d.pointerId)}catch(_){}
+ if(d.moved)window.smPaymentDraggedAt=Date.now();
  smPaymentDragState=null;
  document.removeEventListener('pointermove',movePaymentModalDrag,true);
  document.removeEventListener('pointerup',endPaymentModalDrag,true);
  document.removeEventListener('pointercancel',endPaymentModalDrag,true);
 }
-
 function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
 function updatePaymentModalChange(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
@@ -8803,3 +8822,8 @@ restoreSeaMartSession();
 })();
 </script>
 </body></html>
+/* Robust draggable payment overlay: keep the drag header usable on desktop and touch */
+#modalroot .sm-payment-drag-handle{width:100%!important;min-height:44px!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;cursor:grab!important}
+#modalroot .sm-payment-drag-handle:active{cursor:grabbing!important}
+#modalroot .sm-payment-drag-handle button{cursor:pointer!important;touch-action:manipulation!important}
+#modalroot .modalback>.modal.sm-payment-modal.sm-payment-dragging{margin:0!important;transition:none!important;user-select:none!important;-webkit-user-select:none!important;will-change:left,top}
