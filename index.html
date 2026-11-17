@@ -4355,6 +4355,30 @@ body:not(.seamart-pos-fullscreen) #ptable>.tablewrap{overflow:auto!important}
  #view #odooPosLayout #odooOrderPanel #cartlines>.cartline{min-height:46px!important;height:auto!important}
  #view #odooPosLayout #odooOrderPanel #cartlines:has(.empty){min-height:58px!important;max-height:58px!important;height:58px!important;overflow:hidden!important}
 }
+
+/* SeaMart POS desktop split: catalog 70%, cart 30% */
+@media(min-width:1101px){
+ #view #odooPosLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  gap:12px!important;
+  align-items:start!important;
+  width:100%!important;
+ }
+ #view #odooPosLayout>.odoo-catalog-panel{
+  grid-column:1!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+ }
+ #view #odooPosLayout>.odoo-order-panel{
+  grid-column:2!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+ }
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
