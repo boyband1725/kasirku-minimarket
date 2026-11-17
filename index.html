@@ -8977,6 +8977,30 @@ restoreSeaMartSession();
   height:43px!important;min-height:43px!important;max-height:43px!important;
  }
 }
+
+/* Enforce exact desktop POS panel placement: catalog 70%, cart 30% */
+@media(min-width:1101px){
+ #view #odooPosLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  grid-auto-flow:row!important;
+  gap:12px!important;
+  align-items:stretch!important;
+  width:100%!important;
+ }
+ #view #odooPosLayout>.odoo-category-panel,
+ #view #odooPosLayout>.mobile-cart-backdrop{display:none!important}
+ #view #odooPosLayout>.odoo-catalog-panel{
+  display:block!important;grid-column:1!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+ }
+ #view #odooPosLayout>#odooOrderPanel{
+  display:block!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important;
+ }
+}
 </style>
 <script>
 (function(){
