@@ -905,6 +905,9 @@ function categoryMatches(name){
  return found;
 }
 function openCategoryPopup(name){
+ const clearBtn=document.querySelector('#shopCategoryPopup .category-popup-search button');
+ if(clearBtn){delete clearBtn.dataset.closeReady;clearBtn.setAttribute('aria-label','Hapus pencarian');clearBtn.title='Hapus pencarian';}
+ 
  closeShopMenu();
  const search=document.getElementById('categoryPopupSearch');if(search)search.value='';
  const overlay=document.getElementById('shopCategoryPopup');
@@ -949,7 +952,20 @@ function openAllCategoriesPopup(){
  picker.querySelectorAll('[data-category-choice]').forEach(b=>b.addEventListener('click',()=>openCategoryPopup(b.dataset.categoryChoice)));
  overlay.classList.add('open');document.body.style.overflow='hidden';
 }
-function clearCategoryPopupSearch(){const input=document.getElementById('categoryPopupSearch');if(input){input.value='';input.focus();}if(document.getElementById('shopCategoryPicker').hidden)renderCategoryPopup();}
+function clearCategoryPopupSearch(){
+ const input=document.getElementById('categoryPopupSearch');
+ const btn=document.querySelector('#shopCategoryPopup .category-popup-search button');
+ if(!input)return;
+ if(input.value.trim()){
+  input.value='';
+  if(btn){btn.dataset.closeReady='1';btn.setAttribute('aria-label','Klik sekali lagi untuk menutup katalog');btn.title='Klik sekali lagi untuk menutup katalog';}
+  input.focus();
+  if(document.getElementById('shopCategoryPicker').hidden)renderCategoryPopup();
+  return;
+ }
+ closeCategoryPopup();
+}
+
 function closeCategoryPopup(){document.getElementById('shopCategoryPopup').classList.remove('open');document.body.style.overflow='';}
 function openTrackingPopup(){closeShopMenu();document.getElementById('shopTrackingPopup').classList.add('open');document.body.style.overflow='hidden';}
 function closeTrackingPopup(){document.getElementById('shopTrackingPopup').classList.remove('open');document.body.style.overflow='';}
