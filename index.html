@@ -7545,6 +7545,29 @@ restoreSeaMartSession();
   grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important
  }
 }
+
+/* Keep category filters inside the left 50% catalog area without creating a third column */
+@media(min-width:901px){
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{grid-template-rows:auto minmax(0,1fr)!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-category-panel{
+  display:contents!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-category-heading{
+  grid-column:1!important;grid-row:1!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  min-width:0!important;padding:6px 10px!important;background:#fff!important;
+  border:1px solid #e3ece6!important;border-radius:10px 10px 0 0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #poscategories{
+  grid-column:1!important;grid-row:1!important;align-self:end!important;
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  gap:5px!important;overflow-x:auto!important;white-space:nowrap!important;
+  padding:34px 8px 6px!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-cat{flex:0 0 auto!important;width:auto!important;white-space:nowrap!important;padding:6px 9px!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-panel{grid-column:1!important;grid-row:2!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-panel{grid-column:2!important;grid-row:1 / span 2!important}
+}
 </style>
 <script>
 (function(){
