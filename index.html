@@ -4166,6 +4166,18 @@ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard.is-dragging{opaci
  }
 }
 
+
+/* SeaMart payment dialog: isolate payment keypad from the POS panel */
+#modalroot .modalback{position:fixed!important;inset:0!important;z-index:2147483647!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;background:rgba(12,24,18,.72)!important;backdrop-filter:blur(2px)!important}
+#modalroot .modalback>.modal.sm-payment-modal{position:relative!important;z-index:1!important;width:min(650px,calc(100vw - 32px))!important;max-width:650px!important;max-height:calc(100dvh - 32px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;opacity:1!important;background:#fff!important;color:#173d2a!important;border:1px solid #dce8df!important;border-radius:18px!important;box-shadow:0 24px 80px rgba(0,0,0,.38)!important;padding:20px!important;margin:auto!important}
+#modalroot .sm-payment-keypad{margin-top:12px;padding:10px;background:#f3f7f4;border:1px solid #dce8df;border-radius:12px}
+#modalroot .sm-payment-keypad-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:#174b31}
+#modalroot .sm-payment-keypad-head span{font-size:11px;color:#64756b}
+#modalroot .sm-payment-keypad-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+#modalroot .sm-payment-keypad-grid button{height:38px;min-height:38px;padding:4px;background:#fff!important;color:#174b31!important;border:1px solid #cbdacf!important;border-radius:8px;font-size:16px;font-weight:800}
+#modalroot .sm-payment-keypad-grid button:last-child{background:#087a48!important;color:#fff!important;border-color:#087a48!important}
+body:has(#modalroot .modalback) #cartScreenKeyboard{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:600px){#modalroot .modalback>.modal.sm-payment-modal{padding:14px!important}#modalroot .sm-payment-keypad-grid{gap:5px}#modalroot .sm-payment-keypad-grid button{height:34px;min-height:34px;font-size:14px}}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -6129,6 +6141,7 @@ function checkout(){
  <button type="button" id="chooseQris" class="sm-payment-option ${current==='QRIS'?'active':''}" onclick="selectPaymentMethod('QRIS')"><span>▦</span><b>QRIS</b><small>Pembayaran QR</small></button>
  </div>
  <div id="smCashFields" style="display:${current==='Tunai'?'block':'none'};margin-top:14px"><label style="font-size:12px;font-weight:800">UANG DITERIMA</label><input id="smCashReceived" class="field" type="number" min="${total}" inputmode="numeric" ${current==='QRIS'?'disabled':''} value="${current==='Tunai'?esc(document.getElementById('posCashReceived')?.value||'0'):''}" placeholder="Masukkan uang pelanggan" style="width:100%;min-height:46px;margin-top:6px" oninput="updatePaymentModalChange()"><div class="totalrow"><span>Kembalian</span><b id="smCashChange">0</b></div></div>
+<div class="sm-payment-keypad" aria-label="Numpad pembayaran"><div class="sm-payment-keypad-head"><b>⌨ NUMPAD KASIR</b><span>Nominal uang diterima</span></div><div class="sm-payment-keypad-grid"><button type="button" onclick="paymentModalKey('7')">7</button><button type="button" onclick="paymentModalKey('8')">8</button><button type="button" onclick="paymentModalKey('9')">9</button><button type="button" onclick="paymentModalKey('back')">⌫</button><button type="button" onclick="paymentModalKey('4')">4</button><button type="button" onclick="paymentModalKey('5')">5</button><button type="button" onclick="paymentModalKey('6')">6</button><button type="button" onclick="paymentModalKey('clear')">C</button><button type="button" onclick="paymentModalKey('1')">1</button><button type="button" onclick="paymentModalKey('2')">2</button><button type="button" onclick="paymentModalKey('3')">3</button><button type="button" onclick="paymentModalKey('00')">00</button><button type="button" onclick="paymentModalKey('0')">0</button><button type="button" onclick="paymentModalKey('000')">000</button><button type="button" onclick="paymentModalKey('0000')">0000</button><button type="button" onclick="paymentModalKey('enter')">OK</button></div></div>
  <div id="smQrisInfo" class="notice" style="display:${current==='QRIS'?'block':'none'};margin-top:14px">Pastikan pembayaran QRIS pelanggan sudah berhasil sebelum menekan tombol Konfirmasi.</div>
  <div class="actions"><button class="btn-primary" style="width:100%;min-height:48px" onclick="confirmPayment()">Konfirmasi Pembayaran · ${rupiah(total)}</button></div>
  </div></div>`;
@@ -6145,6 +6158,7 @@ function selectPaymentMethod(method){
  const qrisInfo=document.getElementById('smQrisInfo');if(qrisInfo){qrisInfo.hidden=method!=='QRIS';qrisInfo.style.setProperty('display',method==='QRIS'?'block':'none','important');}
  if(cashInput){cashInput.disabled=method!=='Tunai';cashInput.readOnly=method!=='Tunai';cashInput.value=method==='QRIS'?'':cashInput.value;}
 }
+function paymentModalKey(key){const input=document.getElementById('smCashReceived');if(!input||input.disabled||input.readOnly)return;let value=String(input.value||'0');if(key==='back')value=value.slice(0,-1)||'0';else if(key==='clear')value='0';else if(key==='enter'){input.focus();updatePaymentModalChange();return;}else value=(value==='0'?key:value+key).slice(0,14);input.value=value;updatePaymentModalChange();}
 function updatePaymentModalChange(){
  const total=cart.reduce((n,x)=>n+(db.products.find(p=>p.id===x.id)?.harga||0)*x.qty,0);
  const paid=Number(document.getElementById('smCashReceived')?.value||0);
