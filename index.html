@@ -8824,6 +8824,28 @@ restoreSeaMartSession();
 })();
 </script>
 <script>
+/* Reliable qty commit: Enter on the physical keyboard applies the visible quantity. */
+(function(){
+ if(window.__seamartQtyEnterCommitInstalled)return;
+ window.__seamartQtyEnterCommitInstalled=true;
+ document.addEventListener('keydown',function(event){
+  const layout=document.getElementById('odooPosLayout');
+  const panel=document.getElementById('cartScreenKeyboard');
+  const display=document.getElementById('cartKeyboardDisplay');
+  if(!layout||!panel||!display||!layout.getClientRects().length)return;
+  const code=event.code||'',key=event.key||'',kc=event.keyCode||event.which||0;
+  const isEnter=key==='Enter'||code==='NumpadEnter'||kc===13;
+  if(!isEnter||window.cartKeyMode!=='qty')return;
+  const value=String(display.value||window.cartKeyboardValue||'').trim();
+  if(!value)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  event.stopPropagation();
+  window.cartKeyboardValue=value;
+  applyCartKeyboard();
+ },true);
+})();
+
 /* Laptop keyboard support for the integrated SeaMart POS keypad.
    Keep barcode/search inputs untouched so scanner-as-keyboard continues to work. */
 (function(){
