@@ -4314,6 +4314,24 @@ body:not(.seamart-pos-fullscreen) #ptable>.tablewrap{overflow:auto!important}
 .cart-empty-button:hover{background:#feecec!important;border-color:#e6a5a5!important}
 .cart-empty-button svg{width:17px;height:17px;display:block}
 .cart-empty-button:disabled{opacity:.45;cursor:not-allowed}
+
+/* Final payment alignment: keep Tunai/QRIS untouched, show change then Bayar */
+#view #odooPosLayout #cartScreenKeyboard .cart-payment-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#view #odooPosLayout #cartScreenKeyboard .cart-change-card{
+ grid-column:1/-1!important;
+ width:100%!important;
+ min-height:40px!important;height:40px!important;
+ margin:5px 0 0!important;
+ box-sizing:border-box!important;
+ display:flex!important;flex-direction:row!important;
+ align-items:center!important;justify-content:space-between!important;
+}
+#view #odooPosLayout #cartScreenKeyboard #checkoutBtn{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 50%!important;width:50%!important;min-width:0!important;max-width:50%!important;
+ height:42px!important;min-height:42px!important;max-height:42px!important;
+ margin:6px auto 0!important;padding:6px 12px!important;box-sizing:border-box!important;
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
@@ -9136,10 +9154,18 @@ restoreSeaMartSession();
  function arrange(){
   const layout=document.getElementById('odooPosLayout');
   const catalog=layout?.querySelector(':scope > .odoo-catalog-panel');
-  const categories=layout?.querySelector('.odoo-category-pa
+  const categories=layout?.querySelector('.odoo-category-panel');
+  const top=catalog?.querySelector('.odoo-catalog-top');
+  if(catalog&&categories&&top&&categories.parentElement!==catalog)catalog.insertBefore(categories,top.nextSibling);
+  else if(catalog&&categories&&top&&categories.previousElementSibling!==top)catalog.insertBefore(categories,top.nextSibling);
+ }
+ arrange();
+ const target=document.getElementById('view');
+ if(target)new MutationObserver(arrange).observe(target,{childList:true,subtree:true});
+})();
+</script>
 <script>
-/* Move the existing checkout control directly below the change field.
-   Keep its original checkout(event) handler and all payment logic unchanged. */
+/* Keep the original checkout button and its handler; position it below KEMBALIAN. */
 (function(){
  if(window.__seamartBayarUnderChangeInstalled)return;
  window.__seamartBayarUnderChangeInstalled=true;
@@ -9148,6 +9174,10 @@ restoreSeaMartSession();
   const change=keypad?.querySelector('.cart-change-card');
   const bayar=document.querySelector('#view #odooPosLayout #checkoutBtn');
   if(!keypad||!change||!bayar)return;
+  if(change.parentElement!==keypad){
+   change.insertAdjacentElement('afterend',bayar);
+   return;
+  }
   if(bayar.parentElement!==keypad||bayar.previousElementSibling!==change){
    change.insertAdjacentElement('afterend',bayar);
   }
@@ -9155,17 +9185,6 @@ restoreSeaMartSession();
  placeBayar();
  const target=document.getElementById('view')||document.body;
  new MutationObserver(placeBayar).observe(target,{childList:true,subtree:true});
- document.addEventListener('DOMContentLoaded',placeBayar,{once:true});
-})();
-</script>
-nel');
-  const top=catalog?.querySelector('.odoo-catalog-top');
-  if(catalog&&categories&&top&&categories.parentElement!==catalog)catalog.insertBefore(categories,top.nextSibling);
-  else if(catalog&&categories&&top&&categories.previousElementSibling!==top)catalog.insertBefore(categories,top.nextSibling);
- }
- arrange();
- const target=document.getElementById('view');
- if(target)new MutationObserver(arrange).observe(target,{childList:true,subtree:true});
 })();
 </script>
 </body></html>
