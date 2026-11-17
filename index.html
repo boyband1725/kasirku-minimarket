@@ -7747,6 +7747,74 @@ restoreSeaMartSession();
   display:block!important;height:58px!important;min-height:58px!important;font-size:17px!important;font-weight:900!important
  }
 }
+
+/* FIT-TO-PC: fill available browser viewport without oversized margins or clipping */
+@media(min-width:901px){
+ html,body{width:100%!important;min-width:0!important;min-height:100%!important}
+ body:has(#odooPosLayout) .app{width:100%!important;min-width:0!important;min-height:100dvh!important}
+ body:has(#odooPosLayout) .main{width:calc(100% - 238px)!important;max-width:none!important;min-width:0!important;flex:1 1 auto!important}
+ body:has(#odooPosLayout) .topbar{width:100%!important;box-sizing:border-box!important}
+ body:has(#odooPosLayout) .content{
+  width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;padding:8px 12px 10px!important;box-sizing:border-box!important
+ }
+ body:has(#odooPosLayout) #view{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important}
+ body:has(#odooPosLayout) .odoo-pos-head{
+  min-height:42px!important;height:auto!important;margin:0 0 8px!important;
+  padding:0 2px!important;align-items:center!important
+ }
+ body:has(#odooPosLayout) .odoo-pos-head h1{font-size:20px!important;line-height:1.15!important;margin:0 0 2px!important}
+ body:has(#odooPosLayout) .odoo-pos-head .sub{font-size:11px!important;line-height:1.2!important}
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{
+  display:grid!important;grid-template-columns:minmax(0,57fr) minmax(0,43fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;gap:10px!important;
+  width:100%!important;height:calc(100dvh - 132px)!important;
+  min-height:500px!important;max-height:calc(100dvh - 132px)!important;
+  max-width:none!important;min-width:0!important;box-sizing:border-box!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel,
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{
+  height:100%!important;min-height:0!important;max-height:100%!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  box-sizing:border-box!important;overflow:hidden!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel{grid-column:1!important;grid-row:1!important}
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{grid-column:2!important;grid-row:1!important}
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel>.odoo-category-panel{
+  flex:0 0 auto!important;max-height:48px!important;overflow:hidden!important;margin-bottom:4px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top{margin-bottom:6px!important;gap:5px!important}
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .pos-products-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(0,1fr)!important;gap:7px!important;height:100%!important;min-height:100%!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-image{
+  flex-basis:clamp(42px,8vh,72px)!important;height:clamp(42px,8vh,72px)!important;
+  min-height:clamp(42px,8vh,72px)!important;max-height:clamp(42px,8vh,72px)!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body{
+  flex:1 1 0!important;height:0!important;min-height:0!important;overflow:hidden!important;
+  padding:8px 10px!important;gap:5px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-lines{flex:1 1 50px!important;min-height:42px!important;overflow:auto!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard{gap:5px!important;padding-top:5px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-key-mode button{height:clamp(28px,4vh,34px)!important;min-height:clamp(28px,4vh,34px)!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard #cartKeyboardDisplay{height:clamp(32px,5vh,40px)!important;min-height:clamp(32px,5vh,40px)!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{gap:5px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+  height:clamp(36px,6vh,48px)!important;min-height:clamp(36px,6vh,48px)!important;font-size:clamp(15px,1.5vw,19px)!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions{gap:8px!important;padding:5px 0 0!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{
+  height:clamp(42px,7vh,58px)!important;min-height:clamp(42px,7vh,58px)!important;font-size:clamp(13px,1.35vw,17px)!important
+ }
+}
+@media(min-width:901px) and (max-height:700px){
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{height:calc(100dvh - 118px)!important;max-height:calc(100dvh - 118px)!important;min-height:440px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{height:36px!important;min-height:36px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{height:42px!important;min-height:42px!important}
+}
 </style>
 <script>
 (function(){
