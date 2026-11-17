@@ -4235,6 +4235,51 @@ body:has(#ptable) #ptable>.tablewrap thead th{position:sticky!important;top:0!im
  .app.odoo-inventory .odoo-appnav button{height:46px!important;min-height:46px!important;padding:0 12px!important;font-size:12px!important}
  .app.odoo-inventory .odoo-appnav .appnav-title{height:30px!important;padding-right:10px!important;margin-right:4px!important}
 }
+
+/* FINAL MASTER BARANG REDESIGN — scoped to the existing product page */
+body:has(#ptable) #view{box-sizing:border-box!important;max-width:100%!important;padding:20px 22px 24px!important;gap:14px!important}
+body:has(#ptable) #view>.pagehead{display:grid!important;grid-template-columns:minmax(260px,1fr) minmax(440px,1.15fr)!important;align-items:center!important;gap:18px!important;margin:0!important;padding:2px 0 4px!important}
+body:has(#ptable) #view>.pagehead>div:first-child{min-width:0!important}
+body:has(#ptable) #view>.pagehead h1{margin:0 0 5px!important;color:#174b32!important;font-size:25px!important;line-height:1.2!important;font-weight:800!important;letter-spacing:-.35px!important}
+body:has(#ptable) #view>.pagehead .sub{max-width:700px!important;color:#6b7b71!important;font-size:13px!important;line-height:1.55!important}
+body:has(#ptable) #view>.pagehead .product-admin-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important;min-width:0!important}
+body:has(#ptable) #view>.pagehead .product-admin-actions button{width:100%!important;min-width:0!important;min-height:40px!important;height:auto!important;padding:9px 11px!important;border-radius:9px!important;font-size:12px!important;font-weight:700!important;line-height:1.25!important;white-space:normal!important;box-shadow:0 1px 2px rgba(20,60,40,.06)!important}
+body:has(#ptable) #view>.panel{box-sizing:border-box!important;min-width:0!important;margin:0!important;padding:14px!important;border:1px solid #e1eae4!important;border-radius:13px!important;background:#fff!important;box-shadow:0 3px 12px rgba(24,65,43,.045)!important}
+body:has(#ptable) .product-search-toolbar{display:grid!important;grid-template-columns:minmax(260px,2.2fr) minmax(145px,1fr) minmax(130px,.85fr) minmax(130px,.85fr) auto!important;gap:9px!important;align-items:center!important}
+body:has(#ptable) .product-search-toolbar .field{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;border:1px solid #dce7df!important;border-radius:9px!important;background:#fbfdfb!important;padding:0 12px!important;font-size:13px!important;color:#263b30!important}
+body:has(#ptable) .product-search-toolbar input.search{font-size:14px!important;background:#fff!important}
+body:has(#ptable) .product-search-toolbar button{height:42px!important;min-height:42px!important;padding:0 14px!important;border-radius:9px!important;white-space:nowrap!important;font-size:12px!important}
+body:has(#ptable) #view>.panel:has(#ptable)>div:first-child{display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:wrap!important;margin:0 0 12px!important;padding:0 0 11px!important;border-bottom:1px solid #edf2ee!important}
+body:has(#ptable) #view>.panel:has(#ptable)>div:first-child label{margin-right:auto!important;color:#53665a!important;font-size:12px!important;font-weight:600!important}
+body:has(#ptable) #view>.panel:has(#ptable)>div:first-child button{height:36px!important;min-height:36px!important;padding:0 13px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important}
+body:has(#ptable) #productResultCount{padding:6px 10px!important;border-radius:20px!important;background:#eef7f1!important;color:#176b46!important;font-size:11px!important;font-weight:800!important}
+body:has(#ptable) #ptable>.tablewrap{height:58vh!important;min-height:340px!important;max-height:680px!important;border:1px solid #e2eae4!important;border-radius:10px!important;background:#fff!important;overflow:auto!important;overscroll-behavior:contain!important}
+body:has(#ptable) #ptable table{width:max-content!important;min-width:100%!important;border-collapse:separate!important;border-spacing:0!important;font-size:12px!important;color:#34483b!important}
+body:has(#ptable) #ptable thead th{position:sticky!important;top:0!important;z-index:8!important;height:42px!important;padding:10px 12px!important;background:#eff6f1!important;color:#365b45!important;border-bottom:1px solid #dce8df!important;font-size:11px!important;font-weight:800!important;white-space:nowrap!important}
+body:has(#ptable) #ptable tbody td{height:58px!important;padding:7px 12px!important;border-bottom:1px solid #edf1ee!important;vertical-align:middle!important;white-space:nowrap!important}
+body:has(#ptable) #ptable tbody tr:hover{background:#f8fcf9!important}
+body:has(#ptable) #ptable .product-info-cell{min-width:210px!important;max-width:270px!important;white-space:normal!important}
+body:has(#ptable) #ptable .product-info-cell b{display:block!important;color:#263d30!important;font-size:12px!important;line-height:1.35!important}
+body:has(#ptable) #ptable .product-info-cell small{display:block!important;margin-top:3px!important;color:#819087!important;font-size:10px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+body:has(#ptable) #ptable .product-active-pill{display:none!important}
+body:has(#ptable) #ptable .product-category-select{min-width:125px!important;height:32px!important;font-size:11px!important}
+body:has(#ptable) #ptable .product-row-actions{display:flex!important;align-items:center!important;gap:6px!important}
+body:has(#ptable) #ptable .product-icon-action{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;border-radius:7px!important}
+body:has(#ptable) #ptable .photo-placeholder{display:inline-grid!important;place-items:center!important;width:48px!important;height:48px!important;border-radius:8px!important;background:#f2f6f3!important;color:#9aaba0!important;border:1px solid #e4ebe6!important}
+@media(max-width:1050px){
+ body:has(#ptable) #view>.pagehead{grid-template-columns:1fr!important}
+ body:has(#ptable) #view>.pagehead .product-admin-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ body:has(#ptable) .product-search-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ body:has(#ptable) .product-search-toolbar input.search{grid-column:1/-1!important}
+}
+@media(max-width:640px){
+ body:has(#ptable) #view{padding:12px!important}
+ body:has(#ptable) #view>.pagehead .product-admin-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body:has(#ptable) .product-search-toolbar{grid-template-columns:1fr 1fr!important}
+ body:has(#ptable) .product-search-toolbar input.search{grid-column:1/-1!important}
+ body:has(#ptable) .product-search-toolbar button{grid-column:1/-1!important}
+ body:has(#ptable) #ptable>.tablewrap{height:65vh!important;min-height:300px!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
