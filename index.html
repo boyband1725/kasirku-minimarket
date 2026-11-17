@@ -7518,6 +7518,33 @@ restoreSeaMartSession();
  #view #odooPosLayout .odoo-order-panel{grid-column:3!important}
  #view #odooPosLayout #posproducts .pos-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
+
+/* FIX desktop POS: remove the accidental narrow/overlapping workspace.
+   The catalog and checkout each occupy exactly half of the full content width. */
+@media(min-width:901px){
+ body:has(#odooPosLayout) .content{
+  width:100%!important;max-width:none!important;margin:0!important;
+  padding:18px 22px!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #view{width:100%!important;max-width:none!important;min-width:0!important}
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:14px!important;align-items:stretch!important;
+  width:100%!important;max-width:none!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-category-panel{display:none!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-panel{
+  display:block!important;grid-column:1!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-panel{
+  display:flex!important;flex-direction:column!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .pos-products-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important
+ }
+}
 </style>
 <script>
 (function(){
