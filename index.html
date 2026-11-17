@@ -7321,7 +7321,7 @@ restoreSeaMartSession();
 #odooPosLayout #posPayCash{background:linear-gradient(135deg,#0a984e,#08743d)!important;color:#fff!important;box-shadow:0 4px 10px #087b4320!important}
 #odooPosLayout #posPayQris{background:#fff!important;border:1.5px solid #12864b!important;color:#087b43!important}
 #odooPosLayout #cartKeyboardToggle{display:none!important}
-#odooPosLayout #checkoutBtn{display:none!important}
+#odooPosLayout #checkoutBtn{display:block!important;width:100%!important;min-height:42px!important;margin-top:5px!important;border-radius:9px!important;background:#087b43!important;color:#fff!important;font-weight:850!important}
 @media(max-width:1100px){#odooPosLayout #cartScreenKeyboard.seamart-permanent-keypad{max-width:420px!important;margin:12px auto!important}#odooPosLayout .cart-keypad-grid button{height:42px!important;min-height:42px!important}}
 @media(max-width:520px){#odooPosLayout #cartScreenKeyboard.seamart-permanent-keypad{max-width:100%!important;margin:10px 0!important;padding:10px!important}#odooPosLayout .cart-keypad-grid{gap:5px!important}#odooPosLayout .cart-keypad-grid button{height:38px!important;min-height:38px!important;font-size:16px!important}#odooPosLayout .cart-payment-actions button{height:44px!important;min-height:44px!important;font-size:12px!important}}
 
@@ -7351,6 +7351,16 @@ restoreSeaMartSession();
  #view #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{height:37px!important;min-height:37px!important;font-size:16px!important}
  #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{height:43px!important;min-height:43px!important}
 }
+
+/* FIX: keep the payment actions visible at the bottom of the integrated cart */
+#view #odooPosLayout #cartScreenKeyboard.seamart-permanent-keypad{overflow:visible!important;max-height:none!important;height:auto!important;min-height:0!important;flex-shrink:0!important;scrollbar-width:none!important}
+#view #odooPosLayout #cartScreenKeyboard.seamart-permanent-keypad::-webkit-scrollbar{display:none!important}
+#view #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{height:32px!important;min-height:32px!important}
+#view #odooPosLayout #cartScreenKeyboard .cart-cash-summary{flex:0 0 auto!important}
+#view #odooPosLayout #cartScreenKeyboard .cart-payment-actions{display:grid!important;position:sticky!important;bottom:0!important;z-index:5!important;flex:0 0 auto!important;padding:5px 0 2px!important;margin:0!important;background:#fff!important}
+#view #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{display:block!important;height:42px!important;min-height:42px!important;visibility:visible!important;opacity:1!important}
+#view #odooPosLayout #odooOrderPanel .odoo-order-body{overflow-y:auto!important;overflow-x:hidden!important}
+#view #odooPosLayout #odooOrderPanel .odoo-order-lines{flex:1 1 90px!important;min-height:45px!important;max-height:18vh!important}
 </style>
 <script>
 (function(){
