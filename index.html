@@ -5709,7 +5709,7 @@ function pos(){toggleMobileCart(false);window.posCategory='Semua';document.getEl
 function updatePosCategoryToggle(){const b=document.getElementById('togglePosCategories');const panel=document.getElementById('odooCategoryPanel');if(b)b.textContent=panel&&panel.classList.contains('categories-collapsed')?'+':'−';}
 function togglePosCategories(){const panel=document.getElementById('odooCategoryPanel');if(!panel)return;panel.classList.toggle('categories-collapsed');localStorage.setItem('seamart_pos_categories_hidden',panel.classList.contains('categories-collapsed')?'1':'0');updatePosCategoryToggle();}
 function normalizePosSearchValue(v){const raw=String(v??'').toLocaleLowerCase('id-ID').trim();return raw.replace(/\d+/g,n=>n.replace(/^0+(?=\d)/,''));}
-function renderPosProducts(){let q=normalizePosSearchValue(document.getElementById('posbarcode')?.value||''),defaultCats=['Minuman','Makanan','Mie Instan','Es Krim','Frozen Food','Snack','Sembako','Perlengkapan Rumah','Rokok','Umum'],productCats=[...new Set(db.products.map(p=>String(p.kategori||'Umum').trim()||'Umum'))],cats=['Semua',...defaultCats,...productCats.filter(cat=>!defaultCats.some(d=>d.toLocaleLowerCase('id-ID')===cat.toLocaleLowerCase('id-ID')))],c=window.posCategory||'Semua',a=db.products.filter(p=>p.active!==false&&(c==='Semua'||posProductMatchesCategory(p,c))&&normalizePosSearchValue([p.nama,p.barcode,p.kode].join(' ')).includes(q));let catEl=document.getElementById('poscategories');if(catEl)catEl.innerHTML=cats.map((cat,i)=>'<div class="pos-category-row"><button class="odoo-cat '+(c===cat?'active':'')+'" onclick="setPosCategory('+JSON.stringify(cat).replace(/"/g,'&quot;')+')"><span class="odoo-cat-icon">'+(cat==='Semua'?'▦':categoryIcon({kategori:cat,nama:''}))+'</span>'+esc(cat)+'</button>'+'</div>').join('');let title=document.getElementById('pos-category-title'),count=document.getElementById('pos-product-count');if(title)title.textContent=c==='Semua'?'Semua Produk':c;if(count)count.textContent=a.length+' produk';let el=document.getElementById('posproducts');if(!el)return;const card=p=>{const id=String(p.id??'');return '<div class="odoo-product" data-pos-product="'+esc(id)+'" role="button" tabindex="0" aria-label="Tambah '+esc(p.nama)+'"><div class="odoo-product-image" data-product-photo="'+esc(id)+'">'+productPicture(p)+'</div><div class="odoo-product-name">'+esc(p.nama)+'</div><div class="odoo-product-meta">'+esc(p.kode||p.barcode||'')+'</div><div class="odoo-product-stock">Stok: <b>'+Number(p.stok||0)+'</b></div><div class="odoo-product-price">'+rupiah(Number(p.harga||0))+'</div></div>'};const pageSize=16;const pageKey=c+'|'+q;if(window._posCatalogPageKey!==pageKey){window._posCatalogPageKey=pageKey;window.posCatalogPage=1;}const totalPages=Math.max(1,Math.ceil(a.length/pageSize));window.posCatalogPage=Math.min(Math.max(1,Number(window.posCatalogPage)||1),totalPages);const pageStart=(window.posCatalogPage-1)*pageSize;const pageItems=a.slice(pageStart,pageStart+pageSize);const pageLabel=document.getElementById('posPageLabel'),prev=document.getElementById('posPagePrev'),next=document.getElementById('posPageNext');if(pageLabel)pageLabel.textContent=window.posCatalogPage+'/'+totalPages;if(prev)prev.disabled=window.posCatalogPage<=1;if(next)next.disabled=window.posCatalogPage>=totalPages;el.innerHTML=pageItems.length?'<div class="pos-products-grid">'+pageItems.map(card).join('')+'</div>':'<div class="empty">Produk tidak ditemukan.</div>';if(pageItems.length&&typeof hydrateFeaturedProductPhotos==='function')hydrateFeaturedProductPhotos(pageItems);el.onclick=e=>{const cardEl=e.target.closest('[data-pos-product]');if(!cardEl)return;const id=cardEl.dataset.posProduct,action=e.target.closest('[data-pos-action]')?.dataset.posAction;if(action==='minus'){changeQty(id,-1);return}if(action==='plus'){addCart(id);return}if(e.target.closest('button'))return;addCart(id)};el.onkeydown=e=>{if(e.key!=='Enter'&&e.key!==' ')return;const cardEl=e.target.closest('[data-pos-product]');if(!cardEl||e.target.closest('button'))return;e.preventDefault();addCart(cardEl.dataset.posProduct)}}
+function renderPosProducts(){let q=normalizePosSearchValue(document.getElementById('posbarcode')?.value||''),defaultCats=['Minuman','Makanan','Mie Instan','Es Krim','Frozen Food','Snack','Sembako','Perlengkapan Rumah','Rokok','Umum'],productCats=[...new Set(db.products.map(p=>String(p.kategori||'Umum').trim()||'Umum'))],cats=['Semua',...defaultCats,...productCats.filter(cat=>!defaultCats.some(d=>d.toLocaleLowerCase('id-ID')===cat.toLocaleLowerCase('id-ID')))],c=window.posCategory||'Semua',a=db.products.filter(p=>p.active!==false&&(c==='Semua'||posProductMatchesCategory(p,c))&&normalizePosSearchValue([p.nama,p.barcode,p.kode].join(' ')).includes(q));let catEl=document.getElementById('poscategories');if(catEl)catEl.innerHTML=cats.map((cat,i)=>'<div class="pos-category-row"><button class="odoo-cat '+(c===cat?'active':'')+'" onclick="setPosCategory('+JSON.stringify(cat).replace(/"/g,'&quot;')+')"><span class="odoo-cat-icon">'+(cat==='Semua'?'▦':categoryIcon({kategori:cat,nama:''}))+'</span>'+esc(cat)+'</button>'+'</div>').join('');let title=document.getElementById('pos-category-title'),count=document.getElementById('pos-product-count');if(title)title.textContent=c==='Semua'?'Semua Produk':c;if(count)count.textContent=a.length+' produk';let el=document.getElementById('posproducts');if(!el)return;const card=p=>{const id=String(p.id??'');return '<div class="odoo-product" data-pos-product="'+esc(id)+'" role="button" tabindex="0" aria-label="Tambah '+esc(p.nama)+'"><div class="odoo-product-image" data-product-photo="'+esc(id)+'">'+productPicture(p)+'</div><div class="odoo-product-name">'+esc(p.nama)+'</div><div class="odoo-product-meta">'+esc(p.kode||p.barcode||'')+'</div><div class="odoo-product-stock">Stok: <b>'+Number(p.stok||0)+'</b></div><div class="odoo-product-price">'+rupiah(Number(p.harga||0))+'</div></div>'};const pageSize=12;const pageKey=c+'|'+q;if(window._posCatalogPageKey!==pageKey){window._posCatalogPageKey=pageKey;window.posCatalogPage=1;}const totalPages=Math.max(1,Math.ceil(a.length/pageSize));window.posCatalogPage=Math.min(Math.max(1,Number(window.posCatalogPage)||1),totalPages);const pageStart=(window.posCatalogPage-1)*pageSize;const pageItems=a.slice(pageStart,pageStart+pageSize);const pageLabel=document.getElementById('posPageLabel'),prev=document.getElementById('posPagePrev'),next=document.getElementById('posPageNext');if(pageLabel)pageLabel.textContent=window.posCatalogPage+'/'+totalPages;if(prev)prev.disabled=window.posCatalogPage<=1;if(next)next.disabled=window.posCatalogPage>=totalPages;el.innerHTML=pageItems.length?'<div class="pos-products-grid">'+pageItems.map(card).join('')+'</div>':'<div class="empty">Produk tidak ditemukan.</div>';if(pageItems.length&&typeof hydrateFeaturedProductPhotos==='function')hydrateFeaturedProductPhotos(pageItems);el.onclick=e=>{const cardEl=e.target.closest('[data-pos-product]');if(!cardEl)return;const id=cardEl.dataset.posProduct,action=e.target.closest('[data-pos-action]')?.dataset.posAction;if(action==='minus'){changeQty(id,-1);return}if(action==='plus'){addCart(id);return}if(e.target.closest('button'))return;addCart(id)};el.onkeydown=e=>{if(e.key!=='Enter'&&e.key!==' ')return;const cardEl=e.target.closest('[data-pos-product]');if(!cardEl||e.target.closest('button'))return;e.preventDefault();addCart(cardEl.dataset.posProduct)}}
 function posProductMatchesCategory(product,category){const p=normalizePosCategory(product.kategori||'Umum'),c=normalizePosCategory(category);if(p===c||p.startsWith(c+' ')||c.startsWith(p+' '))return true;const groups={'minuman':['minuman','minuman ringan','air minum'],'makanan':['makanan','makanan ringan','snack','cemilan'],'mie instan':['mie instan','mi instan'],'es krim':['es krim','eskrim','ice cream','icecream'],'frozen food':['frozen food','makanan beku'],'perlengkapan rumah':['perlengkapan rumah','peralatan rumah tangga']};const terms=groups[c]||[c];return terms.some(t=>p===normalizePosCategory(t)||p.startsWith(normalizePosCategory(t)+' '));}
 function normalizePosCategory(value){return String(value||'Umum').trim().toLocaleLowerCase('id-ID').replace(/[._-]+/g,' ').replace(/\s+/g,' ')}
 function setPosCategory(category){window.posCategory=category;const search=document.getElementById('possearch');if(search)search.value='';renderPosProducts()}
@@ -7624,6 +7624,129 @@ restoreSeaMartSession();
   grid-template-columns:repeat(2,minmax(0,1fr))!important
  }
 }
+
+/* REFERENCE-MATCH POS DESKTOP: catalog 57%, checkout 43%, 12 products/page */
+@media(min-width:901px){
+ body:has(#odooPosLayout) .content{
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  margin:0!important;padding:14px 18px!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #view{box-sizing:border-box!important;width:100%!important;max-width:none!important;min-width:0!important}
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{
+  display:grid!important;grid-template-columns:minmax(0,57fr) minmax(0,43fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;gap:12px!important;
+  width:100%!important;max-width:none!important;min-width:0!important;align-items:stretch!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel{
+  display:flex!important;flex-direction:column!important;grid-column:1!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;min-height:calc(100vh - 105px)!important;
+  box-sizing:border-box!important;overflow:hidden!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{
+  display:flex!important;flex-direction:column!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;max-width:none!important;min-height:calc(100vh - 105px)!important;
+  max-height:calc(100vh - 105px)!important;box-sizing:border-box!important;overflow:hidden!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel>.odoo-category-panel{
+  display:block!important;position:static!important;flex:0 0 auto!important;width:100%!important;
+  min-width:0!important;max-width:none!important;margin:0 0 8px!important;padding:6px 8px!important;
+  border:0!important;border-bottom:1px solid #e8eee9!important;border-radius:0!important;
+  box-shadow:none!important;background:#fff!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-category-heading{display:none!important}
+ body:has(#odooPosLayout) #odooPosLayout #poscategories{
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;
+  gap:6px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;
+  min-width:0!important;padding:2px 0 5px!important;scrollbar-width:thin!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .pos-category-row{flex:0 0 auto!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-cat{
+  display:flex!important;flex:0 0 auto!important;width:auto!important;white-space:nowrap!important;
+  margin:0!important;padding:7px 12px!important;border:1px solid #e4eae6!important;border-radius:9px!important;
+  font-size:12px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-areas:"title tools" "search search"!important;gap:8px!important;
+  align-items:center!important;flex:0 0 auto!important;margin:0 0 9px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top h3{grid-area:title!important;font-size:16px!important;margin:0!important}
+ body:has(#odooPosLayout) #odooPosLayout .seamart-catalog-barcode{grid-area:search!important;width:100%!important;min-width:0!important}
+ body:has(#odooPosLayout) #odooPosLayout .pos-catalog-tools{grid-area:tools!important;display:flex!important;align-items:center!important;gap:7px!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-products{
+  display:block!important;flex:1 1 0!important;min-height:0!important;overflow:auto!important;
+  width:100%!important;max-width:none!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .pos-products-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;grid-auto-rows:minmax(0,1fr)!important;
+  gap:9px!important;width:100%!important;min-height:100%!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  min-width:0!important;min-height:0!important;height:100%!important;padding:8px!important;
+  border:1px solid #e5ebe7!important;border-radius:10px!important;box-sizing:border-box!important;overflow:hidden!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-image{
+  flex:0 0 78px!important;height:78px!important;min-height:78px!important;max-height:78px!important;
+  margin:0 0 6px!important;background:#f6f8f6!important;border-radius:7px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-image img{
+  max-width:100%!important;max-height:76px!important;width:auto!important;height:auto!important;object-fit:contain!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-name{
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
+  min-height:30px!important;max-height:30px!important;overflow:hidden!important;
+  font-size:12px!important;line-height:1.25!important;font-weight:800!important;white-space:normal!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-meta{
+  display:block!important;min-height:12px!important;height:12px!important;max-height:12px!important;
+  overflow:hidden!important;font-size:9px!important;line-height:12px!important;color:#839087!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-stock{
+  display:block!important;flex:0 0 18px!important;height:18px!important;min-height:18px!important;
+  margin:2px 0!important;padding:2px 6px!important;border-radius:5px!important;
+  background:#f1f4f2!important;color:#56645b!important;font-size:10px!important;line-height:14px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .odoo-product-price{
+  display:block!important;flex:0 0 28px!important;height:28px!important;min-height:28px!important;
+  margin:auto 0 0!important;padding:5px 8px!important;border-radius:7px!important;
+  background:#e3f5e7!important;color:#087b43!important;font-size:15px!important;line-height:18px!important;
+  font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-head{flex:0 0 auto!important}
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body{
+  display:flex!important;flex:1 1 0!important;min-height:0!important;height:0!important;
+  flex-direction:column!important;overflow:hidden!important;padding:10px 12px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-lines{
+  flex:1 1 90px!important;min-height:55px!important;max-height:none!important;
+  overflow-y:auto!important;overflow-x:hidden!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout .totalrow{flex:0 0 auto!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard{
+  display:flex!important;flex:0 0 auto!important;flex-direction:column!important;gap:6px!important;
+  max-height:none!important;height:auto!important;overflow:visible!important;padding:8px 0 0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keyboard-head{font-size:13px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-key-mode button{height:34px!important;min-height:34px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard #cartKeyboardDisplay{height:40px!important;min-height:40px!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-keypad-grid button{
+  height:48px!important;min-height:48px!important;border-radius:9px!important;font-size:19px!important;font-weight:800!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-cash-summary{flex:0 0 auto!important;padding:4px 0!important}
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions{
+  display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;
+  flex:0 0 auto!important;position:sticky!important;bottom:0!important;padding:8px 0 2px!important;
+  background:#fff!important;z-index:3!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions button{
+  display:block!important;height:58px!important;min-height:58px!important;font-size:17px!important;font-weight:900!important
+ }
+}
 </style>
 <script>
 (function(){
@@ -7702,6 +7825,25 @@ restoreSeaMartSession();
  }
  place();
  new MutationObserver(place).observe(document.getElementById('view')||document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<script>
+/* Place category chips directly below the catalog search row, not in a third column. */
+(function(){
+ if(window.__seamartReferenceLayoutInstalled)return;
+ window.__seamartReferenceLayoutInstalled=true;
+ function arrange(){
+  const layout=document.getElementById('odooPosLayout');
+  const catalog=layout?.querySelector(':scope > .odoo-catalog-panel');
+  const categories=layout?.querySelector('.odoo-category-panel');
+  const top=catalog?.querySelector('.odoo-catalog-top');
+  if(catalog&&categories&&top&&categories.parentElement!==catalog)catalog.insertBefore(categories,top.nextSibling);
+  else if(catalog&&categories&&top&&categories.previousElementSibling!==top)catalog.insertBefore(categories,top.nextSibling);
+ }
+ arrange();
+ const target=document.getElementById('view');
+ if(target)new MutationObserver(arrange).observe(target,{childList:true,subtree:true});
 })();
 </script>
 </body></html>
