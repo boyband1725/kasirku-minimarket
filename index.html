@@ -9166,6 +9166,36 @@ restoreSeaMartSession();
  max-width:50%!important;
  margin:6px auto 0!important;
 }
+
+/* FINAL override: constrain KEMBALIAN to same centered column as BAYAR */
+#view #odooPosLayout section#cartScreenKeyboard.seamart-permanent-keypad > .cart-change-card{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto!important;
+ align-items:center!important;
+ justify-content:stretch!important;
+ width:50%!important;
+ min-width:50%!important;
+ max-width:50%!important;
+ height:34px!important;
+ min-height:34px!important;
+ max-height:34px!important;
+ margin:6px 25% 0!important;
+ padding:4px 9px!important;
+ box-sizing:border-box!important;
+ gap:6px!important;
+ position:static!important;
+ transform:none!important;
+}
+#view #odooPosLayout section#cartScreenKeyboard.seamart-permanent-keypad > .cart-change-card > span{
+ justify-self:start!important;font-size:10px!important;line-height:1!important;white-space:nowrap!important;
+}
+#view #odooPosLayout section#cartScreenKeyboard.seamart-permanent-keypad > .cart-change-card > b{
+ justify-self:end!important;font-size:13px!important;line-height:1!important;white-space:nowrap!important;text-align:right!important;
+}
+#view #odooPosLayout .odoo-order-body > #checkoutBtn{
+ display:flex!important;width:50%!important;min-width:50%!important;max-width:50%!important;
+ margin:6px 25% 0!important;box-sizing:border-box!important;
+}
 </style>
 <script>
 (function(){
