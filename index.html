@@ -5140,6 +5140,63 @@ window.addEventListener('error', function(e) {
 }
 /* On smaller screens retain the existing mobile/tablet layout unchanged. */
 </style>
+
+<style id="seamart-catalog-fill-height-final">
+/* Fill the entire usable POS height AND stretch the 12 visible product cards to use it. */
+@media (min-width:901px){
+ body.seamart-pos-fullscreen #view,
+ body:has(#view #odooPosLayout) #view{min-height:0!important;height:100%!important;flex:1 1 0!important}
+ body.seamart-pos-fullscreen #view .odoo-pos-head,
+ body:has(#view #odooPosLayout) #view .odoo-pos-head{flex:0 0 42px!important}
+ body.seamart-pos-fullscreen #view #odooPosLayout,
+ body:has(#view #odooPosLayout) #view #odooPosLayout{
+  grid-template-columns:minmax(0,7fr) minmax(290px,3fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  height:100%!important;min-height:0!important;flex:1 1 0!important;align-items:stretch!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout>.odoo-catalog-panel,
+ body:has(#view #odooPosLayout) #view #odooPosLayout>.odoo-catalog-panel{
+  display:flex!important;flex-direction:column!important;align-self:stretch!important;
+  height:100%!important;min-height:0!important;max-height:none!important;
+  overflow:hidden!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout .odoo-catalog-top,
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-catalog-top{
+  flex:0 0 auto!important;min-height:0!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout .odoo-products,
+ body:has(#view #odooPosLayout) #view #odooPosLayout .odoo-products{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout #posproducts,
+ body:has(#view #odooPosLayout) #view #odooPosLayout #posproducts{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:100%!important;min-height:100%!important;max-height:none!important;
+  overflow:visible!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout #posproducts .pos-products-grid,
+ body:has(#view #odooPosLayout) #view #odooPosLayout #posproducts .pos-products-grid{
+  display:grid!important;flex:1 1 0!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(0,1fr)!important;align-content:stretch!important;align-items:stretch!important;
+  gap:8px!important;width:100%!important;height:100%!important;min-height:100%!important;
+  max-height:none!important;overflow:visible!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout #posproducts .odoo-product,
+ body:has(#view #odooPosLayout) #view #odooPosLayout #posproducts .odoo-product{
+  display:flex!important;flex-direction:column!important;align-self:stretch!important;
+  width:auto!important;height:100%!important;min-height:0!important;max-height:none!important;
+  overflow:hidden!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view #odooPosLayout>.odoo-order-panel,
+ body:has(#view #odooPosLayout) #view #odooPosLayout>.odoo-order-panel{
+  height:100%!important;min-height:0!important;max-height:none!important;overflow:hidden!important
+ }
+}
+</style>
 </head>
 <body>
 <div class="app">
