@@ -5068,6 +5068,78 @@ window.addEventListener('error', function(e) {
  #view:has(#odooPosLayout) #odooPosLayout .cart-keypad-grid button{height:22px!important;min-height:22px!important}
 }
 </style>
+
+<style id="seamart-pos-viewport-fit-final">
+/* Final correction: fill the available desktop viewport; remove legacy fixed-height gaps. */
+@media (min-width:901px){
+ body.seamart-pos-fullscreen,
+ body:has(#odooPosLayout){width:100vw!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;margin:0!important;padding:0!important;overflow:hidden!important}
+ body.seamart-pos-fullscreen .app,
+ body:has(#odooPosLayout) .app{
+  display:flex!important;position:fixed!important;inset:0!important;
+  width:100vw!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+  margin:0!important;padding:0!important;overflow:hidden!important
+ }
+ body.seamart-pos-fullscreen .sidebar,
+ body:has(#odooPosLayout) .sidebar,
+ body.seamart-pos-fullscreen .topbar,
+ body:has(#odooPosLayout) .topbar,
+ body.seamart-pos-fullscreen .odoo-appnav,
+ body:has(#odooPosLayout) .odoo-appnav{display:none!important}
+ body.seamart-pos-fullscreen .main,
+ body:has(#odooPosLayout) .main{
+  display:flex!important;flex:1 1 100%!important;flex-direction:column!important;
+  width:100vw!important;height:100dvh!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:100dvh!important;margin:0!important;padding:0!important;overflow:hidden!important
+ }
+ body.seamart-pos-fullscreen .content,
+ body:has(#odooPosLayout) .content{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:100%!important;margin:0!important;padding:8px 12px!important;
+  overflow:hidden!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #view,
+ body:has(#odooPosLayout) #view{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:100%!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen .odoo-pos-head,
+ body:has(#odooPosLayout) .odoo-pos-head{
+  display:flex!important;flex:0 0 42px!important;height:42px!important;min-height:42px!important;
+  max-height:42px!important;margin:0 0 7px!important;padding:0 2px!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #odooPosLayout,
+ body:has(#odooPosLayout) #odooPosLayout{
+  display:grid!important;grid-template-columns:minmax(0,7fr) minmax(290px,3fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;gap:10px!important;
+  flex:1 1 0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:100%!important;margin:0!important;padding:0!important;
+  align-items:stretch!important;overflow:hidden!important;box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #odooPosLayout>.odoo-catalog-panel,
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel{
+  grid-column:1!important;grid-row:1!important;display:flex!important;position:relative!important;
+  flex-direction:column!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:none!important;margin:0!important;padding:9px!important;overflow:hidden!important;
+  box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #odooPosLayout>.odoo-order-panel,
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{
+  grid-column:2!important;grid-row:1!important;display:flex!important;position:relative!important;
+  flex-direction:column!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;
+  box-sizing:border-box!important
+ }
+ body.seamart-pos-fullscreen #odooPosLayout .odoo-products,
+ body:has(#odooPosLayout) #odooPosLayout .odoo-products{flex:1 1 0!important;min-height:0!important;overflow:auto!important}
+ body.seamart-pos-fullscreen #odooPosLayout .odoo-order-body,
+ body:has(#odooPosLayout) #odooPosLayout .odoo-order-body{flex:1 1 0!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:hidden!important}
+}
+/* On smaller screens retain the existing mobile/tablet layout unchanged. */
+</style>
 </head>
 <body>
 <div class="app">
