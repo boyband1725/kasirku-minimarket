@@ -7607,6 +7607,23 @@ restoreSeaMartSession();
  body:has(#odooPosLayout) #odooPosLayout .odoo-catalog-top{flex:0 0 auto!important;min-width:0!important;flex-wrap:wrap!important}
  body:has(#odooPosLayout) #odooPosLayout .odoo-products{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 }
+
+/* Desktop proportion requested: catalog 30%, cart/payment 70% */
+@media(min-width:901px){
+ body:has(#odooPosLayout) #odooPosLayout.odoo-pos-layout{
+  grid-template-columns:minmax(0,3fr) minmax(0,7fr)!important;
+  width:100%!important;max-width:none!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-catalog-panel{
+  grid-column:1!important;width:100%!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout>.odoo-order-panel{
+  grid-column:2!important;width:100%!important;min-width:0!important
+ }
+ body:has(#odooPosLayout) #odooPosLayout #posproducts .pos-products-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important
+ }
+}
 </style>
 <script>
 (function(){
