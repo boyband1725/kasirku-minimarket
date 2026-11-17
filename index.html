@@ -8858,9 +8858,9 @@ restoreSeaMartSession();
   const layout=document.getElementById('odooPosLayout');
   if(!panel||!layout||!layout.getClientRects().length)return;
   const active=document.activeElement;
-  const display=document.getElementById('cartKeyboardDisplay');
-  const isDisplay=active===display;
-  const isOtherEditable=active&&active!==document.body&&active!==layout&&active!==display&&
+  const display=document.getElementById('cartKeyboardDisplay'),qtyDisplay=document.getElementById('cartQtyDisplay');
+  const isDisplay=active===display||active===qtyDisplay;
+  const isOtherEditable=active&&active!==document.body&&active!==layout&&active!==display&&active!==qtyDisplay&&
    (active.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
   if(isOtherEditable)return;
   const key=event.key;
