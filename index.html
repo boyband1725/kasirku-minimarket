@@ -4217,6 +4217,24 @@ body:has(#ptable) #ptable>.tablewrap thead th{position:sticky!important;top:0!im
  body:has(#ptable) .content{overflow:visible!important}
  body:has(#ptable) #ptable>.tablewrap{height:65vh!important;min-height:300px!important;max-height:none!important}
 }
+
+/* SeaMart Inventory header refinement */
+.app.odoo-inventory .main{min-width:0!important}
+.app.odoo-inventory .topbar{width:100%!important;min-width:0!important;min-height:58px!important;height:58px!important;padding:0 22px!important;display:flex!important;align-items:center!important;gap:16px!important;box-sizing:border-box!important}
+.app.odoo-inventory .topbar-left{flex:0 0 auto!important;min-width:0!important}
+.app.odoo-inventory .topbar .user{flex:1 1 auto!important;min-width:0!important;gap:8px!important;justify-content:flex-end!important;white-space:nowrap!important}
+.app.odoo-inventory .odoo-appnav{display:flex!important;align-items:center!important;gap:4px!important;width:100%!important;min-width:0!important;min-height:52px!important;height:52px!important;padding:0 22px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;scrollbar-width:thin!important;background:#fff!important;border-bottom:1px solid #e2ebe5!important;box-shadow:0 2px 8px rgba(20,70,45,.05)!important;box-sizing:border-box!important}
+.app.odoo-inventory .odoo-appnav .appnav-title{display:inline-flex!important;align-items:center!important;flex:0 0 auto!important;height:32px!important;padding:0 16px 0 4px!important;margin-right:8px!important;border-right:1px solid #dce8df!important;color:#087b49!important;font-size:13px!important;font-weight:800!important;letter-spacing:.2px!important}
+.app.odoo-inventory .odoo-appnav button{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:52px!important;min-height:52px!important;padding:0 17px!important;margin:0!important;border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;background:transparent!important;color:#52645a!important;font-size:13px!important;font-weight:650!important;line-height:1!important;white-space:nowrap!important}
+.app.odoo-inventory .odoo-appnav button:hover{background:#f3faf6!important;color:#087b49!important}
+.app.odoo-inventory .odoo-appnav button.active{background:#eff9f2!important;color:#087b49!important;border-bottom-color:#0b9856!important;font-weight:800!important}
+.app.odoo-inventory .content{padding-top:18px!important}
+@media(max-width:900px){
+ .app.odoo-inventory .topbar{padding:0 12px!important;gap:8px!important}
+ .app.odoo-inventory .odoo-appnav{padding:0 10px!important;min-height:46px!important;height:46px!important}
+ .app.odoo-inventory .odoo-appnav button{height:46px!important;min-height:46px!important;padding:0 12px!important;font-size:12px!important}
+ .app.odoo-inventory .odoo-appnav .appnav-title{height:30px!important;padding-right:10px!important;margin-right:4px!important}
+}
 </style>
 <script>
 window.__seamartRuntimeError = '';
