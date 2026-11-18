@@ -13016,3 +13016,39 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-layout-fill-v3">
+/* Correct the mobile grid track: the cart list must occupy all space above fixed cashier controls. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  grid-auto-rows:auto!important;
+  align-content:stretch!important;
+  align-items:stretch!important;
+  gap:6px!important;
+  min-height:0!important;
+  height:0!important;
+  flex:1 1 0!important;
+  overflow:hidden!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartlines{
+  display:flex!important;
+  grid-column:1!important;grid-row:1!important;
+  flex:none!important;
+  width:100%!important;height:100%!important;
+  min-height:0!important;max-height:none!important;
+  margin:0!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  align-self:stretch!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  grid-column:1!important;grid-row:2!important;
+  flex:0 0 auto!important;
+  height:auto!important;min-height:0!important;
+  align-self:stretch!important;
+ }
+}
+</style>
