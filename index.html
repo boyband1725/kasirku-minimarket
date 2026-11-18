@@ -10957,4 +10957,47 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+
+<style id="seamart-mobile-cart-smaller-and-trash-v4">
+@media(max-width:700px){
+ body.seamart-cart-open #odooOrderPanel,
+ body.seamart-cart-open .odoo-order-panel#odooOrderPanel{
+  top:12dvh!important;bottom:12dvh!important;
+  left:5vw!important;right:5vw!important;
+  width:auto!important;height:auto!important;
+  max-height:76dvh!important;min-height:0!important;
+  margin:auto!important;overflow:hidden!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head{
+  min-height:48px!important;padding:5px 9px!important;
+  display:flex!important;align-items:center!important;gap:6px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-head-actions{
+  display:flex!important;align-items:center!important;gap:6px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-empty-button{
+  display:inline-grid!important;place-items:center!important;
+  width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;
+  max-width:42px!important;padding:0!important;margin:0!important;
+  border-radius:10px!important;box-sizing:border-box!important;flex:0 0 42px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-empty-button svg{
+  width:20px!important;height:20px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .mobile-cart-close{
+  width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;
+  padding:0!important;box-sizing:border-box!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head h3{
+  font-size:16px!important;line-height:1.15!important;white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-body{
+  min-height:0!important;height:0!important;flex:1 1 0!important;
+  overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;
+  padding:7px 9px calc(12px + env(safe-area-inset-bottom,0px))!important;
+ }
+}
+</style>
+
 </body></html>
