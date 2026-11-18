@@ -12382,4 +12382,31 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+<style id="seamart-pc-qty-minimal-v1">
+/* PC only: make QTY label, number field and +/- controls compact and balanced. */
+@media screen and (min-width:1101px){
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-qty-control{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;gap:5px!important;
+  min-height:34px!important;height:34px!important;padding:3px 6px!important;
+  box-sizing:border-box!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-qty-control label{
+  flex:0 0 auto!important;margin:0!important;font-size:12px!important;
+  line-height:1!important;font-weight:800!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard #seamartCompactQty{
+  flex:0 1 38px!important;width:38px!important;min-width:32px!important;
+  max-width:42px!important;height:26px!important;min-height:26px!important;
+  margin:0!important;padding:2px!important;box-sizing:border-box!important;
+  border-radius:6px!important;font-size:13px!important;line-height:1!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-qty-control button{
+  flex:0 0 24px!important;width:24px!important;min-width:24px!important;
+  max-width:24px!important;height:24px!important;min-height:24px!important;
+  margin:0!important;padding:0!important;border-radius:6px!important;
+  font-size:14px!important;line-height:1!important;font-weight:800!important;
+ }
+}
+</style>
 </body></html>
