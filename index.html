@@ -13214,3 +13214,31 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-header-title-fit-v9">
+/* Phone header: keep the full cart title visible; keypad remains available below. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head{
+  display:flex!important;align-items:center!important;gap:8px!important;
+  width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:10px 12px!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head>h3{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  max-width:none!important;margin:0!important;white-space:nowrap!important;
+  overflow:visible!important;text-overflow:clip!important;
+  font-size:clamp(20px,5.2vw,27px)!important;line-height:1.15!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head>#cartKeyboardToggleDesktop{
+  display:none!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head>.cart-head-actions{
+  display:flex!important;flex:0 0 auto!important;align-items:center!important;
+  gap:6px!important;margin-left:auto!important;white-space:nowrap!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head .cart-empty-button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head .mobile-cart-close{
+  flex:0 0 52px!important;width:52px!important;min-width:52px!important;
+ }
+}
+</style>
