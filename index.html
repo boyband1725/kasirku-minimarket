@@ -13318,3 +13318,49 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-pc-payment-dialog-slim-v11">
+/* Slimmer desktop payment dialog; desktop only, phone/tablet untouched. */
+@media screen and (min-width:901px){
+ #modalroot .modalback{padding:18px!important}
+ #modalroot .modalback>.modal.sm-payment-modal{
+  width:min(500px,calc(100vw - 48px))!important;
+  max-width:500px!important;
+  max-height:calc(100dvh - 64px)!important;
+  padding:16px!important;
+  border-radius:16px!important;
+ }
+ #modalroot .sm-payment-modal .sm-payment-drag-handle{min-height:40px!important;gap:9px!important}
+ #modalroot .sm-payment-modal .sm-payment-drag-handle .btn-light{
+  min-height:38px!important;padding:7px 15px!important;font-size:14px!important
+ }
+ #modalroot .sm-payment-modal .sm-payment-drag-handle strong{font-size:22px!important}
+ #modalroot .sm-payment-modal .sm-payment-drag-handle .pill{padding:6px 11px!important;font-size:12px!important}
+ #modalroot .sm-payment-modal h2{font-size:21px!important;margin:12px 0 9px!important}
+ #modalroot .sm-payment-options{gap:8px!important}
+ #modalroot .sm-payment-option{min-height:52px!important;padding:8px 10px!important;gap:5px!important}
+ #modalroot .sm-payment-option span{font-size:18px!important}
+ #modalroot .sm-payment-option b{font-size:15px!important}
+ #modalroot .sm-payment-option small{font-size:11px!important}
+ #modalroot .sm-payment-modal #smCashFields{gap:6px!important;margin-top:12px!important}
+ #modalroot .sm-payment-modal #smCashFields>label{font-size:12px!important}
+ #modalroot .sm-payment-modal #smCashReceived{
+  height:46px!important;min-height:46px!important;padding:8px 12px!important;font-size:18px!important
+ }
+ #modalroot .sm-payment-modal #smCashFields>.totalrow{min-height:34px!important;padding:4px 0!important;font-size:14px!important}
+ #modalroot .sm-payment-modal #smCashFields>.totalrow b{font-size:17px!important}
+ #modalroot .sm-payment-keypad{margin-top:11px!important;padding:10px!important;border-radius:11px!important}
+ #modalroot .sm-payment-keypad-head{margin-bottom:7px!important;font-size:12px!important}
+ #modalroot .sm-payment-keypad-head span{font-size:11px!important}
+ #modalroot .sm-payment-keypad-grid{gap:6px!important}
+ #modalroot .sm-payment-keypad-grid button{
+  height:44px!important;min-height:44px!important;font-size:17px!important;border-radius:8px!important
+ }
+ #modalroot .sm-payment-modal .notice{margin-top:10px!important;padding:9px 11px!important;font-size:12px!important}
+ #modalroot .sm-payment-modal .actions{margin-top:12px!important}
+ #modalroot .sm-payment-modal .actions button{
+  min-height:46px!important;padding:9px 12px!important;font-size:15px!important;border-radius:9px!important
+ }
+}
+</style>
