@@ -12529,45 +12529,5 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
   border-radius:8px!important;background:#fff!important;color:#173d2a!important;
  }
 
- /* PC FIX v2: force the received amount input to occupy the full right column. */
- @media screen and (min-width:1101px){
-  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row:has(> input#cartKeyboardDisplay),
-  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row:has(> label[for="cartKeyboardDisplay"]){
-   display:grid!important;
-   grid-template-columns: minmax(145px, 30%) minmax(260px, 1fr)!important;
-   width:100%!important;
-   min-width:0!important;
-   min-height:54px!important;
-   align-items:center!important;
-   gap:14px!important;
-   padding:7px 12px!important;
-  }
-  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row input#cartKeyboardDisplay{
-   grid-column:2!important;
-   display:block!important;
-   width:100%!important;
-   min-width:260px!important;
-   max-width:none!important;
-   height:40px!important;
-   min-height:40px!important;
-   margin:0!important;
-   padding:6px 14px!important;
-   box-sizing:border-box!important;
-   text-align:right!important;
-   font-size:21px!important;
-   line-height:1.2!important;
-   font-weight:900!important;
-   border:1.5px solid #16845b!important;
-   border-radius:8px!important;
-   background:#fff!important;
-   color:#173d2a!important;
-  }
-  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row label[for="cartKeyboardDisplay"]{
-   grid-column:1!important;
-   display:block!important;
-   min-width:0!important;
-   white-space:nowrap!important;
-  }
- }
 
 </style>
