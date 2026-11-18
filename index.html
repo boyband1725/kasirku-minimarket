@@ -8126,7 +8126,8 @@ if(window.matchMedia('(min-width: 901px)').matches){
   modal.addEventListener('click',e=>{if(e.target===modal)closeCatalog()});
   modal.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeCatalog()}});
   actionPanel.append(banner,actions,keypad);
-  layout.replaceChildren(cartPanel,actionPanel);\n  document.body.appendChild(modal);
+  layout.replaceChildren(cartPanel,actionPanel);
+  document.body.appendChild(modal);
   window.openSeamartCatalog=openCatalog;window.closeSeamartCatalog=closeCatalog;
  }
 }
