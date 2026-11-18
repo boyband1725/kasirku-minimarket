@@ -8395,6 +8395,7 @@ if(window.matchMedia('(min-width: 901px)').matches){
    document.body.classList.add('seamart-catalog-open');
    modal.classList.add('open');modal.setAttribute('aria-hidden','false');
    modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');
+   if(typeof renderPosProducts==='function')renderPosProducts();
    const input=document.getElementById('posbarcode');
    if(input){input.placeholder=mode==='barcode'?'Pindai atau masukkan barcode...':'Cari nama barang, kode, atau barcode...';setTimeout(()=>input.focus(),30)}
   }
