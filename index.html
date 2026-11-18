@@ -13923,3 +13923,19 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{width:100%!important;height:40px!important;min-height:40px!important;max-height:40px!important;margin:0!important}
 }
 </style>
+<style id="seamart-pc-model4-numpad-hide-fix">
+@media screen and (min-width:901px) and (pointer:fine){
+ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard .cart-keyboard-head,
+ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard .cart-key-mode,
+ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard .cart-keypad-grid,
+ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard .cart-key-apply{
+  display:none!important;
+ }
+ body.seamart-pos-fullscreen #odooPosLayout #cartScreenKeyboard{
+  position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+  width:100%!important;max-width:none!important;z-index:auto!important;
+  box-shadow:none!important;border:0!important;background:transparent!important;
+  padding:0!important;margin:0!important;
+ }
+}
+</style>
