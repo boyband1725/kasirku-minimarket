@@ -13086,3 +13086,55 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-flex-parent-v5">
+/* Mobile cart modal must be a height-constrained flex column; then cart lines can grow. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel#odooOrderPanel{
+  display:flex!important;
+  flex-direction:column!important;
+  height:78dvh!important;
+  max-height:calc(100dvh - 20px)!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head{
+  display:flex!important;flex:0 0 auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  display:flex!important;
+  flex:1 1 0!important;
+  flex-direction:column!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartlines{
+  display:flex!important;
+  flex:1 1 0!important;
+  flex-direction:column!important;
+  flex-wrap:nowrap!important;
+  width:100%!important;height:auto!important;
+  min-height:0!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartlines>.cartline{
+  flex:0 0 auto!important;width:100%!important;max-width:100%!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  display:flex!important;
+  flex:0 0 auto!important;
+  flex-direction:column!important;
+  width:100%!important;height:auto!important;
+  min-height:0!important;max-height:none!important;
+  overflow:visible!important;
+ }
+}
+</style>
