@@ -11000,4 +11000,41 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+
+<style id="seamart-cart-header-alignment-v5">
+@media(max-width:700px){
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;gap:6px!important;
+  padding:6px 8px!important;min-height:48px!important;box-sizing:border-box!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head h3{
+  flex:1 1 0!important;min-width:0!important;max-width:none!important;
+  margin:0!important;font-size:14px!important;line-height:1.1!important;
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-head-actions{
+  flex:0 0 auto!important;min-width:0!important;margin-left:auto!important;
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-empty-button{
+  flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+  max-width:36px!important;height:36px!important;min-height:36px!important;
+  max-height:36px!important;padding:0!important;margin:0!important;
+  display:inline-grid!important;place-items:center!important;border-radius:9px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-empty-button svg{
+  width:18px!important;height:18px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .cart-count-wrap{
+  min-width:0!important;padding:8px 10px!important;font-size:13px!important;
+  white-space:nowrap!important;gap:4px!important;
+ }
+ body.seamart-cart-open #odooOrderPanel>.odoo-order-head .mobile-cart-close{
+  flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+  height:36px!important;min-height:36px!important;padding:0!important;
+ }
+}
+</style>
+
 </body></html>
