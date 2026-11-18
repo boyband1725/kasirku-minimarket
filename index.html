@@ -5775,6 +5775,34 @@ html body #view #odooPosLayout #odooOrderPanel .cart-head-actions #cartcount .ca
  font-weight:900!important;line-height:1!important;box-shadow:0 1px 4px #0003!important;
 }
 </style>
+<style id="seamart-cart-header-two-actions-v24">
+/* Mobile cart header: only clear-cart and close actions; hide cart icon/count */
+@media(max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions #cartcount,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions #cartKeyboardToggle{
+  display:none!important;visibility:hidden!important;width:0!important;min-width:0!important;max-width:0!important;
+  height:0!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important;flex:0 0 0!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:8px!important;width:auto!important;min-width:0!important;flex:0 0 auto!important;margin-left:auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions .cart-empty-button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions .mobile-cart-close{
+  display:inline-flex!important;visibility:visible!important;opacity:1!important;position:static!important;inset:auto!important;transform:none!important;
+  align-items:center!important;justify-content:center!important;flex:0 0 40px!important;
+  width:40px!important;min-width:40px!important;max-width:40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;
+  margin:0!important;padding:0!important;border-radius:12px!important;box-sizing:border-box!important;
+  background:#EAF3FF!important;border:1px solid #D5E5F8!important;color:#0756B9!important;box-shadow:none!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions .cart-empty-button svg{
+  display:block!important;width:19px!important;height:19px!important;flex:0 0 19px!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head .cart-head-actions .mobile-cart-close{
+  font-size:23px!important;line-height:1!important;font-weight:500!important;
+ }
+}
+</style>
 </head>
 <body>
 <div class="app">
