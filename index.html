@@ -7233,13 +7233,33 @@ function posProductMatchesCategory(product,category){const p=normalizePosCategor
 function normalizePosCategory(value){return String(value||'Umum').trim().toLocaleLowerCase('id-ID').replace(/[._-]+/g,' ').replace(/\s+/g,' ')}
 function setPosCategory(category){window.posCategory=category;const search=document.getElementById('possearch');if(search)search.value='';renderPosProducts()}
 function addCart(id){let p=db.products.find(x=>String(x.id)===String(id));if(!p)return alert('Barang tidak ditemukan. ID: '+id);const stock=Math.max(0,Number(p.stok||0));let x=cart.find(x=>String(x.id)===String(p.id));if(stock<1)return alert('Stok '+p.nama+' habis.');if(x){if(x.qty>=stock)return alert('Jumlah '+p.nama+' sudah mencapai stok tersedia: '+stock);x.qty++;}else cart.push({id:p.id,qty:1});renderCart();renderPosProducts()}
-function toggleMobileCart(force){const open=typeof force==="boolean"?force:!document.body.classList.contains("seamart-cart-open");document.body.classList.toggle("seamart-cart-open",open);const trigger=document.getElementById("mobileCartTrigger");if(trigger)trigger.setAttribute("aria-expanded",open?"true":"false");const fab=document.getElementById("posMobileCartFab");if(fab)fab.setAttribute("aria-expanded",open?"true":"false");}
+function toggleMobileCart(force){
+ const panel=document.getElementById('odooOrderPanel');
+ const backdrop=document.getElementById('mobileCartBackdrop');
+ const open=typeof force==='boolean'?force:!document.body.classList.contains('seamart-cart-open');
+ document.body.classList.toggle('seamart-cart-open',open);
+ const trigger=document.getElementById('mobileCartTrigger');if(trigger)trigger.setAttribute('aria-expanded',open?'true':'false');
+ const fab=document.getElementById('posMobileCartFab');if(fab)fab.setAttribute('aria-expanded',open?'true':'false');
+ if(panel){
+  if(open){
+   panel.style.removeProperty('display');
+   panel.style.removeProperty('visibility');
+   panel.style.removeProperty('pointer-events');
+  }else{
+   panel.style.setProperty('display','none','important');
+   panel.style.setProperty('visibility','hidden','important');
+   panel.style.setProperty('pointer-events','none','important');
+  }
+ }
+ if(backdrop)backdrop.style.setProperty('display',open?'block':'none','important');
+ if(!open){
+  document.documentElement.style.removeProperty('overflow');
+  document.body.style.removeProperty('overflow');
+ }
+}
 function closeMobileCartNow(event){
  if(event){event.preventDefault();event.stopPropagation();}
- document.body.classList.remove('seamart-cart-open');
- const trigger=document.getElementById('mobileCartTrigger');if(trigger)trigger.setAttribute('aria-expanded','false');
- const fab=document.getElementById('posMobileCartFab');if(fab)fab.setAttribute('aria-expanded','false');
- const backdrop=document.getElementById('mobileCartBackdrop');if(backdrop)backdrop.style.display='none';
+ toggleMobileCart(false);
 }
 // Close the mobile cart on touch, pointer, or click; capture before panel handlers.
 (function(){
