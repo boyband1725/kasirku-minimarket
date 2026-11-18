@@ -12065,11 +12065,12 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 
 
 
-<style id="seamart-pc-responsive-layout-final-2026-11">
+
+<style id="seamart-pc-cart-viewport-fit-v2">
 /*
-  SeaMart POS desktop layout.
-  Responsive behavior belongs to the page shell and workspace grid only.
-  Keep cashier controls, typography, colors, keypad and button geometry unchanged.
+  Desktop-only POS viewport layout.
+  The page shell and cart's flexible product-list region absorb viewport changes.
+  Keep keypad controls, fonts, colors, button sizes and payment logic unchanged.
 */
 @media screen and (min-width:1101px){
  html,body{
@@ -12078,107 +12079,125 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
  body:has(#view #odooPosLayout) .app{
   display:flex!important;position:fixed!important;inset:0!important;
-  width:100vw!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;
-  margin:0!important;overflow:hidden!important;
- }
- body:has(#view #odooPosLayout) .main{
-  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
-  width:100%!important;min-width:0!important;height:100dvh!important;min-height:0!important;
+  width:100vw!important;height:100dvh!important;min-height:0!important;
   max-height:100dvh!important;margin:0!important;overflow:hidden!important;
  }
- body:has(#view #odooPosLayout) .content{
-  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
-  width:100%!important;max-width:none!important;min-width:0!important;
-  height:auto!important;min-height:0!important;max-height:none!important;
-  margin:0!important;padding:10px 14px 12px!important;overflow:hidden!important;
+ body:has(#view #odooPosLayout) .sidebar{
+  flex:0 0 238px!important;height:100dvh!important;min-height:0!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+ }
+ body:has(#view #odooPosLayout) main.main{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:0!important;min-width:0!important;height:100dvh!important;
+  min-height:0!important;max-height:100dvh!important;overflow:hidden!important;
+ }
+ body:has(#view #odooPosLayout) main.main>.topbar{
+  position:relative!important;top:auto!important;flex:0 0 64px!important;
+  width:100%!important;height:64px!important;min-height:64px!important;
   box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view{
-  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
-  width:100%!important;min-width:0!important;height:auto!important;
-  min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;
+ body:has(#view #odooPosLayout) main.main>.content{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  height:0!important;min-height:0!important;max-height:none!important;
+  margin:0!important;padding:12px 16px!important;overflow:hidden!important;
+  box-sizing:border-box!important;
+ }
+ body:has(#view #odooPosLayout) main.main>.content>#view{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:0!important;min-width:0!important;min-height:0!important;
+  max-height:none!important;margin:0!important;padding:0!important;
   overflow:hidden!important;box-sizing:border-box!important;
  }
  body:has(#view #odooPosLayout) #view>.odoo-pos-head{
-  display:flex!important;flex:0 0 auto!important;align-items:center!important;
-  min-width:0!important;margin:0 0 9px!important;
+  display:flex!important;flex:0 0 auto!important;min-width:0!important;
+  margin:0 0 10px!important;
  }
  body:has(#view #odooPosLayout) #view>#odooPosLayout{
   display:grid!important;
-  grid-template-columns:minmax(0,7fr) minmax(340px,3fr)!important;
+  grid-template-columns:minmax(0,1fr) minmax(350px,min(35vw,500px))!important;
   grid-template-rows:minmax(0,1fr)!important;
   grid-auto-flow:row!important;align-items:stretch!important;
-  flex:1 1 0!important;width:100%!important;height:auto!important;
+  flex:1 1 0!important;width:100%!important;height:0!important;
   min-width:0!important;min-height:0!important;max-height:none!important;
-  gap:12px!important;margin:0!important;padding:0!important;overflow:hidden!important;
-  box-sizing:border-box!important;
+  gap:clamp(8px,1vw,14px)!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;box-sizing:border-box!important;
  }
  body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-category-panel{
-  display:none!important;visibility:hidden!important;position:static!important;
+  display:none!important;visibility:hidden!important;
   width:0!important;min-width:0!important;max-width:0!important;
   height:0!important;min-height:0!important;max-height:0!important;
   margin:0!important;padding:0!important;border:0!important;overflow:hidden!important;
  }
  body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-catalog-panel{
-  display:flex!important;flex:initial!important;flex-direction:column!important;
+  display:flex!important;flex-direction:column!important;
   grid-column:1!important;grid-row:1!important;
   width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
   max-width:none!important;max-height:none!important;margin:0!important;
   overflow:hidden!important;box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-catalog-panel .odoo-catalog-top{
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-catalog-panel>.odoo-catalog-top{
   flex:0 0 auto!important;min-width:0!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-catalog-panel #posproducts{
-  display:block!important;flex:1 1 0!important;width:100%!important;height:auto!important;
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-catalog-panel>#posproducts{
+  display:block!important;flex:1 1 0!important;width:100%!important;height:0!important;
   min-width:0!important;min-height:0!important;max-height:none!important;
   overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-order-panel{
-  display:flex!important;flex:initial!important;flex-direction:column!important;
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel{
+  display:flex!important;flex-direction:column!important;
   grid-column:2!important;grid-row:1!important;
   position:relative!important;inset:auto!important;
   width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
   max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;
   overflow:hidden!important;box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-order-panel>.odoo-order-head{
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-head{
   display:flex!important;flex:0 0 auto!important;min-width:0!important;
+  position:relative!important;inset:auto!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>.odoo-order-panel>.odoo-order-body{
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body{
   display:flex!important;flex:1 1 0!important;flex-direction:column!important;
-  width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;
-  max-height:none!important;margin:0!important;overflow:hidden!important;
+  justify-content:flex-start!important;gap:6px!important;
+  width:100%!important;height:0!important;min-width:0!important;min-height:0!important;
+  max-height:none!important;margin:0!important;padding:8px 10px!important;
+  overflow:hidden!important;box-sizing:border-box!important;
+ }
+ /* Product lines are the only flexible region. They give up space before the keypad does. */
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines{
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  width:100%!important;height:0!important;min-width:0!important;min-height:0!important;
+  max-height:none!important;margin:0!important;padding:0 2px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
   box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout #odooOrderPanel #cartlines{
-  display:block!important;flex:1 1 0!important;width:100%!important;
-  min-width:0!important;min-height:48px!important;max-height:none!important;
-  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
- }
- /* The payment keypad already contains the live Total, Received and Change values.
-    Hide only the duplicate subtotal/grand-total rows above it on desktop. */
- body:has(#view #odooPosLayout) #view>#odooPosLayout #odooOrderPanel .odoo-order-body:has(#cartScreenKeyboard .seamart-payment-summary)>.totalrow{
+ /* The keypad summary is the single authoritative Total / Received / Change display. */
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>.totalrow{
   display:none!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout #odooOrderPanel #cartScreenKeyboard{
-  flex:0 0 auto!important;align-self:stretch!important;
-  width:100%!important;min-width:0!important;max-width:none!important;
-  height:auto!important;min-height:0!important;max-height:none!important;
-  position:relative!important;inset:auto!important;transform:none!important;
-  overflow:visible!important;box-sizing:border-box!important;
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  display:flex!important;flex:0 0 auto!important;flex-shrink:0!important;
+  flex-direction:column!important;align-self:stretch!important;
+  position:relative!important;inset:auto!important;float:none!important;
+  width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;
+  max-width:none!important;max-height:none!important;margin:0!important;
+  overflow:visible!important;transform:none!important;box-sizing:border-box!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout #odooOrderPanel .odoo-order-body>.btn-danger{
-  flex:0 0 auto!important;width:100%!important;
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>#cartScreenKeyboard>*,
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartScreenKeyboard>*{
+  flex-shrink:0!important;position:relative!important;inset:auto!important;transform:none!important;
  }
- body:has(#view #odooPosLayout) #view>#odooPosLayout #odooOrderPanel .odoo-scan-hint{
-  flex:0 0 auto!important;
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>.btn-danger{
+  display:block!important;flex:0 0 auto!important;width:100%!important;min-width:0!important;
+  margin:6px 0 0!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel .odoo-scan-hint{
+  display:none!important;
  }
 }
 @media screen and (min-width:1101px) and (max-width:1250px){
  body:has(#view #odooPosLayout) #view>#odooPosLayout{
-  grid-template-columns:minmax(0,1fr) minmax(330px,38%)!important;
-  gap:9px!important;
+  grid-template-columns:minmax(0,1fr) minmax(340px,38%)!important;
  }
 }
 </style>
