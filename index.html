@@ -12503,5 +12503,17 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard.seamart-numpad-collapsed{
   padding-bottom:8px!important;
  }
+ /* PC only: collapsing the keypad must never collapse payment/quantity controls. */
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard.seamart-numpad-collapsed .cart-keypad-grid[hidden]{
+  display:none!important;visibility:hidden!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard.seamart-numpad-collapsed .seamart-payment-summary,
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard.seamart-numpad-collapsed .seamart-compact-qty-row,
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard.seamart-numpad-collapsed .cart-payment-actions{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel .odoo-order-lines{
+  flex:1 1 auto!important;min-height:90px!important;overflow-y:auto!important;
+ }
 }
 </style>
