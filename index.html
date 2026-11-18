@@ -5261,6 +5261,38 @@ window.addEventListener('error', function(e) {
 #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions.seamart-single-pay{display:block!important;width:100%!important;margin:8px 0 0!important}
 #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions.seamart-single-pay #checkoutBtn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:46px!important;min-height:46px!important;border-radius:9px!important;background:#087b43!important;color:#fff!important;font-size:16px!important;font-weight:900!important;letter-spacing:.3px!important}
 @media(max-width:520px){#view #odooPosLayout #cartScreenKeyboard .seamart-summary-row{min-height:32px!important;padding:4px 8px!important;font-size:11px!important}#view #odooPosLayout #cartScreenKeyboard .seamart-summary-row b{font-size:15px!important}}
+
+/* Inset value boxes matching the editable cash field; shared across phone, tablet and desktop. */
+#view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>b,
+#view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>input#cartKeyboardDisplay{
+ display:block!important;
+ flex:0 1 48%!important;
+ width:48%!important;
+ min-width:0!important;
+ max-width:180px!important;
+ height:34px!important;
+ min-height:34px!important;
+ margin:0!important;
+ padding:4px 9px!important;
+ box-sizing:border-box!important;
+ border:1px solid #cbd5e1!important;
+ border-radius:7px!important;
+ background:#fff!important;
+ text-align:right!important;
+ line-height:24px!important;
+ font-size:16px!important;
+ font-weight:850!important;
+ white-space:nowrap!important;
+}
+#view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row.change>b{
+ border-color:#b9e5c7!important;
+ background:#f0fbf2!important;
+ color:#087b43!important;
+}
+#view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>input#cartKeyboardDisplay{
+ appearance:none!important;
+ -webkit-appearance:none!important;
+}
 </style>
 <style id="seamart-compact-qty-style">
 #view #odooPosLayout #cartScreenKeyboard .seamart-compact-qty-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:8px;align-items:center;margin:7px 0 9px;width:100%}
