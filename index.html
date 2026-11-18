@@ -5656,6 +5656,26 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+<style id="seamart-app-launcher-click-layer-fix">
+/* Keep the app menu above every floating POS layer and make its tiles tappable. */
+html body #appLauncherBackdrop.open{
+ display:block!important;position:fixed!important;inset:56px 0 0!important;
+ z-index:2147482000!important;pointer-events:auto!important;touch-action:pan-y!important;
+}
+html body #appLauncherBackdrop.open>.app-launcher{
+ position:absolute!important;top:0!important;left:0!important;z-index:2147482001!important;
+ pointer-events:auto!important;visibility:visible!important;opacity:1!important;
+}
+html body #appLauncherBackdrop.open .launcher-grid,
+html body #appLauncherBackdrop.open .launcher-tile{
+ position:relative!important;z-index:2147482002!important;pointer-events:auto!important;
+ touch-action:manipulation!important;cursor:pointer!important;
+}
+html body #appLauncherBackdrop.open .launcher-tile{
+ min-height:72px!important;-webkit-tap-highlight-color:rgba(0,140,80,.15)!important;
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -10540,4 +10560,27 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
 </style>
 
 
+
+<script id="seamart-app-launcher-delegated-click-fix">
+(function(){
+ const routes=['dashboard','kasir','produk','stok','penjualan','akun','aruskas','pengaturan','pesanan'];
+ function bind(){
+  const root=document.getElementById('appLauncherBackdrop');
+  if(!root||root.dataset.seamartClickBound==='1')return;
+  root.dataset.seamartClickBound='1';
+  root.addEventListener('click',function(e){
+   const tile=e.target.closest('.launcher-tile');
+   if(!tile)return;
+   const attr=tile.getAttribute('onclick')||'';
+   const match=attr.match(/openAppPage\(['"]([a-z]+)['"]\)/);
+   const route=match&&match[1];
+   if(!route||!routes.includes(route))return;
+   e.preventDefault();e.stopPropagation();
+   if(typeof window.openAppPage==='function')window.openAppPage(route);
+   else if(typeof window.page==='function'){root.classList.remove('open');window.page(route);}
+  },true);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+})();
+</script>
 </body></html>
