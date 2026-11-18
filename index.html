@@ -7470,6 +7470,13 @@ async function completeCheckout(pay,paid){
  db.cashflows.push(saleCash);save();
  if(!cloudSaved&&window.seamartCashFlowSyncReady)syncCashFlowEntry(saleCash).catch(e=>alert('Transaksi lokal tersimpan, tetapi arus kas belum tersinkron: '+(e.message||e)));
  cart=[];
+ // Reset uang diterima and its cashier keypad display after a successful sale.
+ const cashInput=document.getElementById('posCashReceived');if(cashInput)cashInput.value='0';
+ const cashDisplay=document.getElementById('cartKeyboardDisplay');if(cashDisplay)cashDisplay.value='0';
+ const cashChange=document.getElementById('posCashChange');if(cashChange)cashChange.textContent='0';
+ const modalCash=document.getElementById('smCashReceived');if(modalCash)modalCash.value='0';
+ const modalChange=document.getElementById('smCashChange');if(modalChange)modalChange.textContent='0';
+ window.cartKeyboardValue='';window.cartKeyMode='cash';
  document.getElementById('modalroot').innerHTML=`<div class="modalback"><div class="modal"><h2>Transaksi berhasil</h2><p class="muted">${id} · ${dateNow()}</p>${items.map(x=>`<div class="totalrow"><span>${esc(x.nama)} × ${x.qty}</span><b>${rupiah(x.subtotal)}</b></div>`).join('')}<div class="totalrow grand"><span>Total</span><span>${rupiah(total)}</span></div><p class="muted">Metode: ${esc(pay)} · ${cloudSaved?'Tersinkron ke cloud':'Mode lokal'}</p>${pay==='Tunai'?'<div class="totalrow"><span>Uang diterima</span><b>'+rupiah(paid)+'</b></div><div class="totalrow"><span>Kembalian</span><b>'+rupiah(change)+'</b></div>':''}<div class="actions"><button class="btn-light" onclick="closeModal()">Tutup</button><button class="btn-primary" onclick="printReceipt('${id}')">Cetak Struk</button></div></div></div>`;
  renderCart();
 }
