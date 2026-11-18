@@ -12328,4 +12328,31 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+<style id="seamart-pc-cart-input-and-empty-fit-v1">
+/* Desktop-only refinement: reclaim empty cart space and make cash input usable. */
+@media screen and (min-width:1101px){
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body{
+  grid-template-rows:minmax(120px,min(216px,28dvh)) auto!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body:has(#cartlines .empty){
+  grid-template-rows:minmax(105px,14dvh) auto!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:has(.empty){
+  min-height:105px!important;max-height:14dvh!important;height:100%!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines .empty{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:0!important;height:100%!important;padding:12px 8px!important;
+  box-sizing:border-box!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-summary-row input#cartKeyboardDisplay{
+  display:block!important;flex:0 1 260px!important;
+  width:62%!important;min-width:190px!important;max-width:260px!important;
+  height:32px!important;min-height:32px!important;padding:4px 10px!important;
+  margin:0!important;box-sizing:border-box!important;
+  text-align:right!important;font-size:16px!important;line-height:1.2!important;
+  pointer-events:auto!important;
+ }
+}
+</style>
 </body></html>
