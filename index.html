@@ -12281,7 +12281,7 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
-  grid-template-rows:minmax(0,1fr) auto auto!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
   grid-auto-flow:row!important;
   align-content:stretch!important;align-items:stretch!important;
   gap:6px!important;
@@ -12316,10 +12316,6 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartScreenKeyboard>*{
   flex-shrink:0!important;position:relative!important;inset:auto!important;transform:none!important;
- }
- body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>.btn-danger{
-  display:block!important;grid-column:1!important;grid-row:3!important;
-  width:100%!important;min-width:0!important;margin:0!important;
  }
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel .odoo-scan-hint{
   display:none!important;
