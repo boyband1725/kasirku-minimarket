@@ -5262,24 +5262,26 @@ window.addEventListener('error', function(e) {
 #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions.seamart-single-pay #checkoutBtn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:46px!important;min-height:46px!important;border-radius:9px!important;background:#087b43!important;color:#fff!important;font-size:16px!important;font-weight:900!important;letter-spacing:.3px!important}
 @media(max-width:520px){#view #odooPosLayout #cartScreenKeyboard .seamart-summary-row{min-height:32px!important;padding:4px 8px!important;font-size:11px!important}#view #odooPosLayout #cartScreenKeyboard .seamart-summary-row b{font-size:15px!important}}
 
-/* Align all three inner amount boxes to the same grid column on every device. */
+/* Final payment alignment: equal label/value columns on all screen sizes. */
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row{
  display:grid!important;
- grid-template-columns:minmax(0,42%) minmax(0,1fr)!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
  align-items:center!important;
- justify-content:initial!important;
  column-gap:8px!important;
 }
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>span,
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>label{
  grid-column:1!important;
+ width:auto!important;
  min-width:0!important;
  margin:0!important;
+ text-align:left!important;
 }
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>b,
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>input#cartKeyboardDisplay{
  grid-column:2!important;
  justify-self:stretch!important;
+ display:block!important;
  width:100%!important;
  min-width:0!important;
  max-width:none!important;
@@ -5305,6 +5307,10 @@ window.addEventListener('error', function(e) {
 #view #odooPosLayout #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row>input#cartKeyboardDisplay{
  appearance:none!important;
  -webkit-appearance:none!important;
+}
+#odooPosLayout #cartKeyboardToggleDesktop,
+#odooPosLayout #cartKeyboardToggle{
+ display:none!important;
 }</style>
 <style id="seamart-compact-qty-style">
 #view #odooPosLayout #cartScreenKeyboard .seamart-compact-qty-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:8px;align-items:center;margin:7px 0 9px;width:100%}
