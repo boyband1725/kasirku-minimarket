@@ -11174,4 +11174,50 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  #odooOrderPanel .mobile-cart-close{position:relative!important;z-index:2147483647!important;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important}
 }
 </style>
+
+<script id="seamart-close-hit-test-v11">
+(function(){
+ function hardClose(){
+  var panel=document.getElementById('odooOrderPanel');
+  var backdrop=document.getElementById('mobileCartBackdrop');
+  document.body.classList.remove('seamart-cart-open');
+  if(panel){
+   panel.style.setProperty('display','none','important');
+   panel.style.setProperty('visibility','hidden','important');
+   panel.style.setProperty('pointer-events','none','important');
+   panel.setAttribute('aria-hidden','true');
+  }
+  if(backdrop){
+   backdrop.style.setProperty('display','none','important');
+   backdrop.style.setProperty('pointer-events','none','important');
+  }
+  ['mobileCartTrigger','posMobileCartFab'].forEach(function(id){
+   var el=document.getElementById(id);if(el)el.setAttribute('aria-expanded','false');
+  });
+  document.documentElement.style.setProperty('overflow','auto','important');
+  document.body.style.setProperty('overflow','auto','important');
+ }
+ function pointClose(event){
+  var btn=document.querySelector('#odooOrderPanel .mobile-cart-close');
+  if(!btn)return;
+  var p=event.touches&&event.touches[0]?event.touches[0]:event.changedTouches&&event.changedTouches[0]?event.changedTouches[0]:event;
+  if(!p||typeof p.clientX!=='number')return;
+  var r=btn.getBoundingClientRect();
+  if(p.clientX>=r.left-8&&p.clientX<=r.right+8&&p.clientY>=r.top-8&&p.clientY<=r.bottom+8){
+   if(event.cancelable)event.preventDefault();
+   event.stopImmediatePropagation();
+   hardClose();
+  }
+ }
+ document.addEventListener('touchstart',pointClose,{capture:true,passive:false});
+ document.addEventListener('pointerdown',pointClose,true);
+ document.addEventListener('click',function(e){
+  if(e.target&&e.target.closest&&e.target.closest('#odooOrderPanel .mobile-cart-close')){
+   e.preventDefault();e.stopImmediatePropagation();hardClose();
+  }
+ },true);
+ window.seamartHardCloseCart=hardClose;
+})();
+</script>
+
 </body></html>
