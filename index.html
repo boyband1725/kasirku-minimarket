@@ -11652,4 +11652,21 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+
+<style id="seamart-hide-cart-count-pill-fix-v22">
+@media(max-width:700px){
+ #odooOrderPanel #cartcount,
+ #odooOrderPanel .cart-head-actions #cartcount{
+  display:none!important;
+  visibility:hidden!important;
+  width:0!important;min-width:0!important;max-width:0!important;
+  height:0!important;min-height:0!important;padding:0!important;margin:0!important;
+  overflow:hidden!important;flex:0 0 0!important;
+ }
+ #odooOrderPanel .odoo-order-head .cart-head-actions{
+  gap:8px!important;
+ }
+}
+</style>
+
 </body></html>
