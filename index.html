@@ -5676,6 +5676,68 @@ html body #appLauncherBackdrop.open .launcher-tile{
  min-height:72px!important;-webkit-tap-highlight-color:rgba(0,140,80,.15)!important;
 }
 </style>
+
+<style id="seamart-checkout-visible-final-20261118">
+/* Mobile breakpoint previously hid #checkoutBtn. Restore the real checkout action below the keypad. */
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ position:static!important;flex:0 0 auto!important;flex-direction:column!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ margin:12px 0 8px!important;padding:0!important;overflow:visible!important;
+ background:transparent!important;border:0!important;gap:0!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions #checkoutBtn,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
+ display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+ position:static!important;inset:auto!important;transform:none!important;float:none!important;
+ flex:0 0 auto!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:100%!important;max-width:100%!important;
+ height:auto!important;min-height:76px!important;max-height:none!important;
+ margin:0!important;padding:14px 12px!important;box-sizing:border-box!important;
+ border:0!important;border-radius:15px!important;
+ background:#079b22!important;background-image:none!important;color:#fff!important;
+ box-shadow:none!important;filter:none!important;
+ font-size:clamp(26px,3.5vh,36px)!important;line-height:1.15!important;font-weight:950!important;
+ letter-spacing:.2px!important;text-align:center!important;white-space:normal!important;
+ cursor:pointer!important;clip:auto!important;overflow:visible!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:disabled{
+ opacity:.6!important;pointer-events:none!important;
+}
+@media(max-width:900px){
+ html body #view #odooPosLayout #odooOrderPanel{
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  height:calc(100dvh - 20px)!important;max-height:calc(100dvh - 20px)!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  min-height:0!important;height:auto!important;max-height:none!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  padding:10px 14px 16px!important;overscroll-behavior:contain!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard{
+  display:flex!important;position:relative!important;flex:0 0 auto!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  overflow:visible!important;margin:0!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(4,clamp(42px,5.4vh,54px))!important;
+  grid-auto-rows:clamp(42px,5.4vh,54px)!important;gap:6px!important;
+  height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid button{
+  display:flex!important;width:100%!important;height:100%!important;min-height:42px!important;max-height:none!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+  display:flex!important;flex:0 0 auto!important;margin:12px 0 4px!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
+  width:100%!important;min-width:100%!important;max-width:100%!important;
+  min-height:72px!important;height:auto!important;font-size:29px!important;
+ }
+}
+</style>
 </head>
 <body>
 <div class="app">
