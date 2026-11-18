@@ -12657,6 +12657,32 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 </style>
 
 
+
+<style id="seamart-mobile-cart-viewport-fit-v6">
+/* HP only: make the cart drawer fill the usable viewport vertically. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel{
+  position:fixed!important;inset:0!important;width:100vw!important;
+  height:100vh!important;height:100dvh!important;
+  max-height:100vh!important;max-height:100dvh!important;
+  min-height:0!important;margin:0!important;border-radius:0!important;
+  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-head{flex:0 0 auto!important}
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  display:flex!important;flex:1 1 0!important;min-height:0!important;height:auto!important;
+  max-height:none!important;flex-direction:column!important;overflow:hidden!important;
+  padding-bottom:max(8px,env(safe-area-inset-bottom))!important;box-sizing:border-box!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartlines{
+  flex:1 1 0!important;min-height:0!important;height:auto!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  flex:0 0 auto!important;width:100%!important;max-height:none!important;margin-bottom:0!important;
+ }
+}
+</style>
 </body>
 <style id="seamart-pc-payment-summary-three-column">
 /* Desktop: align Total, Uang Diterima and Kembalian as three equal payment cards. */
