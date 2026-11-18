@@ -6460,6 +6460,56 @@ tr:hover td{background:#f5f9fc!important}
  #view #odooPosLayout #cartScreenKeyboard #checkoutBtn{height:40px!important;min-height:40px!important;max-height:40px!important}
 }
 </style>
+
+<style id="seamart-catalog-modal-top-layer-fix-v1">
+@media screen and (min-width:901px){
+ body.seamart-catalog-open{overflow:hidden!important}
+ body #seamartCatalogModal{display:none!important}
+ body #seamartCatalogModal.open{
+  position:fixed!important;inset:0!important;z-index:2147483000!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;
+  margin:0!important;padding:24px!important;box-sizing:border-box!important;
+  background:rgba(13,24,45,.62)!important;isolation:isolate!important;
+  pointer-events:auto!important;
+ }
+ body #seamartCatalogModal.open .seamart-catalog-modal-card{
+  position:relative!important;z-index:1!important;display:flex!important;flex-direction:column!important;
+  width:min(1120px,92vw)!important;height:min(780px,88vh)!important;
+  min-width:0!important;min-height:360px!important;max-width:calc(100vw - 48px)!important;
+  max-height:calc(100vh - 48px)!important;margin:auto!important;padding:16px!important;
+  overflow:hidden!important;border:1px solid #dce5f1!important;border-radius:14px!important;
+  background:#fff!important;box-shadow:0 24px 80px rgba(5,18,42,.32)!important;
+ }
+ body #seamartCatalogModal.open .seamart-catalog-modal-head{
+  position:relative!important;z-index:2!important;display:flex!important;align-items:center!important;
+  justify-content:space-between!important;flex:0 0 42px!important;min-height:42px!important;
+  margin:0 0 10px!important;padding:0 2px 10px!important;border-bottom:1px solid #e5eaf2!important;
+  color:#173b83!important;font-size:19px!important;font-weight:850!important;
+ }
+ body #seamartCatalogModal.open .seamart-catalog-close{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 36px!important;width:36px!important;height:36px!important;
+  border:1px solid #dce5f1!important;border-radius:8px!important;background:#f7f9fc!important;
+  color:#173b83!important;font-size:18px!important;cursor:pointer!important;
+ }
+ body #seamartCatalogModal.open #odooCategoryPanel{position:static!important;flex:0 0 auto!important;max-height:58px!important;overflow:auto!important}
+ body #seamartCatalogModal.open .odoo-catalog-top{position:static!important;flex:0 0 auto!important;margin:0 0 10px!important}
+ body #seamartCatalogModal.open #posproducts{
+  display:block!important;flex:1 1 auto!important;min-height:0!important;height:auto!important;
+  max-height:none!important;overflow:auto!important;overscroll-behavior:contain!important;
+  padding:4px!important;box-sizing:border-box!important;
+ }
+ body #seamartCatalogModal.open .pos-products-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;
+ }
+ body #seamartCatalogModal.open .odoo-scan-hint{display:block!important;flex:0 0 auto!important;margin-top:8px!important}
+}
+@media screen and (min-width:901px) and (max-height:600px){
+ body #seamartCatalogModal.open{padding:12px!important}
+ body #seamartCatalogModal.open .seamart-catalog-modal-card{height:calc(100vh - 24px)!important;max-height:calc(100vh - 24px)!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -7996,16 +8046,22 @@ if(window.matchMedia('(min-width: 901px)').matches){
   if(searchButton){searchButton.setAttribute('type','button');searchButton.onclick=()=>{openCatalog('search')}}
   if(barcodeButton){barcodeButton.setAttribute('type','button');barcodeButton.onclick=()=>{openCatalog('barcode')}}
   function openCatalog(mode){
+   if(modal.parentElement!==document.body)document.body.appendChild(modal);
+   document.body.classList.add('seamart-catalog-open');
    modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+   modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');
    const input=document.getElementById('posbarcode');
    if(input){input.placeholder=mode==='barcode'?'Pindai atau masukkan barcode...':'Cari nama barang, kode, atau barcode...';setTimeout(()=>input.focus(),30)}
   }
-  function closeCatalog(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
+  function closeCatalog(){
+   modal.classList.remove('open');modal.setAttribute('aria-hidden','true');
+   document.body.classList.remove('seamart-catalog-open');
+  }
   modalHead.querySelector('button').onclick=closeCatalog;
   modal.addEventListener('click',e=>{if(e.target===modal)closeCatalog()});
   modal.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeCatalog()}});
   actionPanel.append(banner,actions,keypad);
-  layout.replaceChildren(cartPanel,actionPanel,modal);
+  layout.replaceChildren(cartPanel,actionPanel);\n  document.body.appendChild(modal);
   window.openSeamartCatalog=openCatalog;window.closeSeamartCatalog=closeCatalog;
  }
 }
