@@ -12928,3 +12928,42 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-height-fit-v1">
+/* Keep the cart list compact on phones so the full keypad and PAY button fit. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body{
+  min-height:0!important;overflow:hidden!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:has(.empty){
+  flex:0 0 82px!important;
+  height:82px!important;min-height:82px!important;max-height:82px!important;
+  overflow:hidden!important;margin:0!important;padding:0!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:has(.empty) .empty{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:0!important;height:100%!important;padding:4px 8px!important;
+  box-sizing:border-box!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:not(:has(.empty)){
+  flex:0 1 clamp(112px,14dvh,168px)!important;
+  min-height:96px!important;max-height:clamp(112px,14dvh,168px)!important;
+  height:auto!important;overflow-x:hidden!important;overflow-y:auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard{
+  flex:1 1 0!important;min-height:0!important;overflow:hidden!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+  flex:1 1 0!important;min-height:0!important;
+  grid-template-rows:repeat(4,minmax(26px,1fr))!important;
+  grid-auto-rows:minmax(26px,1fr)!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+  flex:0 0 auto!important;margin:2px 0 0!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard .cart-payment-actions #checkoutBtn{
+  flex:1 1 100%!important;width:100%!important;min-width:0!important;max-width:100%!important;
+ }
+}
+</style>
