@@ -7537,97 +7537,6 @@ async function printReceiptNow(id,isCopy=false){
    const paper=document.getElementById('smReceiptPaper');const w=window.open('','_blank','width=420,height=720');
    if(!w)throw new Error('Popup diblokir. Izinkan popup untuk SeaMart.');
    w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><script>window.onload=function(){window.print()}<\\/script>
-<style id="seamart-mobile-cart-scroll-fix-2026-11">
-/* Fix actual mobile POS cart drawer: scroll the payment body, not the page behind it */
-@media (max-width:1100px){
-  html:has(body.seamart-cart-open),body.seamart-cart-open{
-    overflow:hidden!important;
-    overscroll-behavior:none!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel,
-  body.seamart-cart-open .odoo-order-panel#odooOrderPanel{
-    display:flex!important;
-    flex-direction:column!important;
-    position:fixed!important;
-    inset:8px!important;
-    width:auto!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    overflow:hidden!important;
-    z-index:2147483000!important;
-    box-sizing:border-box!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-head{
-    flex:0 0 auto!important;
-    position:relative!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body{
-    display:flex!important;
-    flex:1 1 0!important;
-    flex-direction:column!important;
-    width:100%!important;
-    height:0!important;
-    min-height:0!important;
-    max-height:none!important;
-    overflow-y:scroll!important;
-    overflow-x:hidden!important;
-    -webkit-overflow-scrolling:touch!important;
-    overscroll-behavior-y:contain!important;
-    touch-action:pan-y!important;
-    padding:10px 12px calc(22px + env(safe-area-inset-bottom,0px))!important;
-    box-sizing:border-box!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout #cartlines{
-    flex:0 0 auto!important;
-    min-height:0!important;
-    max-height:22vh!important;
-    overflow-y:auto!important;
-    -webkit-overflow-scrolling:touch!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard{
-    display:flex!important;
-    flex:0 0 auto!important;
-    flex-direction:column!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    overflow:visible!important;
-    margin:8px 0!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{
-    flex:0 0 auto!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions{
-    display:flex!important;
-    flex:0 0 auto!important;
-    position:sticky!important;
-    bottom:0!important;
-    z-index:8!important;
-    width:100%!important;
-    padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px))!important;
-    margin:8px 0 0!important;
-    background:#fff!important;
-  }
-  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard #checkoutBtn{
-    display:flex!important;
-    visibility:visible!important;
-    opacity:1!important;
-    pointer-events:auto!important;
-    position:static!important;
-    width:100%!important;
-    min-width:100%!important;
-    max-width:100%!important;
-    min-height:60px!important;
-    height:auto!important;
-    margin:0!important;
-    align-items:center!important;
-    justify-content:center!important;
-  }
-}
-</style>
-
 </body></html>');
    w.document.close();const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}return;
   }
@@ -10900,4 +10809,44 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  body.seamart-cart-open .odoo-order-head{background:#fff!important;z-index:3!important}
 }
 </style>
+
+<style id="seamart-mobile-cart-scroll-fix-2026-11">
+/* Fix actual mobile POS cart drawer: scroll the payment body, not the page behind it */
+@media (max-width:1100px){
+  html:has(body.seamart-cart-open),body.seamart-cart-open{overflow:hidden!important;overscroll-behavior:none!important}
+  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel,
+  body.seamart-cart-open .odoo-order-panel#odooOrderPanel{
+    display:flex!important;flex-direction:column!important;position:fixed!important;inset:8px!important;
+    width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:hidden!important;z-index:2147483000!important;box-sizing:border-box!important
+  }
+  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-head{flex:0 0 auto!important;position:relative!important}
+  body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body{
+    display:flex!important;flex:1 1 0!important;flex-direction:column!important;width:100%!important;height:0!important;
+    min-height:0!important;max-height:none!important;overflow-y:scroll!important;overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;
+    padding:10px 12px calc(22px + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important
+  }
+  body.seamart-cart-open #view #odooPosLayout #cartlines{
+    flex:0 0 auto!important;min-height:0!important;max-height:22vh!important;overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important
+  }
+  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard{
+    display:flex!important;flex:0 0 auto!important;flex-direction:column!important;width:100%!important;
+    height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;margin:8px 0!important
+  }
+  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard .cart-keypad-grid{flex:0 0 auto!important}
+  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions{
+    display:flex!important;flex:0 0 auto!important;position:sticky!important;bottom:0!important;z-index:8!important;
+    width:100%!important;padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px))!important;
+    margin:8px 0 0!important;background:#fff!important
+  }
+  body.seamart-cart-open #view #odooPosLayout #cartScreenKeyboard #checkoutBtn{
+    display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+    position:static!important;width:100%!important;min-width:100%!important;max-width:100%!important;
+    min-height:60px!important;height:auto!important;margin:0!important;align-items:center!important;justify-content:center!important
+  }
+}
+</style>
+
 </body></html>
