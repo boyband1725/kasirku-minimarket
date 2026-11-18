@@ -11438,4 +11438,47 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+
+<style id="seamart-mobile-unified-skyblue-palette-v16">
+@media(max-width:700px){
+ /* Satu palet biru muda untuk semua kontrol keranjang dan kasir HP */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .cartline button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-compact-qty-row button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard button{
+  background-color:#e2f3ff!important;
+  background-image:none!important;
+  border-color:#b8e1fa!important;
+  color:#247fb8!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .odoo-order-head button *,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .cartline button *,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-compact-qty-row button *,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard button *{
+  color:#247fb8!important;fill:#247fb8!important;stroke:#247fb8!important;
+ }
+ /* Tombol tambah qty tidak lagi hijau, dan hapus tidak lagi merah */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .cartline button,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-compact-qty-row button{
+  box-shadow:0 1px 2px #247fb81a!important;
+ }
+ /* Samakan panel kembalian dan ringkasan pembayaran */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-summary-row,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-summary-row.change,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-item-count,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-qty-control{
+  background:#eef8ff!important;border-color:#c5e7fb!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-summary-row.change,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .seamart-summary-row.change b{
+  color:#247fb8!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .totalrow.grand,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .totalrow.grand span:last-child,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #posPayAmount{
+  color:#111827!important;
+ }
+}
+</style>
+
 </body></html>
