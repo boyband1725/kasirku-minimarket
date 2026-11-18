@@ -7242,6 +7242,7 @@ function toggleMobileCart(force){
  const fab=document.getElementById('posMobileCartFab');if(fab)fab.setAttribute('aria-expanded',open?'true':'false');
  if(panel){
   if(open){
+   panel.hidden=false;panel.removeAttribute('aria-hidden');
    panel.style.removeProperty('display');
    panel.style.removeProperty('visibility');
    panel.style.removeProperty('pointer-events');
@@ -7251,7 +7252,8 @@ function toggleMobileCart(force){
    panel.style.setProperty('pointer-events','none','important');
   }
  }
- if(backdrop)backdrop.style.setProperty('display',open?'block':'none','important');
+ if(backdrop){backdrop.hidden=!open;backdrop.style.setProperty('display',open?'block':'none','important');backdrop.style.setProperty('pointer-events',open?'auto':'none','important');}
+ const floatingClose=document.getElementById('seamartFloatingCartClose');if(floatingClose)floatingClose.style.setProperty('display',open?'flex':'none','important');
  if(!open){
   document.documentElement.style.removeProperty('overflow');
   document.body.style.removeProperty('overflow');
