@@ -12988,3 +12988,31 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-fill-remaining-height-v2">
+/* Expand only the cart item-list area into the unused lower panel space on phones. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  align-content:stretch!important;align-items:stretch!important;
+  height:0!important;min-height:0!important;flex:1 1 0!important;
+ }
+ html body.seamart-cart-open #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines{
+  grid-column:1!important;grid-row:1!important;
+  flex:none!important;
+  width:100%!important;height:100%!important;
+  min-height:0!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+ }
+ html body.seamart-cart-open #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:has(.empty){
+  grid-row:1!important;height:100%!important;min-height:0!important;max-height:none!important;
+ }
+ html body.seamart-cart-open #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  grid-column:1!important;grid-row:2!important;
+  flex:0 0 auto!important;height:auto!important;min-height:0!important;
+ }
+}
+</style>
