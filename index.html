@@ -9539,7 +9539,7 @@ restoreSeaMartSession();
   width:100%!important;height:48px!important;min-height:48px!important;padding:5px!important;
   border-radius:9px!important;font-size:14px!important;font-weight:900!important
  }
- body:has(#odooPosLayout) #odooPosLayout #checkoutBtn,
+ 
  body:has(#odooPosLayout) #odooPosLayout .odoo-order-body>.btn-danger,
  body:has(#odooPosLayout) #odooPosLayout .odoo-scan-hint{display:none!important}
 }
@@ -10736,6 +10736,30 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
   width:100%!important;min-width:100%!important;max-width:100%!important;
   min-height:72px!important;height:auto!important;max-height:none!important;
   margin:12px 0 8px!important;font-size:29px!important;
+ }
+}
+</style>
+
+<style id="seamart-mobile-checkout-unhide-specific">
+@media(max-width:900px){
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  margin:12px 0 10px!important;padding:0!important;gap:0!important;overflow:visible!important;
+ }
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard .cart-payment-actions>#checkoutBtn,
+ body:has(#odooPosLayout) #odooPosLayout #cartScreenKeyboard #checkoutBtn{
+  display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+  width:100%!important;min-width:100%!important;max-width:100%!important;
+  height:auto!important;min-height:76px!important;max-height:none!important;
+  margin:0 0 10px!important;padding:14px!important;box-sizing:border-box!important;
+  border:0!important;border-radius:15px!important;background:#079b22!important;color:#fff!important;
+  font-size:29px!important;line-height:1.15!important;font-weight:950!important;
+  align-items:center!important;justify-content:center!important;
+ }
+ body:has(#odooPosLayout) #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;
+  padding-bottom:22px!important;
  }
 }
 </style>
