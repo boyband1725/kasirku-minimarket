@@ -725,7 +725,56 @@ body{background:#f5f7f8;color:#27323b}
  overflow-wrap:anywhere!important;word-break:break-word!important;
  line-height:1.4!important
 }
-</style></head>
+</style><style id="seamart-store-blue-white-final-v29">
+:root{--sm-blue:#2389B9;--sm-blue-dark:#0756A0;--sm-blue-soft:#EAF3F8;--sm-bg:#F3F6F8;--sm-ink:#253B58;--sm-muted:#718096;--sm-green:#168B68;--sm-orange:#E5A13B;--sm-red:#DC4545}
+html,body{background:#F3F6F8!important;color:#253B58!important}
+header.top{background:#fff!important;background-color:#fff!important;color:#253B58!important;border-bottom:1px solid #dce6ee!important}
+header.top .brandmark .sea{fill:#253B58!important}
+header.top .brandmark .mart{fill:#62c900!important}
+header.top .tag{color:#718096!important}
+header.top .menu-trigger,header.top .header-icon{
+ background:#EAF3F8!important;color:#0756A0!important;border:1px solid #d5e3ec!important;
+}
+header.top .header-icon svg{stroke:#0756A0!important}
+header.top .header-cart{background:#EAF3F8!important;color:#0756A0!important;border:1px solid #d5e3ec!important}
+header.top .header-cart-count{background:#DC4545!important;color:#fff!important;border:2px solid #fff!important}
+.promo-strip{background:#2389B9!important;color:#fff!important}
+.home-main-banner{background:linear-gradient(115deg,#0756A0,#2389B9 65%,#67b9d1)!important;color:#fff!important}
+.home-promo-tile{color:#fff!important}
+/* Retain the intended colorful promotional tiles; green is allowed only as a promo accent. */
+.tile-green{background:linear-gradient(130deg,#087b53,#32a77b)!important}
+.tile-blue{background:linear-gradient(130deg,#0756A0,#2389B9)!important}
+.tile-gold{background:linear-gradient(130deg,#b86a19,#edb84c)!important}
+.tile-navy{background:linear-gradient(130deg,#253B58,#51718c)!important}
+body,.home,.shop-main,#products{background:#F3F6F8!important}
+.item,.shop-category-modal,.shop-receipt-preview,#checkout,.checkout-summary,.payment-option,.shop-drawer{
+ background:#fff!important;color:#253B58!important;border-color:#dce6ee!important;
+}
+.item .name,.checkout-heading h2,.checkout-summary h3,.payment-title h3{color:#253B58!important}
+.item .price,.suggest-top h3 span,.suggest-row .suggest-rank{color:#2389B9!important}
+.item .stock,.stock{color:#168B68!important}
+.item .detail-btn{background:#fff!important;color:#0756A0!important;border:1px solid #2389B9!important}
+.item .buy-now-btn,.checkout-submit,.shop-receipt-actions .receipt-print{
+ background:linear-gradient(135deg,#2389B9,#0756A0)!important;color:#fff!important;border:1px solid #0756A0!important;
+}
+#cats .cat.active,.shop-category-choice:hover{background:#2389B9!important;color:#fff!important;border-color:#2389B9!important}
+.shop-category-choice,.desktop-category-toggle button{background:#EAF3F8!important;color:#0756A0!important;border-color:#d5e3ec!important}
+.search-panel-inner,.search-panel-inner input{background:#fff!important;color:#253B58!important;border-color:#d5e3ec!important}
+.search-close{background:#2389B9!important;color:#fff!important}
+input,select,textarea{background:#fff!important;color:#253B58!important;border-color:#d5e3ec!important}
+input:focus,select:focus,textarea:focus{border-color:#2389B9!important;box-shadow:0 0 0 3px #2389b91c!important}
+.payment-title-icon,.payment-choice-icon{background:#EAF3F8!important;color:#0756A0!important}
+.payment-option:has(input:checked){border-color:#2389B9!important;background:#eff8fc!important;box-shadow:0 0 0 1px #2389B9 inset!important}
+.payment-option:has(input:checked) .payment-check{background:#2389B9!important;border-color:#2389B9!important;color:#fff!important}
+.payment-option:focus-within{outline:3px solid #2389B933!important}
+#shopCategoryPopup .category-popup-search button{background:#EAF3F8!important;color:#0756A0!important}
+#shopCategoryPopup.open .category-popup-title small,.shop-category-head small{color:#2389B9!important}
+#shopCategoryPopup.open .category-popup-search input{color:#253B58!important}
+.shop-category-head h2,.shop-receipt-preview{color:#253B58!important}
+.shop-receipt-actions .receipt-print{background:#0756A0!important}
+.status-success,.order-status.success{color:#168B68!important}
+</style>
+</head>
 <body>
 <div class="promo-strip" aria-label="Promosi SeaMart"><div class="promo-marquee"><span>Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span><span>Temukan harga spesial setiap hari • Penuhi kebutuhan Anda tanpa batas!</span><span aria-hidden="true">Hemat, Mudah, Cepat! • Belanja kebutuhan harian di SeaMart</span></div></div>
 <div class="search-panel hide" id="searchPanel"><div class="search-panel-inner"><svg class="search-panel-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><input id="search" class="search" placeholder="Cari produk apa?" autocomplete="off" aria-label="Cari nama barang atau barcode"><button class="search-close" type="button" onclick="clearShopSearch()" aria-label="Hapus pencarian" title="Hapus pencarian">×</button></div><div class="search-suggest hide" id="searchSuggest" aria-live="polite"><div class="suggest-col"><h3>SARAN</h3><div id="searchSuggestions"></div></div><div class="suggest-col suggest-top"><h3><span>ϟ</span> TOP</h3><div id="searchTop"></div></div></div></div>
