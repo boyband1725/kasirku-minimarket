@@ -12853,3 +12853,30 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-payment-columns-microalign-v3">
+/* Final micro-adjustment: move value boxes slightly left and lock identical edges. */
+@media screen and (max-width:600px){
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,48%) minmax(0,1fr)!important;
+  column-gap:10px!important;
+  width:100%!important;min-width:0!important;
+  padding:6px 10px!important;
+  box-sizing:border-box!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>span,
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>label{
+  grid-column:1!important;justify-self:start!important;
+  width:auto!important;min-width:0!important;margin:0!important;padding:0!important;
+  text-align:left!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>b,
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>input#cartKeyboardDisplay{
+  grid-column:2!important;justify-self:stretch!important;
+  display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+  margin:0!important;box-sizing:border-box!important;text-align:right!important;
+ }
+}
+</style>
