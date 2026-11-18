@@ -6575,6 +6575,58 @@ tr:hover td{background:#f5f9fc!important}
  }
 }
 </style>
+
+<style id="seamart-catalog-products-render-fix">
+@media screen and (min-width:901px){
+ body.seamart-catalog-open #seamartCatalogModal.open .seamart-catalog-modal-card{
+  display:flex!important;flex-direction:column!important;min-height:0!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts{
+  display:block!important;position:relative!important;flex:1 1 0!important;
+  width:100%!important;min-width:0!important;min-height:0!important;
+  height:0!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  visibility:visible!important;opacity:1!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts>.pos-products-grid{
+  display:grid!important;position:relative!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(185px,auto)!important;
+  align-content:start!important;align-items:stretch!important;
+  gap:12px!important;width:100%!important;min-width:0!important;
+  height:auto!important;min-height:185px!important;max-height:none!important;
+  overflow:visible!important;visibility:visible!important;opacity:1!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product{
+  display:flex!important;position:relative!important;
+  flex-direction:column!important;align-items:stretch!important;
+  justify-content:flex-start!important;visibility:visible!important;opacity:1!important;
+  width:auto!important;min-width:0!important;min-height:185px!important;height:auto!important;
+  padding:10px!important;margin:0!important;overflow:visible!important;
+  border:1px solid #dce5ef!important;border-radius:10px!important;
+  background:#fff!important;color:#263548!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-image{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:100px!important;min-height:100px!important;
+  flex:0 0 100px!important;margin:0 0 8px!important;
+  background:#f5f7fa!important;overflow:hidden!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-name,
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-meta,
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-stock,
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-price{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  color:#263548!important;overflow-wrap:anywhere!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts .odoo-product-price{
+  margin-top:auto!important;padding-top:6px!important;color:#0756a6!important;font-weight:800!important;
+ }
+ body.seamart-catalog-open #seamartCatalogModal.open #posproducts>.empty{
+  display:block!important;padding:24px!important;color:#64748b!important;text-align:center!important;
+ }
+}
+</style>
 </head>
 <body>
 <div class="app">
