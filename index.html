@@ -12443,6 +12443,47 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+<style id="seamart-pc-cash-input-final-fix">
+@media screen and (min-width:1101px){
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row:has(label[for="cartKeyboardDisplay"]){
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:48px!important;
+  padding:6px 10px!important;
+  box-sizing:border-box!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row label[for="cartKeyboardDisplay"]{
+  display:block!important;
+  flex:0 0 34%!important;
+  width:34%!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+  text-align:left!important;
+ }
+ body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel #cartScreenKeyboard .seamart-payment-summary .seamart-summary-row input#cartKeyboardDisplay{
+  display:block!important;
+  flex:1 1 0%!important;
+  width:0!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:5px 12px!important;
+  box-sizing:border-box!important;
+  text-align:right!important;
+  font-size:19px!important;
+  font-weight:850!important;
+  line-height:1.2!important;
+ }
+}
+</style>
 </body></html>
 <style id="seamart-pc-keypad-hide-expand-v1">
 /* Desktop-only keypad hide/show. Hidden keypad gives the cart list the full lower panel. */
