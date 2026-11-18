@@ -5612,6 +5612,50 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
  }
 }
 </style>
+
+<style id="seamart-approved-reference-pay-button-last">
+/* FINAL LAST RULE: restore the real green checkout action after the numpad. */
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ position:relative!important;inset:auto!important;transform:none!important;
+ flex:0 0 auto!important;flex-direction:column!important;align-items:stretch!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ margin:14px 0 4px!important;padding:0!important;overflow:visible!important;
+ background:transparent!important;border:0!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions > #checkoutBtn,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
+ display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+ position:relative!important;inset:auto!important;transform:none!important;float:none!important;
+ flex:0 0 auto!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:100%!important;max-width:100%!important;
+ height:auto!important;min-height:82px!important;max-height:none!important;
+ margin:0!important;padding:14px 12px!important;box-sizing:border-box!important;
+ border:0!important;border-radius:16px!important;
+ background:#079b22!important;background-image:none!important;color:#fff!important;
+ box-shadow:none!important;filter:none!important;
+ font-size:clamp(26px,4vw,40px)!important;line-height:1.15!important;font-weight:950!important;
+ letter-spacing:.2px!important;text-align:center!important;white-space:normal!important;
+ cursor:pointer!important;clip:auto!important;overflow:visible!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn.pos-total-display,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn.pos-total-display:hover,
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn.pos-total-display:focus{
+ background:#079b22!important;background-image:none!important;color:#fff!important;
+ border:0!important;box-shadow:none!important;pointer-events:auto!important;cursor:pointer!important;
+}
+html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:disabled{
+ opacity:.65!important;pointer-events:none!important;
+}
+@media(max-width:900px){
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions{
+  margin:12px 0 4px!important;min-height:76px!important;
+ }
+ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
+  min-height:76px!important;height:auto!important;font-size:clamp(25px,3.6vh,34px)!important;
+ }
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -10494,4 +10538,26 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
  }
 }
 </style>
+
+<script id="seamart-force-real-checkout-button">
+(function(){
+ function restore(){
+  const b=document.getElementById('checkoutBtn');
+  if(!b)return;
+  b.classList.remove('pos-total-display');
+  b.removeAttribute('aria-disabled');
+  if(!b.textContent.trim()||/^(total|rp\s*0|0)$/i.test(b.textContent.trim())){
+   b.textContent='💳  BAYAR (F4)';
+  }
+  b.setAttribute('aria-label','Bayar transaksi (F4)');
+  const p=b.parentElement;
+  if(p&&p.classList.contains('cart-payment-actions'))p.style.setProperty('display','flex','important');
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore);
+ else restore();
+ const observer=new MutationObserver(restore);
+ observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
+ setTimeout(()=>observer.disconnect(),30000);
+})();
+</script>
 </body></html>
