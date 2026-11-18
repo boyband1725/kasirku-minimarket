@@ -11410,4 +11410,32 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 }
 </style>
 
+
+<style id="seamart-mobile-black-total-blue-functions-v15">
+@media(max-width:700px){
+ /* Angka total hitam pada ringkasan total keranjang dan ringkasan pembayaran */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .totalrow.grand,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel .totalrow.grand span:last-child,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #posPayAmount{
+  color:#111827!important;
+ }
+ /* Tombol fungsi keypad: biru muda dengan ikon/tulisan biru */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid button.cart-key-clear,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid button.cart-key-adjust{
+  background:#dff2ff!important;background-color:#dff2ff!important;
+  background-image:none!important;color:#247eb5!important;
+  border:1px solid #a9dcf7!important;box-shadow:0 1px 2px #247eb51c!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid button.cart-key-clear *,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid button.cart-key-adjust *{
+  color:#247eb5!important;fill:#247eb5!important;stroke:#247eb5!important;
+ }
+ /* Ikon judul keypad dan tombol kontrol qty */
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keyboard-head b,
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-qty-control>span{
+  color:#247eb5!important;
+ }
+}
+</style>
+
 </body></html>
