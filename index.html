@@ -6362,8 +6362,8 @@ tr:hover td{background:#f5f9fc!important}
  }
  #view #odooPosLayout .seamart-cart-total-footer .totalrow.grand span:first-child{font-size:15px!important;line-height:1.2!important;font-weight:850!important}
  #view #odooPosLayout .seamart-cart-total-footer #grandtotal{color:#fff!important;font-size:23px!important;line-height:1.1!important;font-weight:950!important}
- #view #odooPosLayout .seamart-compact-cart-head{
-  display:grid!important;grid-template-columns:38px minmax(0,1fr) 72px 110px 110px 32px!important;align-items:center!important;
+  #view #odooPosLayout .seamart-compact-cart-head{
+  position:sticky!important;top:0!important;z-index:3!important;display:grid!important;grid-template-columns:38px minmax(0,1fr) 72px 110px 110px 32px!important;align-items:center!important;
   min-height:39px!important;padding:7px 12px!important;background:#173b86!important;color:#fff!important;border:0!important;font-size:12px!important;
  }
  #view #odooPosLayout .seamart-compact-cart-row{
@@ -6452,7 +6452,7 @@ tr:hover td{background:#f5f9fc!important}
 @media screen and (min-width:901px) and (max-height:700px){
  #view #odooPosLayout{height:calc(100vh - 135px)!important;max-height:calc(100vh - 115px)!important;grid-template-rows:minmax(500px,calc(100vh - 135px))!important;min-height:500px!important}
  #view #odooPosLayout>.seamart-desktop-actions{gap:6px!important;padding:7px!important}
- #view #odooPosLayout .seamart-reference-banner{flex-basis:90px!important;min-height:90px!important}
+ #view #odooPosLayout .seamart-reference-banner{flex-basis:108px!important;min-height:108px!important}
  #view #odooPosLayout #cartScreenKeyboard{padding:6px!important}
  #view #odooPosLayout #cartScreenKeyboard .seamart-summary-row{height:29px!important;min-height:29px!important;max-height:29px!important}
  #view #odooPosLayout #cartScreenKeyboard .seamart-summary-row>b,#view #odooPosLayout #cartScreenKeyboard .seamart-summary-row>input{height:23px!important;min-height:23px!important;max-height:23px!important}
@@ -8003,7 +8003,7 @@ if(window.matchMedia('(min-width: 901px)').matches){
   function closeCatalog(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
   modalHead.querySelector('button').onclick=closeCatalog;
   modal.addEventListener('click',e=>{if(e.target===modal)closeCatalog()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeCatalog()});
+  modal.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeCatalog()}});
   actionPanel.append(banner,actions,keypad);
   layout.replaceChildren(cartPanel,actionPanel,modal);
   window.openSeamartCatalog=openCatalog;window.closeSeamartCatalog=closeCatalog;
