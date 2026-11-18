@@ -10539,25 +10539,5 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment
 }
 </style>
 
-<script id="seamart-force-real-checkout-button">
-(function(){
- function restore(){
-  const b=document.getElementById('checkoutBtn');
-  if(!b)return;
-  b.classList.remove('pos-total-display');
-  b.removeAttribute('aria-disabled');
-  if(!b.textContent.trim()||/^(total|rp\s*0|0)$/i.test(b.textContent.trim())){
-   b.textContent='💳  BAYAR (F4)';
-  }
-  b.setAttribute('aria-label','Bayar transaksi (F4)');
-  const p=b.parentElement;
-  if(p&&p.classList.contains('cart-payment-actions'))p.style.setProperty('display','flex','important');
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore);
- else restore();
- const observer=new MutationObserver(restore);
- observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
- setTimeout(()=>observer.disconnect(),30000);
-})();
-</script>
+
 </body></html>
