@@ -8711,7 +8711,105 @@ async function printReceiptNow(id,isCopy=false){
   if(choice==='browser'){
    const paper=document.getElementById('smReceiptPaper');const w=window.open('','_blank','width=420,height=720');
    if(!w)throw new Error('Popup diblokir. Izinkan popup untuk SeaMart.');
-   w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><scr'+'ipt>window.onload=function(){window.print()}</scr'+'ipt></scr'+'ipt></body></html>');
+   w.document.write('<!doctype html><html><head><title>Cetak Struk</title><style>@page{size:58mm auto;margin:2mm}body{font:12px Arial;margin:0;color:#111}.paper{width:54mm;margin:auto}.sm-receipt-detail,.sm-receipt-total{display:flex;justify-content:space-between;gap:4px;margin:7px 0}.sm-receipt-item{margin:9px 0}.sm-receipt-name{font-weight:bold}.sm-receipt-thanks{text-align:center}hr{border:0;border-top:1px dashed #777}</style></head><body><article class="paper">'+(paper?paper.innerHTML:'')+'</article><scr'+'ipt>window.onload=function(){window.print()}</scr'+'ipt></scr'+'ipt>
+<style id="seamart-numpad-override-after-all-styles">
+/* Last cascade override: keep the existing cashier markup and JS handlers intact. */
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-key-mode.seamart-cash-mode-only{
+ display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ gap:6px!important;width:100%!important;margin:0 0 8px!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row{
+ display:grid!important;grid-template-columns:minmax(0,42%) minmax(0,58%)!important;
+ align-items:center!important;column-gap:0!important;
+ width:100%!important;height:39px!important;min-height:39px!important;max-height:39px!important;
+ margin:0!important;padding:4px 10px!important;box-sizing:border-box!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>span,
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>label{
+ grid-column:1!important;justify-self:start!important;min-width:0!important;
+ width:100%!important;margin:0!important;text-align:left!important;
+ line-height:1.2!important;white-space:nowrap!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>b,
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>input#cartKeyboardDisplay{
+ grid-column:2!important;justify-self:stretch!important;align-self:center!important;
+ display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+ height:29px!important;min-height:29px!important;max-height:29px!important;
+ margin:0!important;padding:3px 9px!important;box-sizing:border-box!important;
+ text-align:right!important;line-height:21px!important;white-space:nowrap!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ grid-auto-flow:row!important;gap:7px!important;align-items:stretch!important;
+ width:100%!important;margin:0 0 8px!important;padding:0!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-item-count,
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-qty-control{
+ display:flex!important;flex-flow:row nowrap!important;align-items:center!important;
+ justify-content:space-between!important;gap:5px!important;
+ width:100%!important;min-width:0!important;height:40px!important;
+ min-height:40px!important;max-height:40px!important;
+ margin:0!important;padding:4px 7px!important;box-sizing:border-box!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-item-count>span{
+ flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;
+ text-overflow:ellipsis!important;white-space:nowrap!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-item-count>b{
+ flex:0 0 auto!important;margin-left:auto!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-qty-control>label{
+ flex:0 0 auto!important;white-space:nowrap!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-qty-control>#seamartCompactQty{
+ flex:1 1 30px!important;width:30px!important;min-width:22px!important;max-width:52px!important;
+ margin:0!important;box-sizing:border-box!important;text-align:center!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row>.seamart-qty-control>button{
+ flex:0 0 29px!important;width:29px!important;min-width:29px!important;max-width:29px!important;
+ height:29px!important;min-height:29px!important;max-height:29px!important;
+ margin:0!important;padding:0!important;box-sizing:border-box!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ grid-template-rows:repeat(4,37px)!important;grid-auto-rows:37px!important;
+ gap:5px!important;width:100%!important;min-width:0!important;margin:0!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid>button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:0!important;height:37px!important;
+ min-height:37px!important;max-height:37px!important;margin:0!important;padding:0 3px!important;
+ box-sizing:border-box!important;line-height:1!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions.seamart-single-pay{
+ display:block!important;width:100%!important;min-width:0!important;
+ margin:8px 0 0!important;padding:0!important;box-sizing:border-box!important;
+}
+body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions.seamart-single-pay>#checkoutBtn{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:0!important;max-width:none!important;
+ height:45px!important;min-height:45px!important;max-height:45px!important;
+ margin:0!important;box-sizing:border-box!important;
+}
+@media(max-width:600px){
+ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+  grid-template-rows:repeat(4,35px)!important;grid-auto-rows:35px!important;gap:5px!important;
+ }
+ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid>button{
+  height:35px!important;min-height:35px!important;max-height:35px!important;
+ }
+}
+@media(max-width:360px){
+ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row{
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+}
+</style>
+</body></html>');
    w.document.close();const b=document.getElementById('smPrintAgainBtn');if(b){b.textContent='Cetak Lagi';b.dataset.copy='1';}return;
   }
   if(choice==='windows'){
