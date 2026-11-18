@@ -6258,6 +6258,60 @@ tr:hover td{background:#f5f9fc!important}
 }
 </style>
 
+
+<style id="seamart-pos-blue-layout-2026">
+/* SeaMart POS — modern blue/white cashier layout */
+#view .odoo-pos-head{background:linear-gradient(115deg,#0755bd,#0878ed)!important;color:#fff!important;border:1px solid #0756b9!important;border-radius:14px!important;padding:14px 18px!important;box-shadow:0 8px 22px #0756b91c!important}
+#view .odoo-pos-head h1,#view .odoo-pos-head .sub,#view .odoo-pos-head .pos-clock strong,#view .odoo-pos-head .pos-clock span{color:#fff!important}
+#view .odoo-pos-head .pos-clock{background:#ffffff1c!important;border:1px solid #ffffff45!important}
+#view .odoo-pos-head .btn-light{background:#fff!important;color:#0756b9!important;border-color:#d6e6ff!important}
+#view #odooPosLayout{gap:12px!important;align-items:stretch!important}
+#view #odooPosLayout .odoo-category-panel,#view #odooPosLayout .odoo-catalog-panel,#view #odooPosLayout .odoo-order-panel{background:#fff!important;border:1px solid #d8e6f8!important;border-radius:15px!important;box-shadow:0 5px 18px #174d8510!important}
+#view #odooPosLayout .odoo-panel-label,#view #odooPosLayout .odoo-catalog-top h3,#view #odooPosLayout .odoo-order-head h3{color:#12356d!important}
+#view #odooPosLayout .odoo-cat.active,#view #odooPosLayout .pos-category-row .active{background:#0866d9!important;color:#fff!important;border-color:#0866d9!important}
+#view #odooPosLayout .odoo-product{border:1px solid #dce8f8!important;border-radius:12px!important;background:#fff!important;box-shadow:0 2px 8px #174d8509!important}
+#view #odooPosLayout .odoo-product:hover{border-color:#7eb5ff!important;box-shadow:0 5px 16px #0866d91c!important}
+#view #odooPosLayout .odoo-product-price{color:#075bc7!important}
+#view #odooPosLayout .odoo-order-head{background:#f5f9ff!important;border-bottom:1px solid #e0eaf8!important;border-radius:15px 15px 0 0!important}
+#view #odooPosLayout .odoo-order-lines{background:#fff!important}
+#view #odooPosLayout .seamart-compact-cart-head{background:#eaf2ff!important;color:#12356d!important;border-color:#d8e6f8!important}
+#view #odooPosLayout .seamart-compact-cart-row{border-bottom:1px solid #e6edf8!important}
+#view #odooPosLayout .seamart-compact-cart-row.cartline-selected{background:#f0f6ff!important}
+#view #odooPosLayout .seamart-summary-row:first-child{background:#eaf2ff!important;border-color:#d5e5ff!important;color:#12356d!important}
+#view #odooPosLayout .seamart-summary-row:first-child b{color:#064fb3!important}
+#view #odooPosLayout .seamart-summary-row input{border:1.5px solid #8fb8f5!important;border-radius:9px!important;background:#fff!important;color:#14233f!important}
+#view #odooPosLayout .seamart-summary-row.change{background:#e9f8ef!important;color:#16733d!important}
+#view #odooPosLayout .seamart-summary-row.change b{color:#16803f!important}
+#view #odooPosLayout .cart-keypad-grid button{border:1px solid #d5e2f4!important;background:#fff!important;color:#17233c!important;border-radius:10px!important;box-shadow:0 1px 2px #163b7010!important}
+#view #odooPosLayout .cart-keypad-grid button:hover{background:#edf5ff!important;border-color:#8bb8f6!important}
+#view #odooPosLayout .cart-keypad-grid .cart-key-clear,#view #odooPosLayout .cart-keypad-grid .cart-key-adjust{background:#eaf2ff!important;color:#0756b9!important}
+#view #odooPosLayout #checkoutBtn{background:linear-gradient(110deg,#1685f5,#0755c8)!important;border:1px solid #0756b9!important;border-radius:11px!important;box-shadow:0 5px 13px #0866d92b!important;min-height:50px!important;font-size:17px!important}
+#view #odooPosLayout .pos-searchbox input{border-color:#c9daf1!important}
+#view #odooPosLayout .cart-empty-button{background:#fff0f0!important;color:#d62f38!important}
+@media(min-width:1101px){
+ #view #odooPosLayout{display:grid!important;grid-template-columns:170px minmax(300px,1fr) minmax(390px,430px)!important;gap:13px!important}
+ #view #odooPosLayout .odoo-category-panel{grid-column:1!important;position:sticky!important;top:12px!important;align-self:start!important;max-height:calc(100vh - 24px)!important;overflow:auto!important}
+ #view #odooPosLayout .odoo-catalog-panel{grid-column:2!important;min-width:0!important}
+ #view #odooPosLayout .odoo-order-panel{grid-column:3!important;position:sticky!important;top:12px!important;max-height:calc(100vh - 24px)!important;overflow:hidden!important}
+ #view #odooPosLayout .odoo-order-body{min-height:0!important}
+ #view #odooPosLayout .odoo-order-lines{min-height:120px!important}
+}
+@media(min-width:601px) and (max-width:1100px){
+ #view #odooPosLayout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(340px,43%)!important;gap:10px!important;align-items:start!important}
+ #view #odooPosLayout .odoo-category-panel{grid-column:1 / -1!important;position:static!important}
+ #view #odooPosLayout #poscategories{display:flex!important;flex-direction:row!important;gap:7px!important;overflow-x:auto!important}
+ #view #odooPosLayout .odoo-catalog-panel{grid-column:1!important;min-width:0!important}
+ #view #odooPosLayout .odoo-order-panel{grid-column:2!important;position:sticky!important;top:8px!important;bottom:auto!important;left:auto!important;right:auto!important;width:auto!important;max-height:calc(100vh - 16px)!important;overflow:auto!important;z-index:4!important;border:1px solid #d8e6f8!important}
+}
+@media(max-width:600px){
+ #view .odoo-pos-head{padding:10px 12px!important;border-radius:12px!important}
+ #view #odooPosLayout{display:flex!important;flex-direction:column!important;gap:9px!important}
+ #view #odooPosLayout .odoo-category-panel{position:static!important}
+ #view #odooPosLayout .odoo-order-panel{border:2px solid #9cc5fa!important;box-shadow:0 -5px 24px #0756b922!important}
+ #view #odooPosLayout #checkoutBtn{min-height:48px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
