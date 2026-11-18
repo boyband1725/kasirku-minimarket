@@ -11220,4 +11220,48 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
 })();
 </script>
 
+
+<style id="seamart-floating-cart-close-v12">
+@media(max-width:1100px){
+ #seamartFloatingCartClose{
+  display:none;position:fixed!important;
+  top:calc(12dvh + 16px)!important;right:calc(5vw + 8px)!important;
+  width:44px!important;height:44px!important;
+  z-index:2147483647!important;
+  border:1px solid #d8e0e5!important;border-radius:50%!important;
+  background:#fff!important;color:#28618a!important;
+  font-size:30px!important;line-height:1!important;
+  align-items:center!important;justify-content:center!important;
+  padding:0!important;box-shadow:0 1px 5px #0002!important;
+  pointer-events:auto!important;touch-action:manipulation!important;
+ }
+ body.seamart-cart-open #seamartFloatingCartClose{display:flex!important}
+}
+</style>
+<script id="seamart-floating-cart-close-v12-script">
+(function(){
+ function closePanel(){
+  var p=document.getElementById('odooOrderPanel');
+  var b=document.getElementById('mobileCartBackdrop');
+  document.body.classList.remove('seamart-cart-open');
+  if(p){p.hidden=true;p.style.setProperty('display','none','important');p.style.setProperty('visibility','hidden','important');p.style.setProperty('pointer-events','none','important');p.setAttribute('aria-hidden','true');}
+  if(b){b.hidden=true;b.style.setProperty('display','none','important');b.style.setProperty('pointer-events','none','important');}
+  var x=document.getElementById('seamartFloatingCartClose');if(x)x.style.setProperty('display','none','important');
+  ['mobileCartTrigger','posMobileCartFab'].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute('aria-expanded','false');});
+  document.documentElement.style.setProperty('overflow','auto','important');
+  document.body.style.setProperty('overflow','auto','important');
+ }
+ function ensureButton(){
+  if(document.getElementById('seamartFloatingCartClose'))return;
+  var x=document.createElement('button');
+  x.id='seamartFloatingCartClose';x.type='button';x.textContent='×';
+  x.setAttribute('aria-label','Tutup keranjang');
+  x.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();closePanel();},{passive:false});
+  x.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();closePanel();});
+  document.body.appendChild(x);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureButton);else ensureButton();
+})();
+</script>
+
 </body></html>
