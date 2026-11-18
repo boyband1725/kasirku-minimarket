@@ -13543,3 +13543,106 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-pc-cashier-final-uniform-v14">
+/* PC pointer devices: one consistent layout for payment rows, QTY, keypad and pay action. */
+@media screen and (min-width:761px) and (pointer:fine){
+ body:has(#view #odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:8px!important;width:100%!important;max-width:none!important;
+  padding:10px!important;box-sizing:border-box!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary{
+  display:flex!important;flex-direction:column!important;gap:7px!important;
+  width:100%!important;margin:0!important;align-items:stretch!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 46%!important;
+  grid-template-rows:42px!important;column-gap:8px!important;align-items:center!important;
+  width:100%!important;height:42px!important;min-height:42px!important;
+  margin:0!important;padding:0!important;box-sizing:border-box!important;
+  border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>span,
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>label{
+  grid-column:1!important;display:flex!important;align-items:center!important;
+  width:100%!important;height:42px!important;min-width:0!important;
+  margin:0!important;padding:0 12px!important;box-sizing:border-box!important;
+  border:1px solid #d5e0da!important;border-radius:9px!important;background:#f3f6f4!important;
+  text-align:left!important;white-space:nowrap!important;font-size:15px!important;
+  line-height:1!important;font-weight:800!important;overflow:hidden!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>b,
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row>input#cartKeyboardDisplay{
+  grid-column:2!important;justify-self:stretch!important;display:flex!important;
+  align-items:center!important;justify-content:flex-end!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:42px!important;min-height:42px!important;max-height:42px!important;
+  margin:0!important;padding:4px 12px!important;box-sizing:border-box!important;
+  border:1px solid #cbd5cf!important;border-radius:9px!important;background:#fff!important;
+  text-align:right!important;font-size:20px!important;line-height:1!important;
+  font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row.change>span,
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row.change>b{
+  color:#087b43!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-payment-summary>.seamart-summary-row.change>b{
+  border-color:#c9e5d2!important;background:#effaf3!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-compact-qty-row{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:8px!important;width:100%!important;margin:0!important;align-items:stretch!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-item-count,
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-qty-control{
+  display:flex!important;align-items:center!important;gap:7px!important;
+  width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;
+  margin:0!important;padding:4px 9px!important;box-sizing:border-box!important;
+  border-radius:9px!important;overflow:hidden!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-item-count{justify-content:space-between!important}
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-qty-control{
+  display:grid!important;grid-template-columns:auto minmax(40px,1fr) 34px 34px!important;
+  justify-content:stretch!important;gap:7px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-qty-control label{
+  margin:0!important;padding:0!important;white-space:nowrap!important;font-size:14px!important;line-height:1!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard #seamartCompactQty{
+  width:100%!important;min-width:0!important;height:34px!important;min-height:34px!important;
+  margin:0!important;padding:2px 5px!important;box-sizing:border-box!important;
+  text-align:center!important;font-size:16px!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .seamart-qty-control>button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:34px!important;min-width:34px!important;max-width:34px!important;
+  height:34px!important;min-height:34px!important;max-height:34px!important;
+  margin:0!important;padding:0!important;box-sizing:border-box!important;
+  border-radius:8px!important;font-size:18px!important;line-height:1!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(4,42px)!important;grid-auto-rows:42px!important;
+  gap:7px!important;width:100%!important;min-width:0!important;margin:0!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid>button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;
+  max-height:42px!important;margin:0!important;padding:4px!important;box-sizing:border-box!important;
+  border-radius:9px!important;font-size:18px!important;line-height:1!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .cart-payment-actions,
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard .cart-payment-actions.seamart-single-pay{
+  display:flex!important;width:100%!important;margin:0!important;padding:0!important;
+ }
+ body:has(#view #odooPosLayout) #view #odooOrderPanel #cartScreenKeyboard #checkoutBtn{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:1 1 100%!important;width:100%!important;min-width:0!important;max-width:none!important;
+  height:42px!important;min-height:42px!important;max-height:42px!important;
+  margin:0!important;padding:6px 12px!important;box-sizing:border-box!important;
+  border-radius:9px!important;font-size:16px!important;line-height:1!important;
+ }
+}
+</style>
