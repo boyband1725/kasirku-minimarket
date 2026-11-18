@@ -12281,7 +12281,7 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
-  grid-template-rows:minmax(0,1fr) auto!important;
+  grid-template-rows:minmax(120px,min(216px,28dvh)) auto!important;
   grid-auto-flow:row!important;
   align-content:stretch!important;align-items:stretch!important;
   gap:6px!important;
@@ -12294,8 +12294,8 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  body:has(#view #odooPosLayout) #view>#odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines{
   display:flex!important;flex-direction:column!important;
   grid-column:1!important;grid-row:1!important;
-  flex:none!important;width:100%!important;height:auto!important;
-  min-width:0!important;min-height:0!important;max-height:none!important;
+  flex:none!important;width:100%!important;height:100%!important;
+  min-width:0!important;min-height:120px!important;max-height:min(216px,28dvh)!important;
   margin:0!important;padding:0 2px!important;
   overflow-x:hidden!important;overflow-y:auto!important;
   overscroll-behavior:contain!important;box-sizing:border-box!important;
