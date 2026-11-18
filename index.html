@@ -12967,3 +12967,24 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-hide-numpad-expand-cart-v1">
+/* Phone cashier: remove only the numeric keypad and give its free height to cart items. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard .cart-keypad-grid{
+  display:none!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines{
+  flex:1 1 0!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel>.odoo-order-body>#cartlines:has(.empty){
+  flex:1 1 0!important;height:auto!important;min-height:0!important;max-height:none!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout>#odooOrderPanel #cartScreenKeyboard{
+  flex:0 0 auto!important;min-height:0!important;height:auto!important;
+ }
+}
+</style>
