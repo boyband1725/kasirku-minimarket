@@ -13186,3 +13186,31 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+
+<style id="seamart-mobile-cart-fill-space-v8">
+/* Keep cart rows flexible while pinning the totals and cashier controls to the bottom. */
+@media screen and (max-width:700px){
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel{
+  display:flex!important;flex-direction:column!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  width:100%!important;height:0!important;min-height:0!important;max-height:none!important;
+  justify-content:flex-start!important;overflow:hidden!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartlines{
+  display:block!important;flex:1 1 0!important;width:100%!important;
+  height:0!important;min-height:0!important;max-height:none!important;
+  margin:0!important;overflow-x:hidden!important;overflow-y:auto!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>.totalrow{
+  flex:0 0 auto!important;margin-top:0!important;
+ }
+ html body.seamart-cart-open #view #odooPosLayout #odooOrderPanel>.odoo-order-body>#cartScreenKeyboard{
+  display:flex!important;flex:0 0 auto!important;width:100%!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  margin-top:0!important;overflow:visible!important;
+ }
+}
+</style>
