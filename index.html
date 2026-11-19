@@ -6855,6 +6855,56 @@ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboar
  }
 }
 </style>
+
+<style id="seamart-mobile-cashier-layout-restore">
+/* Mobile-only recovery: keep desktop layout untouched and keep BAYAR in normal flow. */
+@media screen and (max-width:600px){
+  html body #view #odooPosLayout{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:visible!important;gap:10px!important;
+  }
+  html body #view #odooPosLayout .odoo-catalog-panel,
+  html body #view #odooPosLayout .odoo-order-panel{
+    position:relative!important;inset:auto!important;float:none!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;max-height:none!important;overflow:visible!important;
+    transform:none!important;z-index:auto!important;
+  }
+  html body #view #odooPosLayout .odoo-order-body{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:visible!important;
+  }
+  html body #view #odooPosLayout #cartlines,
+  html body #view #odooPosLayout .odoo-order-lines{
+    flex:1 1 auto!important;min-height:90px!important;max-height:32vh!important;
+    height:auto!important;overflow-y:auto!important;position:relative!important;
+  }
+  html body #view #odooPosLayout .seamart-cart-total-footer{position:relative!important;flex:0 0 auto!important}
+  html body #view #odooPosLayout #cartScreenKeyboard{
+    position:relative!important;inset:auto!important;left:auto!important;right:auto!important;
+    top:auto!important;bottom:auto!important;float:none!important;
+    display:block!important;flex:0 0 auto!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;max-height:none!important;margin:8px 0!important;
+    transform:none!important;z-index:auto!important;overflow:visible!important;
+  }
+  html body #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions,
+  html body #view #odooPosLayout #cartScreenKeyboard .cart-payment-actions.seamart-single-pay{
+    position:relative!important;inset:auto!important;display:block!important;
+    width:100%!important;height:auto!important;min-height:0!important;margin:8px 0 0!important;
+    transform:none!important;
+  }
+  html body #view #odooPosLayout #cartScreenKeyboard #checkoutBtn{
+    position:relative!important;inset:auto!important;display:flex!important;
+    width:100%!important;min-width:0!important;max-width:none!important;
+    height:48px!important;min-height:48px!important;max-height:48px!important;
+    margin:0!important;transform:none!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
