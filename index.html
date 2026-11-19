@@ -6949,6 +6949,15 @@ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboar
 }
 </style>
 
+
+<meta name="theme-color" content="#009f89">
+<meta name="application-name" content="SeaMart POS">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SeaMart POS">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./seamart-pwa-icon.svg">
+<link rel="apple-touch-icon" href="./seamart-pwa-icon.svg">
 </head>
 <body>
 <div class="app">
@@ -13455,6 +13464,15 @@ html body #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn:
  }
 }
 </style>
+
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js', {scope: './'})
+      .catch(error => console.warn('SeaMart PWA service worker:', error));
+  });
+}
+</script>
 </body>
 <style id="seamart-pc-payment-summary-three-column">
 /* Desktop: align Total, Uang Diterima and Kembalian as three equal payment cards. */
