@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "SeaMart POS",
+  "short_name": "SeaMart",
+  "description": "Aplikasi kasir SeaMart POS",
+  "lang": "id-ID",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7f9",
+  "theme_color": "#009f89",
+  "icons": [
+    {
+      "src": "./seamart-pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
