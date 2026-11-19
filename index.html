@@ -6905,6 +6905,50 @@ body:has(#odooPosLayout) #view #odooPosLayout #odooOrderPanel #cartScreenKeyboar
 }
 </style>
 
+
+<style id="seamart-mobile-checkout-no-overlap-v2">
+@media screen and (max-width: 900px) and (pointer: coarse) {
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: 8px !important;
+  }
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-keypad-grid {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 1 !important;
+    display: grid !important;
+    margin-bottom: 8px !important;
+  }
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions,
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions.seamart-single-pay,
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn {
+    position: static !important;
+    inset: auto !important;
+    float: none !important;
+    transform: none !important;
+    z-index: auto !important;
+    flex: 0 0 auto !important;
+    clear: both !important;
+  }
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard .cart-payment-actions {
+    display: flex !important;
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+  }
+  #view #odooPosLayout #odooOrderPanel #cartScreenKeyboard #checkoutBtn {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    margin: 0 !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
