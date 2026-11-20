@@ -1,0 +1,1 @@
+Dedicated SeaMart POS Baru APK build trigger. Source HTML: app/src/main/assets/index.html. Android applicationId: id.seamart.posbaru.
