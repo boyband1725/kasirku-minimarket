@@ -990,6 +990,39 @@ main>section:not(.hidden){
 .finance-expense{padding:14px;margin:14px 0}.finance-expense h3{margin:0 0 10px}
 @media(max-width:600px){.finance-kpis{grid-template-columns:1fr 1fr}.finance-filter label{min-width:calc(50% - 8px)}}
 
+
+/* MYstore mobile dashboard refinement v2 */
+@media(max-width:520px){
+  #dashboardPage.dashboard-page{gap:12px;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  #dashboardPage .dash-welcome{gap:10px}
+  #dashboardPage .dash-welcome h1{font-size:24px;line-height:1.15}
+  #dashboardPage .dash-welcome .sub{font-size:13px;line-height:1.4}
+  #dashboardPage .dash-date{font-size:12px;margin-top:3px}
+  #dashboardPage .dash-actions{width:100%;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:8px}
+  #dashboardPage .dash-actions .btn{width:100%;min-width:0;padding:10px 8px;font-size:13px;white-space:nowrap}
+  #dashboardPage .dash-kpis{gap:8px}
+  #dashboardPage .dash-kpis .dash-card{padding:11px;min-height:132px;border-radius:12px}
+  #dashboardPage .dash-kpi-top{font-size:11px;line-height:1.25;align-items:flex-start}
+  #dashboardPage .dash-icon{width:32px;height:32px;font-size:16px;border-radius:9px}
+  #dashboardPage .dash-value{font-size:19px;margin:9px 0 4px}
+  #dashboardPage .dash-foot{font-size:10px;line-height:1.35}
+  #dashboardPage .dash-main-grid,#dashboardPage .dash-bottom-grid{gap:10px}
+  #dashboardPage .dash-card{padding:12px}
+  #dashboardPage .dash-section-head{margin-bottom:8px}
+  #dashboardPage .dash-section-head h2{font-size:15px}
+  #dashboardPage .dash-section-head span{font-size:10px}
+  #dashboardPage .dash-chart{height:96px;padding:6px 2px 0;gap:5px}
+  #dashboardPage .dash-bar-col{gap:4px}
+  #dashboardPage .dash-bar{width:min(100%,24px);min-height:2px}
+  #dashboardPage .dash-bar-label{font-size:9px}
+  #dashboardPage .dash-bar-value{font-size:8px}
+  #dashboardPage .dash-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  #dashboardPage .dash-quick{padding:9px 8px;gap:7px}
+  #dashboardPage .dash-quick strong{font-size:11px}
+  #dashboardPage .dash-quick small{font-size:9px;line-height:1.25}
+  #dashboardPage .dash-table{font-size:10px}
+}
+
 </style>
 <style>
 .sea-settings-dialog{width:min(440px,calc(100vw - 28px));max-height:86vh;padding:0;border:1px solid #dce3e8;border-radius:14px;color:#263746;box-shadow:0 18px 50px #172b3a35}
