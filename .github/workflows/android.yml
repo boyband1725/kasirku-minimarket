@@ -1,7 +1,7 @@
 name: Build APK Android
 on:
   push:
-    branches: [main]
+    branches: [main, seamart-apk-html-baru]
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +19,6 @@ jobs:
         run: gradle assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: KasirKu-Minimarket-APK
+          name: ${{ github.ref_name == 'main' && 'KasirKu-Minimarket-APK' || 'SeaMart-POS-Baru-APK' }}
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
