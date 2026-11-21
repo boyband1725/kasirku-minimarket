@@ -3519,4 +3519,61 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
  .launcher-icon{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important;border-radius:14px!important}
  .launcher-icon svg{width:38px!important;height:38px!important}
 }
+
+/* FINAL MOBILE DASHBOARD FIX — prevent grid cards stretching to viewport height */
+@media (max-width: 600px){
+  #dashboardPage.dashboard-page{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:10px!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    padding:0 0 calc(92px + env(safe-area-inset-bottom,0px))!important;
+  }
+  #dashboardPage > .dash-kpis{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:min-content!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    flex:0 0 auto!important;
+    gap:8px!important;
+  }
+  #dashboardPage .dash-kpis > .dash-card{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:11px!important;
+    align-self:start!important;
+  }
+  #dashboardPage .dash-main-grid,
+  #dashboardPage .dash-bottom-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-rows:min-content!important;
+    align-content:start!important;
+    align-items:start!important;
+    flex:0 0 auto!important;
+    gap:10px!important;
+  }
+  #dashboardPage .dash-main-grid > .dash-card,
+  #dashboardPage .dash-bottom-grid > .dash-card{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:start!important;
+  }
+  #dashboardPage .dash-chart{height:88px!important;min-height:88px!important;max-height:88px!important}
+  #dashboardPage .dash-quick{min-height:68px!important}
+  #dashboardPage .dash-actions{margin:0!important}
+}
+@media (min-width:601px) and (max-width:850px){
+  #dashboardPage .dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:min-content}
+  #dashboardPage .dash-kpis>.dash-card{height:auto!important;min-height:0}
+}
+
 </style>
