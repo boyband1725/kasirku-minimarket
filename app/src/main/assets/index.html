@@ -3725,3 +3725,102 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
 }
 
 </style>
+
+
+<style id="mystore-android-all-pages-scroll-repair">
+/* MYstore Android: one reliable page scroll area for every module */
+@media screen and (max-width:850px){
+  html,body{
+    width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    overflow:hidden!important;
+  }
+  body{
+    display:flex!important;
+    flex-direction:column!important;
+    height:100dvh!important;
+    min-height:0!important;
+  }
+  .topbar,.nav{
+    flex:0 0 auto!important;
+    position:relative!important;
+  }
+  main{
+    display:block!important;
+    flex:1 1 0!important;
+    width:100%!important;
+    height:0!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior-y:contain!important;
+    touch-action:pan-y!important;
+    padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;
+  }
+  main>section:not(.hidden){
+    display:block!important;
+    position:relative!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    flex:none!important;
+    overflow:visible!important;
+    padding-bottom:28px!important;
+    touch-action:pan-y!important;
+  }
+  #dashboardPage,#sessionsPage,#cashierPage,#barangPage,#ordersPage,#reportsPage{
+    display:block!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  #dashboardPage>*{max-height:none}
+  #cashierPage .cashier-layout{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    align-items:start!important;
+  }
+  #cashierPage .cashier-layout>aside.panel,
+  #cashierPage .cashier-layout>.panel:first-child{
+    grid-column:1!important;
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  #cashierPage .cashier-layout>aside .cart-list{
+    flex:none!important;
+    min-height:100px!important;
+    max-height:260px!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  #ordersPage .orders-panel{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  #reportsPage .report-tabs,
+  #reportsPage .report-content{max-width:100%;min-width:0}
+  .table-wrap,.table-responsive,.report-table-wrap{
+    max-width:100%;
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
+</style>
