@@ -3824,3 +3824,102 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
   }
 }
 </style>
+
+
+<style id="mystore-android-document-scroll-final">
+/* Android WebView: use the document as the single vertical scroll surface.
+   Avoid nested fixed-height scroll containers that can trap touch gestures. */
+@media screen and (max-width:850px){
+  html{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  body{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:visible!important;
+    position:relative!important;
+    touch-action:pan-y!important;
+  }
+  .topbar,.nav{
+    position:relative!important;
+    flex:none!important;
+  }
+  main{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    flex:none!important;
+    overflow:visible!important;
+    padding:10px 10px calc(110px + env(safe-area-inset-bottom,0px))!important;
+    touch-action:pan-y!important;
+  }
+  main>section:not(.hidden){
+    display:block!important;
+    position:relative!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    flex:none!important;
+    touch-action:pan-y!important;
+  }
+  #dashboardPage,#sessionsPage,#cashierPage,#barangPage,#ordersPage,#reportsPage,
+  #settingsPage,#usersPage,#purchasesPage,#stockPage{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  #dashboardPage.dashboard-page{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    padding-bottom:24px!important;
+  }
+  #dashboardPage>*{
+    flex-shrink:0!important;
+    max-height:none!important;
+  }
+  #cashierPage .cashier-layout{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    grid-template-rows:auto auto!important;
+  }
+  #cashierPage .cashier-layout>aside.panel,
+  #cashierPage .cashier-layout>.panel:first-child{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  #cashierPage .cashier-layout>aside .cart-list{
+    flex:none!important;
+    min-height:100px!important;
+    max-height:260px!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .app-launcher-backdrop,.app-launcher-panel{
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .table-wrap,.table-responsive,.report-table-wrap{
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
+</style>
