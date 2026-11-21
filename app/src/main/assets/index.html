@@ -4062,3 +4062,71 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
   #dashboardPage .dash-card{padding:14px}
 }
 </style>
+
+
+<style id="mystore-android-dashboard-final-fix">
+/* Final phone polish: fit more navigation and reduce dashboard height without hiding data */
+@media screen and (max-width:600px){
+  .pos-internal-nav{
+    gap:9px!important;
+    padding:0 9px!important;
+    min-height:40px!important;
+    height:40px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .pos-internal-nav::-webkit-scrollbar{display:none!important}
+  .pos-internal-nav .pos-app-name{font-size:11px!important;margin-right:0!important}
+  .pos-internal-nav button{font-size:10px!important;padding:9px 1px!important;flex:0 0 auto!important}
+  #dashboardPage.dashboard-page{gap:7px!important;padding-bottom:10px!important}
+  #dashboardPage .dash-welcome{gap:5px!important}
+  #dashboardPage .dash-welcome h1{font-size:20px!important}
+  #dashboardPage .dash-welcome .sub{font-size:11px!important}
+  #dashboardPage .dash-date{font-size:10px!important}
+  #dashboardPage .dash-actions{gap:6px!important}
+  #dashboardPage .dash-actions .btn{height:35px!important;min-height:35px!important;font-size:11px!important}
+  #dashboardPage>.dash-kpis{gap:6px!important}
+  #dashboardPage .dash-kpis>.dash-card{
+    min-height:72px!important;
+    padding:7px!important;
+    grid-template-columns:30px minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto!important;
+    column-gap:7px!important;
+    row-gap:1px!important;
+  }
+  #dashboardPage .dash-kpi-top{display:contents!important}
+  #dashboardPage .dash-kpi-top>span:first-child{
+    grid-column:2!important;grid-row:1!important;
+    font-size:9px!important;line-height:1.15!important;
+  }
+  #dashboardPage .dash-kpi-top .dash-icon{
+    grid-column:1!important;grid-row:1 / span 3!important;
+    width:28px!important;height:28px!important;font-size:12px!important;
+  }
+  #dashboardPage .dash-value{grid-column:2!important;grid-row:2!important;font-size:16px!important;margin:0!important}
+  #dashboardPage .dash-foot{grid-column:2!important;grid-row:3!important;font-size:8px!important;line-height:1.1!important}
+  #dashboardPage .dash-main-grid,#dashboardPage .dash-bottom-grid{gap:7px!important}
+  #dashboardPage .dash-main-grid>.dash-card,#dashboardPage .dash-bottom-grid>.dash-card{padding:9px!important}
+  #dashboardPage .dash-section-head{margin-bottom:5px!important}
+  #dashboardPage .dash-section-head h2{font-size:13px!important}
+  #dashboardPage .dash-section-head span{font-size:9px!important}
+  #dashboardPage .dash-chart{height:58px!important;min-height:58px!important;max-height:58px!important;padding:3px 1px 0!important}
+  #dashboardPage .dash-quick-grid{gap:5px!important}
+  #dashboardPage .dash-quick{min-height:56px!important;padding:5px 2px!important;gap:3px!important}
+  #dashboardPage .dash-quick .dash-icon{width:24px!important;height:24px!important;font-size:11px!important}
+  #dashboardPage .dash-quick b{font-size:8px!important}
+  #dashboardPage .dash-stock-row{padding:6px 0!important;font-size:10px!important}
+  #dashboardPage .dash-stock-row small{font-size:9px!important}
+  #dashboardPage .dash-stock-qty{font-size:10px!important}
+  #dashboardPage .dash-table{font-size:9px!important}
+  #dashboardPage .dash-table th,#dashboardPage .dash-table td{padding:5px 3px!important}
+}
+@media screen and (max-width:380px){
+  .pos-internal-nav{gap:7px!important;padding:0 7px!important}
+  .pos-internal-nav button{font-size:9px!important}
+  #dashboardPage .dash-kpis>.dash-card{min-height:68px!important;padding:6px!important}
+  #dashboardPage .dash-value{font-size:15px!important}
+}
+</style>
