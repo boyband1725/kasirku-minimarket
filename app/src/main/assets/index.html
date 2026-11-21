@@ -3134,6 +3134,54 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
 </script>
 
 
+
+<style id="mystore-android-scroll-final-override">
+@media (max-width:700px){
+  html,body{
+    width:100%!important;height:100%!important;min-height:0!important;
+    overflow:hidden!important;
+  }
+  body{
+    display:flex!important;flex-direction:column!important;
+    height:100dvh!important;min-height:0!important;
+    overflow:hidden!important;
+  }
+  .topbar,.nav{
+    flex:0 0 auto!important;
+    position:relative!important;
+  }
+  main{
+    display:block!important;
+    flex:1 1 0!important;
+    width:100%!important;height:0!important;min-height:0!important;
+    overflow-x:hidden!important;overflow-y:scroll!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior-y:contain!important;
+    touch-action:pan-y!important;
+    padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important;
+  }
+  main>section:not(.hidden){
+    display:flex!important;flex-direction:column!important;
+    width:100%!important;min-width:0!important;
+    min-height:0!important;height:auto!important;max-height:none!important;
+    flex:0 0 auto!important;
+    overflow:visible!important;
+    padding-bottom:24px!important;
+  }
+  #dashboardPage{
+    display:flex!important;flex-direction:column!important;
+    justify-content:flex-start!important;align-items:stretch!important;
+    width:100%!important;min-height:0!important;height:auto!important;
+    max-height:none!important;overflow:visible!important;
+    padding-bottom:24px!important;
+  }
+  #dashboardPage>*{flex:0 0 auto!important;min-height:0!important}
+  #dashboardPage .dash-kpis,
+  #dashboardPage .dash-main-grid,
+  #dashboardPage .dash-bottom-grid{flex:0 0 auto!important}
+}
+</style>
+
 </body>
 </html><style>
 /* Compact app launcher on phones */
