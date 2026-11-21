@@ -3982,3 +3982,83 @@ try{initializeMYstoreAccounting();}catch(e){console.warn('Inisialisasi COA MYsto
   #dashboardPage .dash-table th,#dashboardPage .dash-table td{padding:5px 4px!important}
 }
 </style>
+
+
+<style id="mystore-dashboard-mobile-polish-v3">
+/* MYstore dashboard: balanced, readable layout for Android phones */
+@media screen and (max-width:850px){
+  .topbar{height:52px!important;min-height:52px!important;padding:0 12px!important}
+  .brand-logo{height:40px!important;width:168px!important;max-width:168px!important}
+  .brand-logo img{height:35px!important}
+  .pos-internal-nav{height:42px!important;min-height:42px!important;gap:14px!important;padding:0 11px!important}
+  .pos-internal-nav button{font-size:11px!important;padding:10px 1px!important}
+  main{padding:10px 12px calc(82px + env(safe-area-inset-bottom,0px))!important}
+  #dashboardPage.dashboard-page{
+    display:flex!important;flex-direction:column!important;gap:10px!important;
+    width:100%!important;padding:0 0 16px!important;margin:0!important;
+    overflow:visible!important;min-width:0!important
+  }
+  #dashboardPage .dash-welcome{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    gap:8px!important;margin:0!important;padding:0!important
+  }
+  #dashboardPage .dash-welcome h1{font-size:22px!important;line-height:1.2!important;margin:0 0 3px!important}
+  #dashboardPage .dash-welcome .sub{font-size:12px!important;line-height:1.35!important}
+  #dashboardPage .dash-date{font-size:11px!important;margin-top:3px!important}
+  #dashboardPage .dash-actions{display:grid!important;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;gap:8px!important;width:100%!important;margin:0!important}
+  #dashboardPage .dash-actions .btn{width:100%!important;min-width:0!important;height:38px!important;min-height:38px!important;padding:7px 6px!important;font-size:12px!important;border-radius:9px!important;white-space:nowrap!important}
+  #dashboardPage .dash-kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:0!important}
+  #dashboardPage .dash-kpis>.dash-card{
+    display:flex!important;flex-direction:column!important;justify-content:space-between!important;
+    min-width:0!important;min-height:94px!important;padding:10px!important;
+    border-radius:11px!important;gap:4px!important
+  }
+  #dashboardPage .dash-kpi-top{font-size:10px!important;line-height:1.25!important;gap:5px!important}
+  #dashboardPage .dash-kpi-top>span:first-child{font-size:10px!important}
+  #dashboardPage .dash-kpi-top .dash-icon{width:28px!important;height:28px!important;min-width:28px!important;font-size:13px!important;border-radius:8px!important}
+  #dashboardPage .dash-value{font-size:19px!important;line-height:1.15!important;margin:2px 0!important;letter-spacing:-.3px!important}
+  #dashboardPage .dash-foot{font-size:9px!important;line-height:1.25!important}
+  #dashboardPage .dash-main-grid,#dashboardPage .dash-bottom-grid{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;margin:0!important
+  }
+  #dashboardPage .dash-card{min-width:0!important;padding:11px!important;border-radius:11px!important}
+  #dashboardPage .dash-main-grid>.dash-card,#dashboardPage .dash-bottom-grid>.dash-card{padding:11px!important}
+  #dashboardPage .dash-section-head{display:flex!important;align-items:center!important;gap:8px!important;margin:0 0 8px!important}
+  #dashboardPage .dash-section-head h2{font-size:14px!important;line-height:1.25!important}
+  #dashboardPage .dash-section-head span{font-size:10px!important;white-space:nowrap!important}
+  #dashboardPage .dash-chart{
+    height:86px!important;min-height:86px!important;max-height:86px!important;
+    padding:5px 2px 0!important;gap:6px!important
+  }
+  #dashboardPage .dash-bar-col{gap:3px!important}
+  #dashboardPage .dash-bar{width:min(100%,22px)!important;min-height:2px!important}
+  #dashboardPage .dash-bar-label{font-size:8px!important}
+  #dashboardPage .dash-bar-value{font-size:8px!important}
+  #dashboardPage .dash-quick-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  #dashboardPage .dash-quick{
+    display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;
+    text-align:center!important;gap:5px!important;min-width:0!important;min-height:68px!important;height:auto!important;
+    padding:7px 3px!important;border-radius:9px!important
+  }
+  #dashboardPage .dash-quick .dash-icon{width:29px!important;height:29px!important;min-width:29px!important;font-size:13px!important;border-radius:8px!important}
+  #dashboardPage .dash-quick b{display:block!important;font-size:9px!important;line-height:1.2!important;overflow-wrap:anywhere!important}
+  #dashboardPage .dash-quick small{display:none!important}
+  #dashboardPage .dash-table{font-size:10px!important;min-width:0!important;width:100%!important}
+  #dashboardPage .dash-table th,#dashboardPage .dash-table td{padding:7px 4px!important;white-space:nowrap!important}
+  #dashboardPage .dash-stock-row{gap:8px!important;padding:9px 0!important;font-size:11px!important;line-height:1.3!important}
+  #dashboardPage .dash-stock-row small{font-size:10px!important}
+  #dashboardPage .dash-stock-qty{font-size:11px!important;white-space:nowrap!important}
+}
+@media screen and (max-width:380px){
+  main{padding-left:9px!important;padding-right:9px!important}
+  #dashboardPage .dash-kpis{gap:6px!important}
+  #dashboardPage .dash-kpis>.dash-card{padding:8px!important;min-height:88px!important}
+  #dashboardPage .dash-quick-grid{gap:5px!important}
+  #dashboardPage .dash-quick{min-height:64px!important}
+  #dashboardPage .dash-quick b{font-size:8px!important}
+}
+@media screen and (min-width:851px){
+  #dashboardPage.dashboard-page{gap:14px}
+  #dashboardPage .dash-card{padding:14px}
+}
+</style>
